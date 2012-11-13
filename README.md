@@ -29,4 +29,4 @@ http://opensource.org/licenses/MIT
 
 [1]: https://github.com/sephiroth74/HorizontalVariableListView/blob/master/Demo/src/it/sephiroth/android/sample/horizontalvariablelistviewdemo/MainActivity.java        "MainActivity"
 
-[2]: http://www.sephiroth.it	"sephiroth.it"
+[2]: http://www.sephiroth.it
