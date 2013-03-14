@@ -82,18 +82,12 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 		 * Implementers can call getItemAtPosition(position) if they need to
 		 * access the data associated with the selected item.
 		 * 
-		 * @param parent
-		 *            The AdapterView where the click happened.
-		 * @param view
-		 *            The view within the AdapterView that was clicked (this
+		 * @param parent The AdapterView where the click happened.
+		 * @param view The view within the AdapterView that was clicked (this
 		 *            will be a view provided by the adapter)
-		 * @param position
-		 *            The position of the view in the adapter.
-		 * @param id
-		 *            The row id of the item that was clicked.
-		 * @return if the implementation return false, then the selection will
-		 *         not
-		 *         be updated
+		 * @param position The position of the view in the adapter.
+		 * @param id The row id of the item that was clicked.
+		 * @return if the implementation return false, then the selection will not be updated
 		 */
 		boolean onItemClick( AdapterView<?> parent, View view, int position, long id );
 	}
@@ -454,6 +448,10 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 		mOnItemSelected = listener;
 	}
 
+	/**
+	 * Toggle the item clicked listener. See the {@link OnItemClickedListener} interface
+	 * @param listener
+	 */
 	public void setOnItemClickedListener( OnItemClickedListener listener ) {
 		mOnItemClicked = listener;
 	}
