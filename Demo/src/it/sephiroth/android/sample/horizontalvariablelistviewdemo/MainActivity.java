@@ -1,20 +1,16 @@
 package it.sephiroth.android.sample.horizontalvariablelistviewdemo;
 
-import it.sephiroth.android.library.widget.HorizontalVariableListView;
-import it.sephiroth.android.library.widget.HorizontalVariableListView.OnLayoutChangeListener;
-import java.util.ArrayList;
-import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
+import android.view.*;
+import android.widget.*;
+import it.sephiroth.android.library.widget.HorizontalVariableListView;
+import it.sephiroth.android.library.widget.HorizontalVariableListView.OnLayoutChangeListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends Activity {
 
@@ -32,10 +28,18 @@ public class MainActivity extends Activity {
 			data.add( String.valueOf( i ) );
 		}
 
-		ListAdapter adapter = new ListAdapter( this, R.layout.view1, R.layout.divider, data );
+		ListAdapter adapter = new ListAdapter( this, R.layout.list_item, R.layout.divider, data );
 		mList.setOverScrollMode( View.OVER_SCROLL_ALWAYS );
 		mList.setEdgeGravityY( Gravity.BOTTOM );
 		mList.setAdapter( adapter );
+        mList.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+        mList.setItemChecked(3, true);
+        mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(MainActivity.this, "Clicked on # "+String.valueOf(position), Toast.LENGTH_SHORT).show();
+            }
+        });
 
 	}
 
