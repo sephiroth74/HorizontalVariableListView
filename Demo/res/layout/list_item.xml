@@ -15,7 +15,6 @@ s    <ImageView
         android:layout_height="wrap_content"
         android:layout_above="@+id/text"
         android:layout_centerHorizontal="true"
-        android:clickable="true"
         android:src="@drawable/image"
         android:scaleType="centerInside" />
 

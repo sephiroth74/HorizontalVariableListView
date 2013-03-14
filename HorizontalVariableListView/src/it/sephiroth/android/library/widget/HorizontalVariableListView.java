@@ -320,8 +320,16 @@ public class HorizontalVariableListView extends AdapterView<ListAdapter> impleme
 	public void setOnItemClickListener( AdapterView.OnItemClickListener listener ) {
 		mOnItemClicked = listener;
 	}
+    /**
+    * WARNING: not yet implemented, sorry.
+    */
+    @Deprecated
+    @Override
+    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+        super.setOnItemLongClickListener(listener);
+    }
 
-	private DataSetObserverExtended mDataObserverExtended = new DataSetObserverExtended() {
+    private DataSetObserverExtended mDataObserverExtended = new DataSetObserverExtended() {
 
 		@Override
 		public void onAdded() {
@@ -811,6 +819,36 @@ public class HorizontalVariableListView extends AdapterView<ListAdapter> impleme
 		return true;
 	}
 
+    private boolean onItemClick( MotionEvent ev ) {
+        if ( !mFlingRunnable.isFinished() || mWasFlinging ) return false;
+
+        Rect viewRect = new Rect();
+
+        for ( int i = 0; i < getChildCount(); i++ ) {
+            View child = getChildAt( i );
+            int left = child.getLeft();
+            int right = child.getRight();
+            int top = child.getTop();
+            int bottom = child.getBottom();
+            viewRect.set( left, top, right, bottom );
+            viewRect.offset( -mCurrentX, 0 );
+
+            if ( viewRect.contains( (int) ev.getX(), (int) ev.getY() ) ) {
+                if ( mOnItemClicked != null ) {
+                    playSoundEffect( SoundEffectConstants.CLICK );
+                    mOnItemClicked.onItemClick( HorizontalVariableListView.this, child, mLeftViewIndex + 1 + i, mAdapter.getItemId( mLeftViewIndex + 1 + i ) );
+                    performItemClick(child, mLeftViewIndex + 1 + i, mAdapter.getItemId(mLeftViewIndex + 1 + i));
+                }
+                if ( mOnItemSelected != null ) {
+                    mOnItemSelected.onItemSelected( HorizontalVariableListView.this, child, mLeftViewIndex + 1 + i, mAdapter.getItemId( mLeftViewIndex + 1 + i ) );
+                    performItemClick(child, mLeftViewIndex + 1 + i, mAdapter.getItemId(mLeftViewIndex + 1 + i));
+                }
+                break;
+            }
+        }
+        return true;
+    }
+
 	@Override
 	public void onLongPress( MotionEvent e ) {
 		if ( mWasFlinging ) return;
@@ -986,7 +1024,12 @@ public class HorizontalVariableListView extends AdapterView<ListAdapter> impleme
 		if ( mIsDragging ) return false;
 
 		final int action = ev.getAction();
-		mGesture.onTouchEvent( ev );
+
+        /*
+        * We better get rid of gesture detector, it doesn't work properly for layouts/views without clickable property
+        * e.g. see AbsListView's mPendingCheckForLongPress usage in long press logic, must be implemented this way
+        */
+        // mGesture.onTouchEvent( ev );
 
 		/*
 		 * Shortcut the most recurring case: the user is in the dragging state and he is moving his finger. We want to intercept this
@@ -1226,7 +1269,11 @@ public class HorizontalVariableListView extends AdapterView<ListAdapter> impleme
 					if ( mFlingRunnable.isFinished() ) {
 						scrollIntoSlots();
 					}
-				}
+				} else {
+                    // assume it's a click
+                    onItemClick(ev);
+                }
+
 				break;
 			}
 
@@ -1477,74 +1524,22 @@ public class HorizontalVariableListView extends AdapterView<ListAdapter> impleme
 	private OnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
 		@Override
-		public boolean onDoubleTap( MotionEvent e ) {
-			return false;
-		};
-
-		@Override
-		public boolean onSingleTapUp( MotionEvent e ) {
-			return onItemClick( e );
-		};
-
-		@Override
-		public boolean onDown( MotionEvent e ) {
-			return false;
-			// return HorizontalFixedListView.this.onDown( e );
-		};
-
-		@Override
 		public boolean onFling( MotionEvent e1, MotionEvent e2, float velocityX, float velocityY ) {
 			return false;
 			// return HorizontalFixedListView.this.onFling( e1, e2, velocityX, velocityY );
-		};
-
-		@Override
-		public void onLongPress( MotionEvent e ) {
-			HorizontalVariableListView.this.onLongPress( e );
-		};
+		}
 
 		@Override
 		public boolean onScroll( MotionEvent e1, MotionEvent e2, float distanceX, float distanceY ) {
 			return false;
 			// return HorizontalFixedListView.this.onScroll( e1, e2, distanceX, distanceY );
-		};
-
-		@Override
-		public void onShowPress( MotionEvent e ) {};
-
-		@Override
-		public boolean onSingleTapConfirmed( MotionEvent e ) {
-			return true;
 		}
 
-		private boolean onItemClick( MotionEvent ev ) {
-			if ( !mFlingRunnable.isFinished() || mWasFlinging ) return false;
+        @Override
+        public void onLongPress( MotionEvent e ) {
+            HorizontalVariableListView.this.onLongPress( e );
+        }
 
-			Rect viewRect = new Rect();
-
-			for ( int i = 0; i < getChildCount(); i++ ) {
-				View child = getChildAt( i );
-				int left = child.getLeft();
-				int right = child.getRight();
-				int top = child.getTop();
-				int bottom = child.getBottom();
-				viewRect.set( left, top, right, bottom );
-				viewRect.offset( -mCurrentX, 0 );
-
-				if ( viewRect.contains( (int) ev.getX(), (int) ev.getY() ) ) {
-					if ( mOnItemClicked != null ) {
-						playSoundEffect( SoundEffectConstants.CLICK );
-						mOnItemClicked.onItemClick( HorizontalVariableListView.this, child, mLeftViewIndex + 1 + i, mAdapter.getItemId( mLeftViewIndex + 1 + i ) );
-                        performItemClick(child, mLeftViewIndex + 1 + i, mAdapter.getItemId(mLeftViewIndex + 1 + i));
-                    }
-					if ( mOnItemSelected != null ) {
-						mOnItemSelected.onItemSelected( HorizontalVariableListView.this, child, mLeftViewIndex + 1 + i, mAdapter.getItemId( mLeftViewIndex + 1 + i ) );
-					}
-					break;
-				}
-			}
-			return true;
-		}
 	};
 
 	public View getChild( MotionEvent e ) {
