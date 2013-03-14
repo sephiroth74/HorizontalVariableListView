@@ -393,9 +393,6 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	}
 
 	public void setSelectedPosition( int position, boolean fireEvent ) {
-
-		Log.i( LOG_TAG, "setSelectedPosition: " + position );
-
 		if ( position == INVALID_POSITION ) {
 			setSelectedItem( null, INVALID_POSITION, false, fireEvent );
 		} else {
@@ -663,8 +660,6 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 		if ( mAdapter == null ) {
 			return;
 		}
-
-		Log.i( LOG_TAG, "onLayout. changed: " + changed + ", datachanged: " + mDataChanged + ", forceLayout: " + mForceLayout );
 
 		if ( !changed && !mDataChanged ) {
 			layoutChildren();
@@ -1697,11 +1692,11 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	}
 
 	protected void setSelectedItem( final View newView, final int position, boolean selected, boolean fireEvent ) {
-
+		
 		if ( mChoiceMode == SelectionMode.Single ) {
 			if ( mSelectedPositions.size() > 0 ) {
 				int pos = mSelectedPositions.keyAt( 0 );
-				View child = getChildAt( pos );
+				View child = getItemAt( pos );
 				if ( null != child ) {
 					child.setSelected( false );
 				}
@@ -1730,7 +1725,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	}
 
 	public boolean getIsSelected( int position ) {
-		return mSelectedPositions.get( position );
+		return mSelectedPositions.get( position, false );
 	}
 
 	/** The m gesture listener. */

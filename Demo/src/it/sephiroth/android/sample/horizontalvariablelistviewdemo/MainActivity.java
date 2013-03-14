@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
 		ListAdapter adapter = new ListAdapter( this, R.layout.view1, R.layout.divider, data );
 
 		// change the selection mode: single or multiple
-		mList.setSelectionMode( SelectionMode.Multiple );
+		mList.setSelectionMode( SelectionMode.Single );
 
 		mList.setOverScrollMode( HorizontalVariableListView.OVER_SCROLL_ALWAYS );
 		mList.setEdgeGravityY( Gravity.CENTER );
