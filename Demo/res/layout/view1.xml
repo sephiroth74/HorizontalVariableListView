@@ -6,24 +6,25 @@
     android:clickable="false"
     android:focusable="true"
     android:gravity="center_horizontal|bottom"
-    android:padding="10dip"
-    android:orientation="vertical" >
+    android:background="@drawable/image_background_selector"
+    android:orientation="vertical"
+    android:padding="10dip" >
 
     <ImageView
         android:id="@+id/image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/text"
         android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
         android:clickable="true"
-        android:src="@drawable/image"
-        android:scaleType="centerInside" />
+        android:scaleType="centerInside"
+        android:src="@drawable/image" />
 
     <TextView
         android:id="@+id/text"
+        android:layout_below="@+id/image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:clickable="true"
         android:text="@android:string/ok" />

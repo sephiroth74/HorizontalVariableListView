@@ -4,18 +4,20 @@
     android:layout_height="match_parent" >
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_marginTop="20dp"
+        android:id="@+id/text"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/hello_world"
+        android:text=""
+        android:gravity="center"
         tools:context=".MainActivity" />
 
     <it.sephiroth.android.library.widget.HorizontalVariableListView
         android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_height="150dp"
+        android:layout_below="@+id/text"
         android:gravity="bottom|center_vertical"
         android:paddingBottom="0dp"
         android:paddingTop="0dp" />

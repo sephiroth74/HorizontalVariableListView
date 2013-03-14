@@ -1,7 +1,9 @@
 package it.sephiroth.android.sample.horizontalvariablelistviewdemo;
 
+import it.sephiroth.android.library.widget.HorizontalListView.OnLayoutChangeListener;
 import it.sephiroth.android.library.widget.HorizontalVariableListView;
-import it.sephiroth.android.library.widget.HorizontalVariableListView.OnLayoutChangeListener;
+import it.sephiroth.android.library.widget.HorizontalVariableListView.OnItemClickedListener;
+import it.sephiroth.android.library.widget.HorizontalVariableListView.SelectionMode;
 import java.util.ArrayList;
 import java.util.List;
 import android.app.Activity;
@@ -13,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
@@ -21,6 +25,7 @@ public class MainActivity extends Activity {
 	private static final String LOG_TAG = "main-activity";
 
 	HorizontalVariableListView mList;
+	TextView mText;
 
 	@Override
 	public void onCreate( Bundle savedInstanceState ) {
@@ -28,14 +33,21 @@ public class MainActivity extends Activity {
 		setContentView( R.layout.activity_main );
 
 		List<String> data = new ArrayList<String>();
-		for ( int i = 0; i < 20; i++ ) {
+		for ( int i = 0; i < 40; i++ ) {
 			data.add( String.valueOf( i ) );
 		}
 
 		ListAdapter adapter = new ListAdapter( this, R.layout.view1, R.layout.divider, data );
-		mList.setOverScrollMode( View.OVER_SCROLL_ALWAYS );
-		mList.setEdgeGravityY( Gravity.BOTTOM );
+
+		// change the selection mode: single or multiple
+		mList.setSelectionMode( SelectionMode.Multiple );
+
+		mList.setOverScrollMode( HorizontalVariableListView.OVER_SCROLL_ALWAYS );
+		mList.setEdgeGravityY( Gravity.CENTER );
 		mList.setAdapter( adapter );
+		
+		// children gravity ( top, center, bottom )
+		mList.setGravity( Gravity.CENTER );
 
 	}
 
@@ -43,6 +55,8 @@ public class MainActivity extends Activity {
 	public void onContentChanged() {
 		super.onContentChanged();
 		mList = (HorizontalVariableListView) findViewById( R.id.list );
+		mText = (TextView) findViewById( R.id.text );
+
 		mList.setOnLayoutChangeListener( new OnLayoutChangeListener() {
 
 			@Override
@@ -52,6 +66,33 @@ public class MainActivity extends Activity {
 					mList.setEdgeHeight( bottom - top );
 				}
 			}
+		} );
+
+		mList.setOnItemClickedListener( new OnItemClickedListener() {
+
+			@Override
+			public boolean onItemClick( AdapterView<?> parent, View view, int position, long id ) {
+				Log.i( LOG_TAG, "onItemClick: " + position );
+
+				// item has been clicked, return true if you want the
+				// HorizontalVariableList to handle the event
+				// false otherwise
+				return true;
+			}
+		} );
+
+		mList.setOnItemSelectedListener( new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected( AdapterView<?> parent, View view, int position, long id ) {
+				mText.setText( "item selected: " + position + ", selected items: " + mList.getSelectedPositions().length );
+			}
+
+			@Override
+			public void onNothingSelected( android.widget.AdapterView<?> parent ) {
+				mText.setText( "nothing selected" );
+			};
+
 		} );
 	}
 
@@ -74,8 +115,10 @@ public class MainActivity extends Activity {
 
 		@Override
 		public int getItemViewType( int position ) {
-			if ( position % 4 == 1 ) {
-				return 1;
+			if( getViewTypeCount() > 1 ) {
+				if ( position % 4 == 1 ) {
+					return 1;
+				}
 			}
 			return 0;
 		}
@@ -94,14 +137,14 @@ public class MainActivity extends Activity {
 			if ( convertView == null ) {
 				view = LayoutInflater.from( getContext() ).inflate( type == 0 ? resId1 : resId2, parent, false );
 				view.setLayoutParams( new HorizontalVariableListView.LayoutParams(
-						HorizontalVariableListView.LayoutParams.WRAP_CONTENT, 200 ) );
+						HorizontalVariableListView.LayoutParams.WRAP_CONTENT, HorizontalVariableListView.LayoutParams.WRAP_CONTENT ) );
 			} else {
 				view = convertView;
 			}
 
 			if ( type == 0 ) {
 				TextView text = (TextView) view.findViewById( R.id.text );
-				text.setText( String.valueOf( position ) );
+				text.setText( "Image " + String.valueOf( position ) );
 			}
 
 			return view;
