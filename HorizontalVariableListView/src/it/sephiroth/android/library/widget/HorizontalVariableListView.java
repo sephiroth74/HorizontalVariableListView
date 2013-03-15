@@ -49,29 +49,6 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 		Single, Multiple
 	};
 	
-	/**
-	 * Interface definition for a callback to be invoked when an item in this view has been clicked and held.
-	 */
-	public interface OnItemDragListener {
-
-		/**
-		 * Callback method to be invoked when an item in this view has been dragged outside the vertical tolerance area.
-		 * 
-		 * Implementers can call getItemAtPosition(position) if they need to access the data associated with the selected item.
-		 * 
-		 * @param parent
-		 *           The AbsListView where the click happened
-		 * @param view
-		 *           The view within the AbsListView that was clicked
-		 * @param position
-		 *           The position of the view in the list
-		 * @param id
-		 *           The row id of the item that was clicked
-		 * 
-		 * @return true if the callback consumed the long click, false otherwise
-		 */
-		boolean onItemStartDrag( AdapterView<?> parent, View view, int position, long id );
-	}	
 
 	public interface OnItemClickedListener {
 
@@ -90,16 +67,6 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 		 * @return if the implementation return false, then the selection will not be updated
 		 */
 		boolean onItemClick( AdapterView<?> parent, View view, int position, long id );
-	}
-
-	public interface OnScrollFinishedListener {
-		/**
-		 * Callback method to be invoked when the scroll has completed.
-		 * 
-		 * @param currentX
-		 *            The current scroll position of the view
-		 */
-		void onScrollFinished( int currentX );
 	}
 
 	public static final int OVER_SCROLL_ALWAYS = 0;
@@ -229,13 +196,10 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 			mFlingRunnable = new Fling8Runnable( this, mAnimationDuration );
 		}
 
-		mSelectedPositions.clear();
-
 		mLeftViewIndex = -1;
 		mRightViewIndex = 0;
 		mMaxX = Integer.MAX_VALUE;
 		mMinX = 0;
-		mChildHeight = 0;
 		mRightEdge = 0;
 		mLeftEdge = 0;
 		mGesture = new GestureDetector( getContext(), mGestureListener );
@@ -393,6 +357,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	}
 
 	public void setSelectedPosition( int position, boolean fireEvent ) {
+
 		if ( position == INVALID_POSITION ) {
 			setSelectedItem( null, INVALID_POSITION, false, fireEvent );
 		} else {
@@ -402,6 +367,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	}
 
 	public void setSelectedPositions( int[] positions, boolean fireEvent ) {
+		
 		if ( mChoiceMode == SelectionMode.Multiple ) {
 
 			View child;
@@ -656,7 +622,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	@Override
 	protected void onLayout( boolean changed, int left, int top, int right, int bottom ) {
 		super.onLayout( changed, left, top, right, bottom );
-
+		
 		if ( mAdapter == null ) {
 			return;
 		}
@@ -678,6 +644,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 		}
 
 		if ( mDataChanged ) {
+			mSelectedPositions.clear();
 			trackValue = mCurrentX;
 			mDataChanged = false;
 		}
@@ -867,9 +834,8 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 			}
 
 			if ( firstChild ) {
-				mChildHeight = child.getMeasuredHeight();
 				if ( mEdgesHeight == -1 ) {
-					mEdgesHeight = mChildHeight;
+					mEdgesHeight = childHeight;
 				}
 				mRightEdge = viewWidth;
 				mLeftEdge = ( realWidth - viewWidth );
@@ -1617,7 +1583,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	int mAnimationDuration = 400;
 
 	/** The m child height. */
-	int mMaxX, mMinX, mChildHeight;
+	int mMaxX, mMinX;
 
 	/** The m should stop fling. */
 	boolean mShouldStopFling;
