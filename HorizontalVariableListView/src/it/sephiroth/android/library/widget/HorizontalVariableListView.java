@@ -488,21 +488,40 @@ public class HorizontalVariableListView extends AdapterView<ListAdapter> impleme
 	 * 
 	 * @see android.view.View#onMeasure(int, int)
 	 */
-	@Override
-	protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
-		
-		int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
-		int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
-		
-		if( mChildHeight != 0 ) {
-			setMeasuredDimension( parentWidth, mChildHeight );
-		} else {
-			setMeasuredDimension( parentWidth, 0 );
-		}
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
+        int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
+        if (mChildHeight == 0) {
+            if (mAdapter != null && mAdapter.getCount() > 0) {
+                int viewType = mAdapter.getItemViewType(0);
+                View child = mAdapter.getView(0, mRecycleBin.get(viewType).poll(), this);
 
-		mHeightMeasureSpec = heightMeasureSpec;
-		mWidthMeasureSpec = widthMeasureSpec;
-	}
+                LayoutParams params = child.getLayoutParams();
+
+                if (params == null) {
+                    params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                }
+
+                int childHeightSpec = ViewGroup.getChildMeasureSpec(mHeightMeasureSpec, getPaddingTop() + getPaddingBottom(), params.height);
+                int childWidthSpec = ViewGroup.getChildMeasureSpec(mWidthMeasureSpec, getPaddingLeft() + getPaddingRight(), params.width);
+                child.measure(childWidthSpec, childHeightSpec);
+
+                mChildHeight = child.getMeasuredHeight();
+
+                setMeasuredDimension(parentWidth, mChildHeight);
+            }
+            else {
+                setMeasuredDimension(parentWidth, parentHeight);
+            }
+        }
+        else {
+            setMeasuredDimension(parentWidth, mChildHeight);
+        }
+
+        mHeightMeasureSpec = heightMeasureSpec;
+        mWidthMeasureSpec = widthMeasureSpec;
+    }
 
 	/**
 	 * Adds the and measure child.
