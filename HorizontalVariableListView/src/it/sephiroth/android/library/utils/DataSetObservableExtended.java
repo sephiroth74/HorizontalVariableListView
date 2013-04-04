@@ -20,10 +20,10 @@ public class DataSetObservableExtended extends Observable<DataSetObserverExtende
 	 * Invokes onChanged on each observer. Called when an item in the data set being observed has added, and which when read contains
 	 * the new state of the data.
 	 */
-	public void notifyAdded() {
+	public void notifyAdded( int position ) {
 		synchronized ( mObservers ) {
 			for ( DataSetObserverExtended observer : mObservers ) {
-				observer.onAdded();
+				observer.onAdded( position );
 			}
 		}
 	}
@@ -32,10 +32,10 @@ public class DataSetObservableExtended extends Observable<DataSetObserverExtende
 	 * Invokes onRemoved on each observer. Called when an item in the data set being observed has removed, and which when read
 	 * contains the new state of the data.
 	 */
-	public void notifyRemoved() {
+	public void notifyRemoved( int position, int viewType ) {
 		synchronized ( mObservers ) {
 			for ( DataSetObserverExtended observer : mObservers ) {
-				observer.onRemoved();
+				observer.onRemoved( position, viewType );
 			}
 		}
 	}

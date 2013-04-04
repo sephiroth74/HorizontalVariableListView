@@ -36,11 +36,11 @@ public abstract class BaseAdapterExtended extends BaseAdapter {
 		mDataSetObservableExtended.notifyInvalidated();
 	}
 
-	public void notifyDataSetAdded() {
-		mDataSetObservableExtended.notifyAdded();
+	public void notifyDataSetAdded( int position ) {
+		mDataSetObservableExtended.notifyAdded( position );
 	}
 
-	public void notifyDataSetRemoved() {
-		mDataSetObservableExtended.notifyRemoved();
+	public void notifyDataSetRemoved( int position, int viewType ) {
+		mDataSetObservableExtended.notifyRemoved( position, viewType );
 	}
 }

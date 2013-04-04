@@ -4,11 +4,7 @@ import android.database.DataSetObserver;
 
 public abstract class DataSetObserverExtended extends DataSetObserver {
 
-	public void onAdded() {
-		// Do Nothing
-	}
+	public void onAdded( int position ) {}
 
-	public void onRemoved() {
-		// Do Nothing
-	}
+	public void onRemoved( int position, int viewType ) {}
 }

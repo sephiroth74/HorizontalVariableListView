@@ -4,13 +4,13 @@
     android:layout_height="match_parent" >
 
     <TextView
-        android:layout_marginTop="20dp"
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text=""
+        android:layout_marginTop="20dp"
         android:gravity="center"
+        android:text=""
         tools:context=".MainActivity" />
 
     <it.sephiroth.android.library.widget.HorizontalVariableListView
@@ -21,5 +21,76 @@
         android:gravity="bottom|center_vertical"
         android:paddingBottom="0dp"
         android:paddingTop="0dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/button_add_before"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Add before"
+                android:textSize="10sp" />
+
+            <Button
+                android:id="@+id/button_add_in_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Add middle"
+                android:textSize="10sp" />
+
+            <Button
+                android:id="@+id/button_add_after"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Add after"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/button_delete_before"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Delete before"
+                android:textSize="10sp" />
+
+            <Button
+                android:id="@+id/button_delete_in_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Delete middle"
+                android:textSize="10sp" />
+
+            <Button
+                android:id="@+id/button_delete_after"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Delete after"
+                android:textSize="10sp" />
+        </LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>
