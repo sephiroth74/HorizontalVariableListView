@@ -200,8 +200,6 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	/** the current scroll X position */
 	private int mCurrentX = 0;
 
-	private int mOldX = 0;
-
 	/** the touch slop */
 	private int mTouchSlop;
 
@@ -383,7 +381,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	public void trackMotionScroll( int newX ) {
 
 		Log.i( LOG_TAG, "trackMotionScroll: " + newX + " (" + mMinX + " : " + mMaxX + " ) - " + "viewIndex (" + mLeftViewIndex
-				+ " : " + mRightViewIndex + ")" );
+				+ " : " + mRightViewIndex + "), total children: " + getChildCount() );
 
 		scrollTo( newX, 0 );
 		mCurrentX = getScrollX();
@@ -555,18 +553,21 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 
 		@Override
 		public void onAdded( int position ) {
+			Log.i( LOG_TAG, "onAdded: " + position );
 			mDataSetChange.add( position );
 			handleDataSetChanged( mDataSetChange );
 		};
 
 		@Override
 		public void onRemoved( int position, int viewType ) {
+			Log.i( LOG_TAG, "onRemoved: " + position );
 			mDataSetChange.remove( position, viewType );
 			handleDataSetChanged( mDataSetChange );
 		};
 
 		@Override
 		public void onChanged() {
+			Log.i( LOG_TAG, "onChanged" );
 			mDataSetChange.invalidate();
 			handleDataSetChanged( mDataSetChange );
 		};
@@ -732,25 +733,11 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 			// size changed, invalidate the edges!
 			invalidateEdges();
 
-			if ( changed ) {
-				
-				mForceLayout = true;
-				removeNonVisibleItems( mCurrentX, nullInt );
-				fillList( mCurrentX );
-				trackMotionScroll( Math.min( mMaxX, Math.max( mMinX, mCurrentX ) ) );
-				mForceLayout = false;
-				
-				//mCurrentX = mOldX = 0;
-				//initView();
-				//removeAllViewsInLayout();
-			} else if ( mForceLayout ) {
-				mOldX = mCurrentX;
-				initView();
-				removeAllViewsInLayout();
-			}
-
-			//trackMotionScroll( mOldX );
-			//mForceLayout = false;
+			mForceLayout = true;
+			removeNonVisibleItems( mCurrentX, nullInt );
+			fillList( mCurrentX );
+			trackMotionScroll( Math.min( mMaxX, Math.max( mMinX, mCurrentX ) ) );
+			mForceLayout = false;
 		}
 
 		postNotifyLayoutChange( changed, left, top, right, bottom );
@@ -959,6 +946,9 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	}
 
 	private void handleDataSetChanged( DataSetChange data ) {
+		
+		Log.i( LOG_TAG, "handleDataSetChanged" );
+		
 		if ( null == mAdapter ) return;
 
 		// update the adapter items count
@@ -977,7 +967,6 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 				+ mAdapterItemCount );
 
 		if ( data.invalidated() ) {
-
 			// whole dataset has been invalidated
 			data.clear();
 			reset();
