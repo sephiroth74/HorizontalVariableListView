@@ -6,10 +6,12 @@ import it.sephiroth.android.library.widget.HorizontalVariableListView;
 import it.sephiroth.android.library.widget.HorizontalVariableListView.OnItemClickedListener;
 import it.sephiroth.android.library.widget.HorizontalVariableListView.SelectionMode;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -18,6 +20,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.TextView;
@@ -26,7 +29,12 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private static final String LOG_TAG = "main-activity";
 
+	public static boolean USE_MULTIPLE_VIEWTYPES = false;
+	public static final int DIVIDER_WIDTH = 600;
+
 	int labelIndex = 0;
+	int textIndex = 0;
+
 	HorizontalVariableListView mList;
 	TextView mText;
 
@@ -36,14 +44,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		setContentView( R.layout.activity_main );
 
 		List<String> data = new ArrayList<String>();
-		String value;
 		for ( int i = 0; i < 20; i++ ) {
-			value = String.valueOf( labelIndex++ );
-			if( i > 0 && ( i%4 == 0 ) ) {
-				//value = null;
-				//labelIndex--;
-			}
-			data.add( value );
+			data.add( getNextValue() );
 		}
 
 		ListAdapter adapter = new ListAdapter( this, R.layout.view1, R.layout.divider, data );
@@ -54,10 +56,29 @@ public class MainActivity extends Activity implements OnClickListener {
 		mList.setOverScrollMode( HorizontalVariableListView.OVER_SCROLL_ALWAYS );
 		mList.setEdgeGravityY( Gravity.CENTER );
 		mList.setAdapter( adapter );
-		
+
 		// children gravity ( top, center, bottom )
 		mList.setGravity( Gravity.CENTER );
+	}
 
+	private String getNextValue() {
+		labelIndex++;
+		String value;
+		if ( USE_MULTIPLE_VIEWTYPES ) {
+			if ( labelIndex % 4 == 0 ) {
+				value = null;
+			} else {
+				value = String.valueOf( textIndex++ );
+			}
+		} else {
+			value = String.valueOf( textIndex++ );
+		}
+		return value;
+	}
+
+	@Override
+	public void onConfigurationChanged( Configuration newConfig ) {
+		super.onConfigurationChanged( newConfig );
 	}
 
 	@Override
@@ -103,16 +124,19 @@ public class MainActivity extends Activity implements OnClickListener {
 			};
 
 		} );
-		
+
 		// let's select the first item by default
 		mList.setSelectedPosition( 0, false );
-		
+
 		findViewById( R.id.button_add_before ).setOnClickListener( this );
 		findViewById( R.id.button_add_in_range ).setOnClickListener( this );
 		findViewById( R.id.button_add_after ).setOnClickListener( this );
 		findViewById( R.id.button_delete_before ).setOnClickListener( this );
 		findViewById( R.id.button_delete_in_range ).setOnClickListener( this );
 		findViewById( R.id.button_delete_after ).setOnClickListener( this );
+		findViewById( R.id.button_adds_before ).setOnClickListener( this );
+		findViewById( R.id.button_adds_in_range ).setOnClickListener( this );
+		findViewById( R.id.button_adds_after ).setOnClickListener( this );
 	}
 
 	@Override
@@ -123,6 +147,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	class ListAdapter extends BaseAdapterExtended {
 
+		Object mLock = new Object();
 		Context context;
 		List<String> objects;
 		int resId1;
@@ -137,8 +162,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		@Override
 		public int getItemViewType( int position ) {
-			
-			if( getViewTypeCount() > 1 ) {
+
+			if ( getViewTypeCount() > 1 ) {
 				return getItem( position ) == null ? 1 : 0;
 			}
 			return 0;
@@ -158,8 +183,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			if ( convertView == null ) {
 				view = LayoutInflater.from( context ).inflate( type == 0 ? resId1 : resId2, parent, false );
-				view.setLayoutParams( new HorizontalVariableListView.LayoutParams(
-						HorizontalVariableListView.LayoutParams.WRAP_CONTENT, HorizontalVariableListView.LayoutParams.WRAP_CONTENT ) );
+				LayoutParams params = new LayoutParams( type == 0 ? LayoutParams.WRAP_CONTENT : DIVIDER_WIDTH,
+						LayoutParams.WRAP_CONTENT );
+				view.setLayoutParams( params );
 			} else {
 				view = convertView;
 			}
@@ -172,7 +198,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			return view;
 		}
-		
+
 		@Override
 		public boolean hasStableIds() {
 			return false;
@@ -190,25 +216,70 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		@Override
 		public long getItemId( int position ) {
-			return this.objects.get( position ).hashCode();
+			if ( position >= 0 && position < getCount() ) {
+				String value = this.objects.get( position );
+				if ( null != value )
+					return value.hashCode();
+				else
+					return -1;
+			}
+			return -1;
 		}
 
+		/**
+		 * new item added
+		 * 
+		 * @param value
+		 */
 		public void add( String value ) {
-			Log.i( LOG_TAG, "add value: " + value );
-			this.objects.add( value );
-			this.notifyDataSetAdded( this.objects.size()-1 );
+			synchronized ( mLock ) {
+				Log.i( LOG_TAG, "add value: " + value );
+				this.objects.add( value );
+			}
+			this.notifyDataSetAdded( this.objects.size() - 1 );
 		}
 
+		public void addAll( Collection<String> values ) {
+			synchronized ( mLock ) {
+				this.objects.addAll( values );
+			}
+			this.notifyDataSetAdded( this.objects.size() - values.size() );
+		}
+
+		public void addAll( int position, Collection<String> values ) {
+			synchronized ( mLock ) {
+				this.objects.addAll( position, values );
+			}
+			this.notifyDataSetAdded( position );
+		}
+
+		/**
+		 * Item has been removed, we need to dispatch also the current item viewType because otherwise it is not more available from
+		 * the adapter
+		 * 
+		 * @param position
+		 */
 		public void remove( int position ) {
-			Log.i( LOG_TAG, "remove position: " + position );
-			int viewType = getItemViewType( position );
-			this.objects.remove( position );
+			int viewType;
+			synchronized ( mLock ) {
+				Log.i( LOG_TAG, "remove position: " + position );
+				viewType = getItemViewType( position );
+				this.objects.remove( position );
+			}
 			this.notifyDataSetRemoved( position, viewType );
 		}
 
+		/**
+		 * Item has been inserted
+		 * 
+		 * @param value
+		 * @param position
+		 */
 		public void insert( String value, int position ) {
-			Log.i( LOG_TAG, "insert value: " + value + " at position: " + position );
-			this.objects.add( position, value );
+			synchronized ( mLock ) {
+				Log.i( LOG_TAG, "insert value: " + value + " at position: " + position );
+				this.objects.add( position, value );
+			}
 			this.notifyDataSetAdded( position );
 		}
 
@@ -222,46 +293,76 @@ public class MainActivity extends Activity implements OnClickListener {
 		int count = adapter.getCount();
 		int next;
 		String value;
-		
+		List<String> collection;
+
 		int first = mList.getFirstVisiblePosition();
 		int last = mList.getLastVisiblePosition();
-		
-		switch( id ) {
+
+		switch ( id ) {
+		// add single
 			case R.id.button_add_before:
-				value = String.valueOf( labelIndex++ );
-				//value = null;
-				adapter.insert( value, first == 0 ? 0 : first - 1 );
+				if ( count > 0 )
+					adapter.insert( getNextValue(), first == 0 ? 0 : first - 1 );
+				else
+					adapter.add( getNextValue() );
 				break;
-				
+
 			case R.id.button_add_in_range:
-				value = String.valueOf( labelIndex++ );
-				//value = null;
-				adapter.insert( value, first + (last-first)/2 );
+				if ( count > 0 )
+					adapter.insert( getNextValue(), first + ( last - first ) / 2 );
+				else
+					adapter.add( getNextValue() );
 				break;
-				
+
 			case R.id.button_add_after:
-				value = String.valueOf( labelIndex++ );
-				//value = null;
-				adapter.add( value );
+				adapter.add( getNextValue() );
 				break;
-				
-				
+
+			// delete single
 			case R.id.button_delete_before:
-				if( count > 0 ) {
+				if ( count > 0 ) {
 					adapter.remove( first > 0 ? first - 1 : 0 );
 				}
 				break;
-				
+
 			case R.id.button_delete_in_range:
-				if( count > 0 ) {
-					adapter.remove( first + ( last-first)/2 );
+				if ( count > 0 ) {
+					adapter.remove( first + ( last - first ) / 2 );
 				}
 				break;
-				
+
 			case R.id.button_delete_after:
-				if( count > 0 ) {
+				if ( count > 0 ) {
 					adapter.remove( count - 1 );
 				}
+				break;
+
+			// add multiple
+			case R.id.button_adds_before:
+				collection = new ArrayList<String>();
+				for ( int i = 0; i < 3; i++ ) {
+					collection.add( getNextValue() );
+				}
+				if ( count > 0 )
+					adapter.addAll( first == 0 ? 0 : first - 1, collection );
+				else
+					adapter.addAll( collection );
+				break;
+
+			case R.id.button_adds_in_range:
+				collection = new ArrayList<String>();
+				for ( int i = 0; i < 3; i++ ) {
+					collection.add( getNextValue() );
+				}
+				adapter.addAll( first + ( last - first ) / 2, collection );
+				break;
+
+			case R.id.button_adds_after:
+				collection = new ArrayList<String>();
+				for ( int i = 0; i < 3; i++ ) {
+					collection.add( getNextValue() );
+				}
+				adapter.addAll( last + 1, collection );
 				break;
 		}
 	}

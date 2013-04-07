@@ -10,8 +10,8 @@ class Fling9Runnable extends IFlingRunnable {
 
 	private OverScroller mScroller;
 
-	public Fling9Runnable( FlingRunnableView parent, int animationDuration ) {
-		super( parent, animationDuration );
+	public Fling9Runnable( FlingRunnableView parent ) {
+		super( parent );
 		mScroller = new OverScroller( ( (View) parent ).getContext(), new DecelerateInterpolator( 1.0f ) );
 	}
 
@@ -37,8 +37,8 @@ class Fling9Runnable extends IFlingRunnable {
 	}
 
 	@Override
-	protected void _startUsingDistance( int initialX, int distance ) {
-		mScroller.startScroll( initialX, 0, distance, 0, mAnimationDuration );
+	protected void _startUsingDistance( int initialX, int distance, int duration ) {
+		mScroller.startScroll( initialX, 0, distance, 0, duration );
 	}
 
 	@Override

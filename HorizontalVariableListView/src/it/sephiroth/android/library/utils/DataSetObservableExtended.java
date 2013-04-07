@@ -5,8 +5,8 @@ import android.database.Observable;
 public class DataSetObservableExtended extends Observable<DataSetObserverExtended> {
 
 	/**
-	 * Invokes onChanged on each observer. Called when the data set being observed has changed, and which when read contains the new
-	 * state of the data.
+	 * Invokes onChanged on each observer. <br />
+	 * Called when the data set being observed has changed, and which when read contains the new state of the data.
 	 */
 	public void notifyChanged() {
 		synchronized ( mObservers ) {
@@ -17,8 +17,10 @@ public class DataSetObservableExtended extends Observable<DataSetObserverExtende
 	}
 
 	/**
-	 * Invokes onChanged on each observer. Called when an item in the data set being observed has added, and which when read contains
-	 * the new state of the data.
+	 * Invokes onChanged on each observer. <br />
+	 * Called when an item in the data set being observed has added, and which when read contains the new state of the data.
+	 * 
+	 * @param position position of the added item
 	 */
 	public void notifyAdded( int position ) {
 		synchronized ( mObservers ) {
@@ -29,8 +31,13 @@ public class DataSetObservableExtended extends Observable<DataSetObserverExtende
 	}
 
 	/**
-	 * Invokes onRemoved on each observer. Called when an item in the data set being observed has removed, and which when read
-	 * contains the new state of the data.
+	 * Invokes onRemoved on each observer. <br />
+	 * Called when an item in the data set being observed has removed, and which when read contains the new state of the data.
+	 * 
+	 * @param position
+	 *           the position of the removed item
+	 * @param viewType
+	 *           the viewType of the item removed
 	 */
 	public void notifyRemoved( int position, int viewType ) {
 		synchronized ( mObservers ) {
@@ -41,7 +48,8 @@ public class DataSetObservableExtended extends Observable<DataSetObserverExtende
 	}
 
 	/**
-	 * Invokes onInvalidated on each observer. Called when the data set being monitored has changed such that it is no longer valid.
+	 * Invokes onInvalidated on each observer.<br />
+	 * Called when the data set being monitored has changed such that it is no longer valid.
 	 */
 	public void notifyInvalidated() {
 		synchronized ( mObservers ) {

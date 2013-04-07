@@ -1,6 +1,5 @@
 package it.sephiroth.android.library.widget;
 
-
 abstract class IFlingRunnable implements Runnable {
 
 	public static interface FlingRunnableView {
@@ -21,13 +20,11 @@ abstract class IFlingRunnable implements Runnable {
 	protected int mLastFlingX;
 	protected boolean mShouldStopFling;
 	protected FlingRunnableView mParent;
-	protected int mAnimationDuration;
 
 	protected static final String LOG_TAG = "fling";
 
-	public IFlingRunnable( FlingRunnableView parent, int animationDuration ) {
+	public IFlingRunnable( FlingRunnableView parent ) {
 		mParent = parent;
-		mAnimationDuration = animationDuration;
 	}
 
 	public int getLastFlingX() {
@@ -43,11 +40,11 @@ abstract class IFlingRunnable implements Runnable {
 		endFling( scrollIntoSlots );
 	}
 
-	public void startUsingDistance( int initialX, int distance ) {
+	public void startUsingDistance( int initialX, int distance, int duration ) {
 		if ( distance == 0 ) return;
 		startCommon();
 		mLastFlingX = initialX;
-		_startUsingDistance( mLastFlingX, distance );
+		_startUsingDistance( mLastFlingX, distance, duration );
 		mParent.post( this );
 	}
 
@@ -97,7 +94,7 @@ abstract class IFlingRunnable implements Runnable {
 
 	protected abstract void _startUsingVelocity( int initialX, int velocity );
 
-	protected abstract void _startUsingDistance( int initialX, int distance );
+	protected abstract void _startUsingDistance( int initialX, int distance, int duration );
 
 	public abstract boolean isFinished();
 }
