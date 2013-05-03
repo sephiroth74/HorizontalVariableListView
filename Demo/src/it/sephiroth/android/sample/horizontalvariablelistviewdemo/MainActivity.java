@@ -29,8 +29,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private static final String LOG_TAG = "main-activity";
 
-	public static boolean USE_MULTIPLE_VIEWTYPES = false;
-	public static final int DIVIDER_WIDTH = 600;
+	public static boolean USE_MULTIPLE_VIEWTYPES = true;
+	public static final int DIVIDER_WIDTH = 30;
 
 	int labelIndex = 0;
 	int textIndex = 0;
@@ -185,8 +185,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			if ( convertView == null ) {
 				view = LayoutInflater.from( context ).inflate( type == 0 ? resId1 : resId2, parent, false );
-				LayoutParams params = new LayoutParams( type == 0 ? LayoutParams.WRAP_CONTENT : DIVIDER_WIDTH,
-						LayoutParams.WRAP_CONTENT );
+				LayoutParams params = new LayoutParams( type == 0 ? LayoutParams.WRAP_CONTENT : DIVIDER_WIDTH, LayoutParams.WRAP_CONTENT );
 				view.setLayoutParams( params );
 			} else {
 				view = convertView;
