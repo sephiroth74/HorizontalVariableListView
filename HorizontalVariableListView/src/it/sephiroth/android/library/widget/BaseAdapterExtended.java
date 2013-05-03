@@ -4,7 +4,7 @@ import it.sephiroth.android.library.utils.DataSetObservableExtended;
 import it.sephiroth.android.library.utils.DataSetObserverExtended;
 import android.widget.BaseAdapter;
 
-public abstract class BaseAdapterExtended extends BaseAdapter {
+public abstract class BaseAdapterExtended<T> extends BaseAdapter {
 
 	private final DataSetObservableExtended mDataSetObservableExtended = new DataSetObservableExtended();
 
@@ -43,4 +43,11 @@ public abstract class BaseAdapterExtended extends BaseAdapter {
 	public void notifyDataSetRemoved( int position, int viewType ) {
 		mDataSetObservableExtended.notifyRemoved( position, viewType );
 	}
+	
+	public void notifyDataSetReplaced( int position, int viewType ) {
+		mDataSetObservableExtended.notifyReplaced( position, viewType );
+	}
+
+	@Override
+	public abstract T getItem( int position );
 }

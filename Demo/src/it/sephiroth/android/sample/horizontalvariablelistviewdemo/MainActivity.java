@@ -54,7 +54,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		mList.setSelectionMode( SelectionMode.Multiple );
 
 		mList.setOverScrollMode( HorizontalVariableListView.OVER_SCROLL_ALWAYS );
-		mList.setEdgeGravityY( Gravity.CENTER );
 		mList.setAdapter( adapter );
 
 		// children gravity ( top, center, bottom )
@@ -93,7 +92,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			public void onLayoutChange( boolean changed, int left, int top, int right, int bottom ) {
 				Log.d( LOG_TAG, "onLayoutChange: " + changed + ", " + bottom + ", " + top );
 				if ( changed ) {
-					mList.setEdgeHeight( 200 );
+					// mList.setEdgeHeight( 200 );
 				}
 			}
 		} );
@@ -137,6 +136,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		findViewById( R.id.button_adds_before ).setOnClickListener( this );
 		findViewById( R.id.button_adds_in_range ).setOnClickListener( this );
 		findViewById( R.id.button_adds_after ).setOnClickListener( this );
+		findViewById( R.id.button_replace_before ).setOnClickListener( this );
+		findViewById( R.id.button_replace_after ).setOnClickListener( this );
+		findViewById( R.id.button_replace_in_range ).setOnClickListener( this );
 	}
 
 	@Override
@@ -145,7 +147,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		return true;
 	}
 
-	class ListAdapter extends BaseAdapterExtended {
+	class ListAdapter extends BaseAdapterExtended<String> {
 
 		Object mLock = new Object();
 		Context context;
@@ -210,7 +212,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 
 		@Override
-		public Object getItem( int position ) {
+		public String getItem( int position ) {
 			return objects.get( position );
 		}
 
@@ -251,6 +253,15 @@ public class MainActivity extends Activity implements OnClickListener {
 				this.objects.addAll( position, values );
 			}
 			this.notifyDataSetAdded( position );
+		}
+		
+		public void replace( int position, String newValue ) {
+			final int viewType = getItemViewType( position );
+			synchronized ( mLock ) {
+				this.objects.remove( position );
+				this.objects.add( position, newValue );
+			}
+			this.notifyDataSetReplaced( position, viewType );
 		}
 
 		/**
@@ -363,6 +374,18 @@ public class MainActivity extends Activity implements OnClickListener {
 					collection.add( getNextValue() );
 				}
 				adapter.addAll( last + 1, collection );
+				break;
+				
+			case R.id.button_replace_before:
+				adapter.replace( 0, getNextValue() );
+				break;
+				
+			case R.id.button_replace_in_range:
+				adapter.replace( first + ( last - first ) / 2, getNextValue() );
+				break;
+				
+			case R.id.button_replace_after:
+				adapter.replace( last, getNextValue() );
 				break;
 		}
 	}

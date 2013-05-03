@@ -16,7 +16,7 @@
     <it.sephiroth.android.library.widget.HorizontalVariableListView
         android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/text"
         android:gravity="bottom|center_vertical"
         android:paddingBottom="0dp"
@@ -99,6 +99,29 @@
                 style="@style/AppTheme.Button"
                 android:text="Delete after" />
         </LinearLayout>
+        
+        <!-- replace -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/button_replace_before"
+                style="@style/AppTheme.Button"
+                android:text="Replace before" />
+
+            <Button
+                android:id="@+id/button_replace_in_range"
+                style="@style/AppTheme.Button"
+                android:text="Replace middle" />
+
+            <Button
+                android:id="@+id/button_replace_after"
+                style="@style/AppTheme.Button"
+                android:text="Replace after" />
+        </LinearLayout>        
     </LinearLayout>
 
 </RelativeLayout>

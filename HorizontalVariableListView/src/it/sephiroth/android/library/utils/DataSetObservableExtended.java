@@ -46,6 +46,23 @@ public class DataSetObservableExtended extends Observable<DataSetObserverExtende
 			}
 		}
 	}
+	
+	/**
+	 * Invokes onReplaced on each observer. <br />
+	 * Called when an item in the data set being observed has replaced, and which when read contains the new state of the data.
+	 * 
+	 * @param position
+	 *           the position of the replaced item
+	 * @param viewType
+	 *           the viewType of the item removed
+	 */
+	public void notifyReplaced( int position, int viewType ) {
+		synchronized ( mObservers ) {
+			for ( DataSetObserverExtended observer : mObservers ) {
+				observer.onReplaced( position, viewType );
+			}
+		}
+	}	
 
 	/**
 	 * Invokes onInvalidated on each observer.<br />
