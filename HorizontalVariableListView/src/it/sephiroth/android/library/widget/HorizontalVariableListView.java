@@ -141,7 +141,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 		boolean onItemClick( AdapterView<?> parent, View view, int position, long id );
 	}
 
-	protected static boolean LOG_ENABLED = false;
+	protected static boolean LOG_ENABLED = true;
 	
 	protected static final String LOG_TAG = "horizontal-variable-list";
 
@@ -584,6 +584,10 @@ public class HorizontalVariableListView extends HorizontalListView {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void setAdapter( ListAdapter adapter ) {
+		
+		if( LOG_ENABLED ) {
+			Log.i( LOG_TAG, "setAdapter: " + adapter );
+		}
 
 		if ( mAdapter != null ) {
 
@@ -660,52 +664,65 @@ public class HorizontalVariableListView extends HorizontalListView {
 	@Override
 	protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
 		if( LOG_ENABLED ) {
-			Log.i( LOG_TAG, "onMeasure. children: " + getChildCount() );
+			Log.w( LOG_TAG, "onMeasure. children: " + getChildCount() );
 		}
-		
-		
 		
 		super.onMeasure( widthMeasureSpec, heightMeasureSpec );
 
 		mHeightMeasureSpec = heightMeasureSpec; 
 		mWidthMeasureSpec = widthMeasureSpec;
 		
-		final int widthMode = MeasureSpec.getMode( widthMeasureSpec );
-		final int heightMode = MeasureSpec.getMode( heightMeasureSpec );
-
+		final int widthMode = MeasureSpec.getMode( mWidthMeasureSpec );
+		final int heightMode = MeasureSpec.getMode( mHeightMeasureSpec );
+		final int widthSize = MeasureSpec.getSize( mWidthMeasureSpec );
+		final int heightSize = MeasureSpec.getSize( mHeightMeasureSpec );
 		
 		if ( widthMode == MeasureSpec.UNSPECIFIED ) {
 			Log.e( LOG_TAG, "invalid widthMode!");
 			return;
 		}
 		
-		
 		if( getChildCount() == 0 && null != mAdapter && mAdapterItemCount > 0 && ( heightMode == MeasureSpec.UNSPECIFIED || heightMode == MeasureSpec.AT_MOST ) ) {
 			if( LOG_ENABLED ) {
 				Log.d( LOG_TAG, "measure the first child" );
 			}
 			
-			final int widthSize = MeasureSpec.getSize( widthMeasureSpec );
-			final int heightSize = MeasureSpec.getSize( heightMeasureSpec );
-			
 			int viewType = mAdapter.getItemViewType( 0 );
 			View child = mAdapter.getView( 0, mRecycleBin.get( viewType ).poll(), this );
 			addAndMeasureChild( child, -1 );
+			
 			int childHeight = Math.min( heightSize, child.getMeasuredHeight() );
 			mRecycleBin.get( viewType ).offer( child );
 			removeViewInLayout( child );
+
+			if( LOG_ENABLED ) {
+				Log.d( LOG_TAG, "final dimension: " + widthSize + "x" + childHeight );
+			}
 			setMeasuredDimension( widthSize, childHeight );
+			
+			
 			return;
 		}
 		
 		if ( getChildCount() > 0 ) {
 			final View child = getChildAt( 0 );
-			int height = getMeasuredHeight();
-			if ( child.getMeasuredHeight() < height ) {
+			int height = getHeight();
+			if ( child.getMeasuredHeight() != height ) {
 				if( LOG_ENABLED ) {
-					Log.d( LOG_TAG, "force layout children" );
+					Log.e( LOG_TAG, "child height != current height: " + child.getMeasuredHeight() + " != " + height );
 				}
-				layoutChildren();
+				
+				if( heightMode == MeasureSpec.UNSPECIFIED || heightMode == MeasureSpec.AT_MOST ) {
+					if( LOG_ENABLED ) {
+						Log.d( LOG_TAG, "final dimension: " + widthSize + "x" + child.getMeasuredHeight() );
+					}
+					setMeasuredDimension( widthSize, child.getMeasuredHeight() );
+				} else {
+					// TODO: need to verify this case
+					// layoutChildren();
+				}
+			} else {
+				setMeasuredDimension( widthSize, getHeight() );
 			}
 		}
 	}
@@ -725,6 +742,16 @@ public class HorizontalVariableListView extends HorizontalListView {
 		int childHeightSpec = ViewGroup.getChildMeasureSpec( mHeightMeasureSpec, getPaddingTop() + getPaddingBottom(), params.height );
 		int childWidthSpec = ViewGroup.getChildMeasureSpec( mWidthMeasureSpec, getPaddingLeft() + getPaddingRight(), params.width );
 		child.measure( childWidthSpec, childHeightSpec );
+		// measureChild( child, mWidthMeasureSpec, mHeightMeasureSpec );
+	}
+	
+	@Override
+	protected void onSizeChanged( int w, int h, int oldw, int oldh ) {
+		super.onSizeChanged( w, h, oldw, oldh );
+		
+		if( LOG_ENABLED ) {
+			Log.w( LOG_TAG, "onSizeChanged: " + w + "x" + h );
+		}
 	}
 
 	@Override
@@ -732,16 +759,17 @@ public class HorizontalVariableListView extends HorizontalListView {
 		super.onLayout( changed, left, top, right, bottom );
 		
 		if( LOG_ENABLED ) {
-			Log.d( LOG_TAG, "onLayout: changed: " + changed + ", forceLayout: " + mForceLayout );
+			Log.w( LOG_TAG, "onLayout: changed: " + changed + ", forceLayout: " + mForceLayout );
+			Log.d( LOG_TAG, "size: " + (right-left) + "x" + (bottom-top) );
 		}
 
 		if ( mAdapter == null ) {
 			return;
 		}
 
-		if ( !changed ) {
-			layoutChildren();
-		}
+		//if ( changed ) {
+		layoutChildren();
+		//}
 
 		if ( changed || mForceLayout ) {
 
@@ -1505,10 +1533,10 @@ public class HorizontalVariableListView extends HorizontalListView {
 	}
 
 	protected void layoutChild( View child, int left, int right, int childHeight ) {
-
+		
 		int top = getPaddingTop();
 		int height = getHeight();
-
+		
 		if ( mAlignMode == Gravity.BOTTOM ) {
 			top = top + ( height - childHeight );
 		} else if ( mAlignMode == Gravity.CENTER ) {
