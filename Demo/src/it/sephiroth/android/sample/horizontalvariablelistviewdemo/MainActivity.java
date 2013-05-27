@@ -1,7 +1,6 @@
 package it.sephiroth.android.sample.horizontalvariablelistviewdemo;
 
 import it.sephiroth.android.library.widget.BaseAdapterExtended;
-import it.sephiroth.android.library.widget.HorizontalListView.OnLayoutChangeListener;
 import it.sephiroth.android.library.widget.HorizontalVariableListView;
 import it.sephiroth.android.library.widget.HorizontalVariableListView.OnItemClickedListener;
 import it.sephiroth.android.library.widget.HorizontalVariableListView.SelectionMode;
@@ -20,23 +19,26 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class MainActivity extends Activity implements OnClickListener {
 
 	private static final String LOG_TAG = "main-activity";
 
-	public static boolean USE_MULTIPLE_VIEWTYPES = true;
+	public static boolean USE_MULTIPLE_VIEWTYPES = false;
 	public static final int DIVIDER_WIDTH = 30;
+	
+	public static final boolean USE_VLIST = false;
 
 	int labelIndex = 0;
 	int textIndex = 0;
 
 	HorizontalVariableListView mList;
-	TextView mText;
+	ListView mList2;
+	ListAdapter mAdapter;
 
 	@Override
 	public void onCreate( Bundle savedInstanceState ) {
@@ -44,17 +46,23 @@ public class MainActivity extends Activity implements OnClickListener {
 		setContentView( R.layout.activity_main );
 
 		List<String> data = new ArrayList<String>();
-		for ( int i = 0; i < 20; i++ ) {
+		for ( int i = 0; i < 200; i++ ) {
 			data.add( getNextValue() );
 		}
 
-		ListAdapter adapter = new ListAdapter( this, R.layout.view1, R.layout.divider, data );
+		mAdapter = new ListAdapter( this, R.layout.view1, R.layout.divider, data );
 
 		// change the selection mode: single or multiple
 		mList.setSelectionMode( SelectionMode.Multiple );
-
 		mList.setOverScrollMode( HorizontalVariableListView.OVER_SCROLL_ALWAYS );
-		mList.setAdapter( adapter );
+		
+		if( USE_VLIST ) {
+			mList.setVisibility( View.GONE );
+			mList2.setAdapter( mAdapter );
+		} else {
+			mList2.setVisibility( View.GONE );
+			mList.setAdapter( mAdapter );
+		}
 
 		// children gravity ( top, center, bottom )
 		mList.setGravity( Gravity.CENTER );
@@ -84,18 +92,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	public void onContentChanged() {
 		super.onContentChanged();
 		mList = (HorizontalVariableListView) findViewById( R.id.list );
-		mText = (TextView) findViewById( R.id.text );
+		mList2 = (ListView) findViewById( R.id.list2 );
 
-		mList.setOnLayoutChangeListener( new OnLayoutChangeListener() {
-
-			@Override
-			public void onLayoutChange( boolean changed, int left, int top, int right, int bottom ) {
-				Log.d( LOG_TAG, "onLayoutChange: " + changed + ", " + bottom + ", " + top );
-				if ( changed ) {
-					// mList.setEdgeHeight( 200 );
-				}
-			}
-		} );
 
 		mList.setOnItemClickedListener( new OnItemClickedListener() {
 
@@ -114,15 +112,30 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			@Override
 			public void onItemSelected( AdapterView<?> parent, View view, int position, long id ) {
-				mText.setText( "item selected: " + position + ", selected items: " + mList.getSelectedPositions().length );
+				Log.d( LOG_TAG, "onItemSelected: " + position + ", selected items: " + mList.getSelectedPositions().length );
 			}
 
 			@Override
 			public void onNothingSelected( android.widget.AdapterView<?> parent ) {
-				mText.setText( "nothing selected" );
+				Log.d( LOG_TAG, "onNothingSelected" );
 			};
 
 		} );
+		
+		mList2.setOnItemSelectedListener( new OnItemSelectedListener() {
+			
+			@Override
+			public void onItemSelected( AdapterView<?> arg0, View arg1, int arg2, long arg3 ) {
+				Log.d( LOG_TAG, "onItemSelected: " + arg2 );
+			}
+			
+			@Override
+			public void onNothingSelected( AdapterView<?> arg0 ) {
+				Log.d( LOG_TAG, "onNothingSelected" );
+			}
+			
+		} );
+		
 
 		// let's select the first item by default
 		mList.setSelectedPosition( 0, false );
@@ -139,6 +152,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		findViewById( R.id.button_replace_before ).setOnClickListener( this );
 		findViewById( R.id.button_replace_after ).setOnClickListener( this );
 		findViewById( R.id.button_replace_in_range ).setOnClickListener( this );
+		findViewById( R.id.button_smoothscroll ).setOnClickListener( this );
 	}
 
 	@Override
@@ -185,8 +199,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			if ( convertView == null ) {
 				view = LayoutInflater.from( context ).inflate( type == 0 ? resId1 : resId2, parent, false );
-				LayoutParams params = new LayoutParams( type == 0 ? LayoutParams.WRAP_CONTENT : DIVIDER_WIDTH, LayoutParams.WRAP_CONTENT );
-				view.setLayoutParams( params );
 			} else {
 				view = convertView;
 			}
@@ -298,15 +310,22 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick( View v ) {
 		final int id = v.getId();
-		ListAdapter adapter = (ListAdapter) mList.getAdapter();
+		ListAdapter adapter = mAdapter;
 		Random random = new Random( System.currentTimeMillis() );
 		int count = adapter.getCount();
 		int next;
 		String value;
 		List<String> collection;
 
-		int first = mList.getFirstVisiblePosition();
-		int last = mList.getLastVisiblePosition();
+		int first, last;
+		
+		if( USE_VLIST ) {
+			first = mList2.getFirstVisiblePosition();
+			last = mList2.getLastVisiblePosition();
+		} else {
+			first = mList.getFirstVisiblePosition();
+			last = mList.getLastVisiblePosition();
+		}
 
 		switch ( id ) {
 		// add single
@@ -385,6 +404,15 @@ public class MainActivity extends Activity implements OnClickListener {
 				
 			case R.id.button_replace_after:
 				adapter.replace( last, getNextValue() );
+				break;
+				
+			case R.id.button_smoothscroll:
+				
+				if( USE_VLIST ) {
+					mList2.smoothScrollBy( 15000, 250 );
+				} else {
+					mList.smoothScrollBy( mList.getChildAt( 0 ).getWidth() * 20, 500 );
+				}
 				break;
 		}
 	}

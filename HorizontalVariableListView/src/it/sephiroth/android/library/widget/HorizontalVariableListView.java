@@ -1,16 +1,8 @@
 /*
- * 
- * HorizontalVariableListView.java
- * ListView with horizontal scrolling. It can also handle items with different widths
- * 
+ * HorizontalVariableListView.java ListView with horizontal scrolling. It can also handle items with different widths
  * @author Alessandro Crugnola
- * 
  * @email alessandro.crugnola@gmail.com
- * 
- * @version 2.0
- * 
- * DISTRIBUTED UNDER THE MIT LICENSE
- * http://opensource.org/licenses/MIT
+ * @version 2.0 DISTRIBUTED UNDER THE MIT LICENSE http://opensource.org/licenses/MIT
  */
 
 package it.sephiroth.android.library.widget;
@@ -45,7 +37,6 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver.OnScrollChangedListener;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.OverScroller;
@@ -129,28 +120,20 @@ public class HorizontalVariableListView extends HorizontalListView {
 	public interface OnItemClickedListener {
 
 		/**
-		 * Callback method to be invoked when an item in this AdapterView has been
-		 * clicked.
+		 * Callback method to be invoked when an item in this AdapterView has been clicked.
 		 * <p>
-		 * Implementers can call getItemAtPosition(position) if they need to access the
-		 * data associated with the selected item.
+		 * Implementers can call getItemAtPosition(position) if they need to access the data associated with the selected item.
 		 * 
-		 * @param parent
-		 *            The AdapterView where the click happened.
-		 * @param view
-		 *            The view within the AdapterView that was clicked (this will be a
-		 *            view provided by the adapter)
-		 * @param position
-		 *            The position of the view in the adapter.
-		 * @param id
-		 *            The row id of the item that was clicked.
-		 * @return if the implementation return false, then the selection will not be
-		 *         updated
+		 * @param parent The AdapterView where the click happened.
+		 * @param view The view within the AdapterView that was clicked (this will be a view provided by the adapter)
+		 * @param position The position of the view in the adapter.
+		 * @param id The row id of the item that was clicked.
+		 * @return if the implementation return false, then the selection will not be updated
 		 */
 		boolean onItemClick( AdapterView<?> parent, View view, int position, long id );
 	}
 
-	protected static boolean LOG_ENABLED = false;
+	protected static boolean LOG_ENABLED = true;
 
 	protected static final String LOG_TAG = "horizontal-variable-list";
 
@@ -164,13 +147,12 @@ public class HorizontalVariableListView extends HorizontalListView {
 	private static final int MIN_SCROLL = Integer.MIN_VALUE / 2;
 
 	private static final int INVALID_POINTER = -1;
-	private static final long ANIMATED_SCROLL_GAP = 250;
+	private static final int SMOOTH_ANIMATION_DURATION = 250;
 
 	private boolean mIsDragging = false;
 
 	/**
-	 * True if the user is currently dragging this ScrollView around. This is not the same
-	 * as 'is being flinged', which can be
+	 * True if the user is currently dragging this ScrollView around. This is not the same as 'is being flinged', which can be
 	 * checked by mScroller.isFinished() (flinging begins when the user lifts his finger).
 	 */
 	private boolean mIsBeingDragged = false;
@@ -221,7 +203,6 @@ public class HorizontalVariableListView extends HorizontalListView {
 
 	private boolean mDragScrollEnabled;
 
-	private long mLastScroll;
 	private EdgeEffectCompat mEdgeGlowLeft;
 	private EdgeEffectCompat mEdgeGlowRight;
 
@@ -285,8 +266,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 	 * Single or multiple selections are supported
 	 * 
 	 * @see SelectionMode
-	 * @param mode
-	 *            the selection mode
+	 * @param mode the selection mode
 	 */
 	public void setSelectionMode( SelectionMode mode ) {
 		mChoiceMode = mode;
@@ -302,17 +282,17 @@ public class HorizontalVariableListView extends HorizontalListView {
 		return mChoiceMode;
 	}
 
-	public HorizontalVariableListView ( Context context ) {
+	public HorizontalVariableListView( Context context ) {
 		super( context );
 		initScrollView( context, null, 0 );
 	}
 
-	public HorizontalVariableListView ( Context context, AttributeSet attrs ) {
+	public HorizontalVariableListView( Context context, AttributeSet attrs ) {
 		super( context, attrs );
 		initScrollView( context, attrs, 0 );
 	}
 
-	public HorizontalVariableListView ( Context context, AttributeSet attrs, int defStyle ) {
+	public HorizontalVariableListView( Context context, AttributeSet attrs, int defStyle ) {
 		super( context, attrs, defStyle );
 		initScrollView( context, attrs, defStyle );
 	}
@@ -592,7 +572,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 		return null;
 	}
 
-	@SuppressWarnings ( "rawtypes" )
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void setAdapter( ListAdapter adapter ) {
 
@@ -750,8 +730,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 	}
 
 	public void forceChildLayout( View child, LayoutParams params ) {
-		int childHeightSpec = ViewGroup.getChildMeasureSpec( mHeightMeasureSpec, getPaddingTop() + getPaddingBottom(),
-				params.height );
+		int childHeightSpec = ViewGroup.getChildMeasureSpec( mHeightMeasureSpec, getPaddingTop() + getPaddingBottom(), params.height );
 		int childWidthSpec = ViewGroup.getChildMeasureSpec( mWidthMeasureSpec, getPaddingLeft() + getPaddingRight(), params.width );
 		child.measure( childWidthSpec, childHeightSpec );
 		// measureChild( child, mWidthMeasureSpec, mHeightMeasureSpec );
@@ -831,8 +810,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 	/**
 	 * Fill list.
 	 * 
-	 * @param positionX
-	 *            the position x
+	 * @param positionX the position x
 	 */
 	private void fillList( final int positionX ) {
 		if ( LOG_ENABLED ) {
@@ -866,10 +844,8 @@ public class HorizontalVariableListView extends HorizontalListView {
 	/**
 	 * Fill list left.
 	 * 
-	 * @param positionX
-	 *            the position x
-	 * @param leftEdge
-	 *            the left edge
+	 * @param positionX the position x
+	 * @param leftEdge the left edge
 	 */
 	private void fillListLeft( int positionX, int leftEdge ) {
 		if ( mAdapter == null ) return;
@@ -897,18 +873,19 @@ public class HorizontalVariableListView extends HorizontalListView {
 			mLeftViewIndex--;
 		}
 
-		if ( mLeftViewIndex == -1 ) {
+		if ( mLeftViewIndex <= -1 ) {
 			mMinX = leftEdge;
+		} else {
+			// TODO: verify this
+			mMinX = MIN_SCROLL;
 		}
 	}
 
 	/**
 	 * Fill list right.
 	 * 
-	 * @param positionX
-	 *            the position x
-	 * @param rightEdge
-	 *            the right edge
+	 * @param positionX the position x
+	 * @param rightEdge the right edge
 	 */
 	private void fillListRight( int positionX, int rightEdge ) {
 
@@ -917,6 +894,10 @@ public class HorizontalVariableListView extends HorizontalListView {
 		if ( mAdapter == null ) return;
 
 		final int realWidth = getWidth();
+		
+		if( LOG_ENABLED ) {
+			Log.i( LOG_TAG, "fillListRight: " + positionX + ", edge: " + rightEdge );
+		}
 
 		while ( ( rightEdge - positionX ) < mRightEdge || firstChild ) {
 
@@ -942,12 +923,16 @@ public class HorizontalVariableListView extends HorizontalListView {
 
 			if ( ( rightEdge - leftEdge ) > realWidth ) {
 				mMaxX = rightEdge - realWidth;
+				Log.e( LOG_TAG, "max x: " + mMaxX );
 			} else {
 				mMaxX = rightEdge - realWidth;
 				if ( mMaxX - mMinX < realWidth ) {
 					mMaxX = mMinX;
 				}
 			}
+		} else {
+			// TODO: verify this
+			mMaxX = MAX_SCROLL;
 		}
 	}
 
@@ -1007,6 +992,10 @@ public class HorizontalVariableListView extends HorizontalListView {
 	}
 
 	private void handleDataSetChanged( DataSetChange data ) {
+		
+		if( null != mFlingScroller ) {
+			mFlingScroller.stop();
+		}
 
 		if ( null == mAdapter ) return;
 
@@ -1052,10 +1041,8 @@ public class HorizontalVariableListView extends HorizontalListView {
 	/**
 	 * move all the selections by an arbitrary value
 	 * 
-	 * @param fromPosition
-	 *            the first position to move from
-	 * @param amount
-	 *            the delta change
+	 * @param fromPosition the first position to move from
+	 * @param amount the delta change
 	 */
 	private void moveAllSelections( int fromPosition, int amount ) {
 		synchronized ( mSelectedPositions ) {
@@ -1233,10 +1220,8 @@ public class HorizontalVariableListView extends HorizontalListView {
 	/**
 	 * Handle the item removal from the current adapter
 	 * 
-	 * @param position
-	 *            the position of the item removed
-	 * @param viewType
-	 *            the removed item type
+	 * @param position the position of the item removed
+	 * @param viewType the removed item type
 	 */
 	private void handleItemRemoved( int position, int viewType ) {
 		if ( null == mAdapter ) return;
@@ -1378,10 +1363,8 @@ public class HorizontalVariableListView extends HorizontalListView {
 	/**
 	 * Handles the items added to the dataset
 	 * 
-	 * @param fromPosition
-	 *            of the new item
-	 * @param count
-	 *            items added
+	 * @param fromPosition of the new item
+	 * @param count items added
 	 */
 	private void handleItemAdded( int fromPosition, int count ) {
 
@@ -1576,8 +1559,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 	/**
 	 * Removes the non visible items.
 	 * 
-	 * @param positionX
-	 *            the position x
+	 * @param positionX the position x
 	 */
 	private void removeNonVisibleItems( final int positionX, int[] removed ) {
 
@@ -1586,6 +1568,12 @@ public class HorizontalVariableListView extends HorizontalListView {
 
 		View child = getChildAt( 0 );
 		boolean removedCount = false;
+		
+		if( LOG_ENABLED ) {
+			Log.i( LOG_TAG, "removeNonVisibleItems: " + positionX );
+			Log.d( LOG_TAG, "currentIndex: " + mLeftViewIndex + " - " + mRightViewIndex );
+			Log.d( LOG_TAG, "edges: " + mLeftEdge + " - " + mRightEdge );
+		}
 
 		// remove to left...
 		while ( child != null && child.getRight() - positionX < mLeftEdge ) {
@@ -1633,6 +1621,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 		if ( removedCount ) {
 			if ( LOG_ENABLED ) {
 				Log.d( LOG_TAG, "removeNonVisibleItems: leftIndex: " + mLeftViewIndex + ", rightIndex: " + mRightViewIndex );
+				Log.d( LOG_TAG, "removed: " + removed[0] + " - " + removed[1] );
 			}
 		}
 	}
@@ -1641,14 +1630,19 @@ public class HorizontalVariableListView extends HorizontalListView {
 	private boolean mCanCheckDrag;
 	private boolean mWasFlinging;
 	private WeakReference<View> mOriginalDragItem;
+	private FlingScroller mFlingScroller;
 
-	public void fling( int velocityX ) {
+	private void fling( int velocityX ) {
 		if ( mMaxX == mMinX ) return;
 		if ( getChildCount() > 0 ) {
 			mCanCheckDrag = false;
 			mWasFlinging = true;
+			
+			if( null != mFlingScroller ) {
+				mFlingScroller.stop();
+			}
+			
 			mScroller.fling( mCurrentX, 0, velocityX, 0, mMinX, mMaxX, 0, 0, Math.abs( getScrollRange() / 2 ), 0 );
-			// mFlingRunnable.startUsingVelocity( mCurrentX, (int) -velocityX );
 			postInvalidate();
 		}
 	}
@@ -1807,8 +1801,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 		mGesture.onTouchEvent( ev );
 
 		/*
-		 * Shortcut the most recurring case: the user is in the dragging state and he is
-		 * moving his finger. We want to intercept this
+		 * Shortcut the most recurring case: the user is in the dragging state and he is moving his finger. We want to intercept this
 		 * motion.
 		 */
 		if ( action == MotionEvent.ACTION_MOVE && mIsBeingDragged ) {
@@ -1818,8 +1811,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 		switch ( action & MotionEvent.ACTION_MASK ) {
 			case MotionEvent.ACTION_MOVE: {
 				/*
-				 * mIsBeingDragged == false, otherwise the shortcut would have caught it.
-				 * Check whether the user has moved far enough
+				 * mIsBeingDragged == false, otherwise the shortcut would have caught it. Check whether the user has moved far enough
 				 * from his original down touch.
 				 */
 				final int activePointerId = mActivePointerId;
@@ -1894,6 +1886,10 @@ public class HorizontalVariableListView extends HorizontalListView {
 				mIsBeingDragged = false;
 				mActivePointerId = INVALID_POINTER;
 
+				if( mFlingScroller != null ) {
+					mFlingScroller.stop();
+				}
+				
 				if ( mScroller.springBack( mCurrentX, 0, mMinX, mMaxX, 0, 0 ) ) {
 					postInvalidate();
 				}
@@ -1931,6 +1927,10 @@ public class HorizontalVariableListView extends HorizontalListView {
 					if ( parent != null ) {
 						parent.requestDisallowInterceptTouchEvent( true );
 					}
+				}
+				
+				if( null != mFlingScroller ) {
+					mFlingScroller.stop();
 				}
 
 				if ( !mScroller.isFinished() ) {
@@ -2018,6 +2018,10 @@ public class HorizontalVariableListView extends HorizontalListView {
 					final VelocityTracker velocityTracker = mVelocityTracker;
 					velocityTracker.computeCurrentVelocity( 1000, mMaximumVelocity );
 					int initialVelocity = (int) velocityTracker.getXVelocity( mActivePointerId );
+					
+					if( null != mFlingScroller ) {
+						mFlingScroller.stop();
+					}
 
 					if ( getChildCount() > 0 ) {
 						if ( ( Math.abs( initialVelocity ) > mMinimumVelocity ) ) {
@@ -2044,6 +2048,11 @@ public class HorizontalVariableListView extends HorizontalListView {
 			}
 
 			case MotionEvent.ACTION_CANCEL: {
+				
+				if( null != mFlingScroller ) {
+					mFlingScroller.stop();
+				}
+				
 				if ( mIsBeingDragged && getChildCount() > 0 ) {
 					if ( mScroller.springBack( mCurrentX, 0, mMinX, mMaxX, 0, 0 ) ) {
 						postInvalidate();
@@ -2115,8 +2124,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 						if ( null != view && position > -1 ) {
 							getParent().requestDisallowInterceptTouchEvent( false );
 							if ( mItemDragListener != null ) {
-								fireItemDragStart( view, mLeftViewIndex + 1 + position,
-										mAdapter.getItemId( mLeftViewIndex + 1 + position ) );
+								fireItemDragStart( view, mLeftViewIndex + 1 + position, mAdapter.getItemId( mLeftViewIndex + 1 + position ) );
 								return true;
 							}
 						}
@@ -2127,17 +2135,43 @@ public class HorizontalVariableListView extends HorizontalListView {
 		}
 		return false;
 	}
+	
 
+	/**
+	 * Scroll the list to an absolute position.
+	 * Note that the allowed max "x" amount is the current list width.
+	 * You cannot scroll more than that. 
+	 * 
+	 */
 	@Override
 	public void scrollTo( int x, int y ) {
+
+		final int width = getWidth();
+		int delta = x - mCurrentX;
+		
 		if ( LOG_ENABLED ) {
-			Log.d( LOG_TAG, "scrollTo: " + x + ", current: " + getScrollX() );
+			Log.d( LOG_TAG, "scrollTo: " + x + ", current: " + mCurrentX + ", delta: " + delta );
 		}
-		mCurrentX = x;
+
+		if ( delta < 0 ) {
+			delta = Math.max( -( width - 1 ), delta );
+		} else {
+			delta = Math.min( width - 1, delta );
+		}
+		
+		mCurrentX = mCurrentX + delta;
+		
+		if ( LOG_ENABLED ) {
+			Log.d( LOG_TAG, "scrollTo: " + mCurrentX + ", delta: " + delta + ", width: " + width );
+		}
 
 		if ( getChildCount() > 0 ) {
-			super.scrollTo( x, 0 );
+			super.scrollTo( mCurrentX, 0 );
 		}
+	}
+
+	public int getCurrentScrollX() {
+		return mCurrentX;
 	}
 
 	@Override
@@ -2162,6 +2196,11 @@ public class HorizontalVariableListView extends HorizontalListView {
 		if ( !mScroller.isFinished() ) {
 			mCurrentX = scrollX;
 			if ( clampedX ) {
+				
+				if( null != mFlingScroller ) {
+					mFlingScroller.stop();
+				}
+				
 				mScroller.springBack( mCurrentX, 0, mMinX, mMaxX, 0, 0 );
 			}
 		} else {
@@ -2173,11 +2212,15 @@ public class HorizontalVariableListView extends HorizontalListView {
 		return mIsBeingDragged || !mScroller.isFinished();
 	}
 
-	@SuppressLint ( "NewApi" )
+	@SuppressLint("NewApi")
 	@Override
 	public void computeScroll() {
 
 		final boolean more = mScroller.computeScrollOffset();
+		
+		if( LOG_ENABLED ) {
+			Log.d( LOG_TAG, "scroller.current: " + mScroller.getCurrX() + ", current: " + mCurrentX + ", more: " + more + ", is.finished: " + mScroller.isFinished() + ", " + mWasFlinging + ", " + mIsBeingDragged );
+		}
 
 		if ( more ) {
 			int oldX = mCurrentX;
@@ -2207,6 +2250,16 @@ public class HorizontalVariableListView extends HorizontalListView {
 				}
 			}
 			postInvalidate();
+			
+		} else {
+			
+			// TODO: find a better solution for this
+			if( null != mFlingScroller ) {
+				if( mFlingScroller.hasMore() ) {
+					post( mFlingScroller );
+				}
+			}
+			
 		}
 	}
 
@@ -2217,11 +2270,20 @@ public class HorizontalVariableListView extends HorizontalListView {
 		if ( LOG_ENABLED ) {
 			Log.i( LOG_TAG, "overscrollby: " + deltaX + ", current: " + scrollX );
 		}
-
+		
+		final int width = getWidth();
+		if ( deltaX < 0 ) {
+			deltaX = Math.max( -( width - 1 ), deltaX );
+		} else {
+			deltaX = Math.min( width - 1, deltaX );
+		}
+		
 		final int overScrollMode = mOverScrollMode;
 		final boolean toLeft = deltaX > 0;
 		final boolean toRight = deltaX < 0;
 		final boolean overScrollHorizontal = overScrollMode == OVER_SCROLL_ALWAYS;
+		
+
 
 		if ( LOG_ENABLED ) {
 			Log.d( LOG_TAG, "toLeft: " + toLeft + ", toRight: " + toRight );
@@ -2269,29 +2331,29 @@ public class HorizontalVariableListView extends HorizontalListView {
 		return 0;
 	}
 
-	public void smoothScrollTo( int x ) {
-		smoothScrollBy( x - mCurrentX, 0 );
+	private void smoothScrollTo( int x ) {
+		smoothScrollTo( x, SMOOTH_ANIMATION_DURATION );
 	}
 
-	public final void smoothScrollBy( int dx, int dy ) {
+	private void smoothScrollTo( int x, int duration ) {
+		smoothScrollBy( x - mCurrentX, duration );
+	}
+
+	public final void smoothScrollBy( int offset ) {
+		smoothScrollBy( offset, SMOOTH_ANIMATION_DURATION );
+	}
+
+	public final void smoothScrollBy( int offset, int duration ) {
 		if ( getChildCount() == 0 ) {
 			return;
 		}
-
-		long duration = AnimationUtils.currentAnimationTimeMillis() - mLastScroll;
-		if ( duration > ANIMATED_SCROLL_GAP ) {
-			final int scrollX = mCurrentX;
-			dx = Math.max( mMinX, Math.min( mCurrentX + dx, mMaxX ) ) - scrollX;
-
-			mScroller.startScroll( scrollX, 0, dx, 0 );
-			postInvalidate();
-		} else {
-			if ( !mScroller.isFinished() ) {
-				mScroller.abortAnimation();
-			}
-			scrollBy( dx, dy );
+		
+		if( mFlingScroller == null ) {
+			mFlingScroller = new FlingScroller();
 		}
-		mLastScroll = AnimationUtils.currentAnimationTimeMillis();
+		
+		mFlingScroller.start( offset, duration );
+
 	}
 
 	protected void onFinishedMovement() {
@@ -2481,7 +2543,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 		return mAlignMode;
 	}
 
-	@SuppressWarnings ( "unused" )
+	@SuppressWarnings("unused")
 	private void printSelectedPositions() {
 		if ( LOG_ENABLED ) {
 			Log.i( LOG_TAG, "selected positions" );
@@ -2495,5 +2557,64 @@ public class HorizontalVariableListView extends HorizontalListView {
 				}
 			}
 		}
+	}
+	
+	class FlingScroller implements Runnable {
+		
+		int mDuration;
+		int mFinalPosition;
+		int mOffset;
+		boolean mMore;
+		
+		public FlingScroller() {
+		}
+		
+		public void start( int offset, int duration ) {
+			
+			if( offset != 0 ) {
+				
+				mMore = true;
+				mOffset = offset;
+				mFinalPosition = mCurrentX + mOffset;
+				mDuration = duration;
+				
+				if( !mScroller.isFinished() ) {
+					mScroller.abortAnimation();
+				}
+				post( this );
+			}
+		}
+		
+		public void stop() {
+			mMore = false;
+		}
+		
+		public boolean hasMore() {
+			return mMore;
+		}
+		
+		@Override
+		public void run() {
+			
+			if( getChildCount() < 1 ) {
+				mMore = false;
+				return;
+			}
+			
+			if( hasMore() ) {
+				
+				if( mFinalPosition != mCurrentX ) {
+					
+					int offset = Math.max( mMinX, Math.min( mCurrentX + mOffset, mMaxX ) ) - mCurrentX;
+					mFinalPosition = mCurrentX + offset;
+					
+					mScroller.startScroll( mCurrentX, 0, offset, 0, mDuration );
+					postInvalidate();
+				} else {
+					mMore = false;
+				}
+			}
+		}
+		
 	}
 }

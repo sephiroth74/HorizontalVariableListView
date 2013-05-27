@@ -1,28 +1,34 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent" 
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/text"
+    <RelativeLayout 
+        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:text=""
-        tools:context=".MainActivity" />
-
-    <it.sephiroth.android.library.widget.HorizontalVariableListView
-        android:id="@+id/list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/text"
-        android:gravity="bottom|center_vertical"
-        android:paddingBottom="0dp"
-        android:paddingTop="0dp" />
+        android:layout_height="0dip"
+        android:gravity="center_vertical">
+        
+	    <ListView android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:smoothScrollbar="true"
+	        android:id="@+id/list2"
+	        android:choiceMode="multipleChoice"
+	        >
+	    </ListView>
+	
+	    <it.sephiroth.android.library.widget.HorizontalVariableListView
+	        android:id="@+id/list"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:gravity="bottom|center_vertical"
+	        android:paddingBottom="0dp"
+	        android:paddingTop="0dp" />
+    </RelativeLayout>
 
     <LinearLayout
+        android:layout_weight="0"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -121,7 +127,20 @@
                 android:id="@+id/button_replace_after"
                 style="@style/AppTheme.Button"
                 android:text="Replace after" />
+        </LinearLayout>
+        
+        <!-- scroll -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/button_smoothscroll"
+                style="@style/AppTheme.Button"
+                android:text="Scroll 1" />
         </LinearLayout>        
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>
