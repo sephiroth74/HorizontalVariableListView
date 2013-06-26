@@ -1120,8 +1120,6 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	@Override
 	public boolean onInterceptTouchEvent( MotionEvent ev ) {
 
-		getParent().requestDisallowInterceptTouchEvent( true );
-
 		if ( mIsDragging ) return false;
 
 		final int action = ev.getAction();
@@ -1174,7 +1172,12 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 						parent.requestDisallowInterceptTouchEvent( true );
 					}
 					postScrollNotifier();
-				}
+				} else {
+		          		final ViewParent parent = getParent();
+	                		if ( parent != null ) {
+	                			parent.requestDisallowInterceptTouchEvent( false );
+					}
+		        	}
 				break;
 			}
 
