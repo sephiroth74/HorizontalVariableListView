@@ -7,16 +7,6 @@
 
 package it.sephiroth.android.library.widget;
 
-import it.sephiroth.android.library.utils.DataSetObserverExtended;
-import it.sephiroth.android.library.utils.ReflectionUtils;
-import it.sephiroth.android.library.utils.ReflectionUtils.ReflectionException;
-import it.sephiroth.android.library.widget.IFlingRunnable.FlingRunnableView;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Canvas;
@@ -28,20 +18,18 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseBooleanArray;
-import android.view.GestureDetector;
+import android.view.*;
 import android.view.GestureDetector.OnGestureListener;
-import android.view.Gravity;
-import android.view.HapticFeedbackConstants;
-import android.view.MotionEvent;
-import android.view.SoundEffectConstants;
-import android.view.VelocityTracker;
-import android.view.View;
-import android.view.ViewConfiguration;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.ViewTreeObserver.OnScrollChangedListener;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
+import it.sephiroth.android.library.utils.DataSetObserverExtended;
+import it.sephiroth.android.library.utils.ReflectionUtils;
+import it.sephiroth.android.library.utils.ReflectionUtils.ReflectionException;
+import it.sephiroth.android.library.widget.IFlingRunnable.FlingRunnableView;
+
+import java.lang.ref.WeakReference;
+import java.util.*;
 
 public class HorizontalVariableListView extends HorizontalListView implements OnGestureListener, FlingRunnableView {
 
@@ -1125,7 +1113,6 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 		if ( mIsDragging ) return false;
 
 		final int action = ev.getAction();
-		mGesture.onTouchEvent( ev );
 
 		/*
 		 * Shortcut the most recurring case: the user is in the dragging state
@@ -1636,6 +1623,12 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 	protected void onFinishedMovement() {
 		fireOnScrollFininshed();
 	}
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        mGesture.onTouchEvent(ev);
+        return super.dispatchTouchEvent(ev);
+    }
 
 	private void onItemClick( View child, int position ) {
 
