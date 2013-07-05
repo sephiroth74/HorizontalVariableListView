@@ -1784,7 +1784,7 @@ public class HorizontalVariableListView extends HorizontalListView implements On
 
 	@Override
 	public int getMaxX() {
-		return Integer.MAX_VALUE;
+		return mMaxX;
 	}
 
 	public void setDragTolerance( int value ) {
