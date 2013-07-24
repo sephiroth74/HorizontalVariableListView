@@ -8,6 +8,7 @@
 package it.sephiroth.android.library.widget;
 
 import it.sephiroth.android.library.utils.DataSetObserverExtended;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +16,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.DataSetObserver;
@@ -133,7 +135,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 		boolean onItemClick( AdapterView<?> parent, View view, int position, long id );
 	}
 
-	protected static boolean LOG_ENABLED = true;
+	protected static boolean LOG_ENABLED = false;
 
 	protected static final String LOG_TAG = "horizontal-variable-list";
 
@@ -345,7 +347,6 @@ public class HorizontalVariableListView extends HorizontalListView {
 	@Override
 	protected void dispatchDraw( Canvas canvas ) {
 		super.dispatchDraw( canvas );
-
 		if ( getChildCount() > 0 ) {
 			drawEdges( canvas );
 		}
@@ -629,7 +630,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 	/**
 	 * Reset.
 	 */
-	private synchronized void reset() {
+	private void reset() {
 		mCurrentX = 0;
 		resetView();
 		removeAllViewsInLayout();
@@ -651,14 +652,33 @@ public class HorizontalVariableListView extends HorizontalListView {
 
 	@Override
 	public void setSelection( int position ) {}
+	
+	public int[] measureChild( View child ) {
+		addAndMeasureChild( child, -1, child != null );
+		
+		int w = child.getMeasuredWidth();
+		int h = child.getMeasuredHeight();
+		
+		removeViewInLayout( child );
+		
+		return new int[]{ w, h };
+	}
 
 	@Override
 	protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
 		if ( LOG_ENABLED ) {
-			Log.w( LOG_TAG, "onMeasure. children: " + getChildCount() );
+			Log.w( LOG_TAG, "onMeasure. children: " + getChildCount() + ", isShown: " + isShown() + ", enabled: " + isEnabled() );
 		}
 
 		super.onMeasure( widthMeasureSpec, heightMeasureSpec );
+		
+		
+		if( !isShown() ) {
+			return;
+		}
+		
+		int paddingTop = getPaddingTop();
+		int paddingBottom = getPaddingBottom();
 
 		mHeightMeasureSpec = heightMeasureSpec;
 		mWidthMeasureSpec = widthMeasureSpec;
@@ -680,12 +700,17 @@ public class HorizontalVariableListView extends HorizontalListView {
 			}
 
 			int viewType = mAdapter.getItemViewType( 0 );
-			View child = mAdapter.getView( 0, mRecycleBin.get( viewType ).poll(), this );
-			addAndMeasureChild( child, -1 );
-
-			int childHeight = Math.min( heightSize, child.getMeasuredHeight() );
+			View recycledView = mRecycleBin.get( viewType ).poll();
+			View child = mAdapter.getView( 0, recycledView, this );
+			
+			int[] childSizes = measureChild( child );
+			
+			//addAndMeasureChild( child, -1, recycledView != null );
+			//int childHeight = Math.min( heightSize, child.getMeasuredHeight() );
+			
+			int childHeight = Math.min( heightSize, childSizes[1] );
+			
 			mRecycleBin.get( viewType ).offer( child );
-			removeViewInLayout( child );
 
 			if ( LOG_ENABLED ) {
 				Log.d( LOG_TAG, "final dimension: " + widthSize + "x" + childHeight );
@@ -697,7 +722,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 
 		if ( getChildCount() > 0 ) {
 			final View child = getChildAt( 0 );
-			int height = getHeight();
+			int height = getHeight() - paddingBottom - paddingTop;
 			if ( child.getMeasuredHeight() != height ) {
 				if ( LOG_ENABLED ) {
 					Log.e( LOG_TAG, "child height != current height: " + child.getMeasuredHeight() + " != " + height );
@@ -718,7 +743,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 		}
 	}
 
-	private void addAndMeasureChild( final View child, int viewPos ) {
+	private void addAndMeasureChild( final View child, int viewPos, boolean recycled ) {
 		LayoutParams params = child.getLayoutParams();
 
 		if ( params == null ) {
@@ -726,13 +751,31 @@ public class HorizontalVariableListView extends HorizontalListView {
 		}
 
 		addViewInLayout( child, viewPos, params, false );
-		forceChildLayout( child, params );
+		forceChildLayout( child, params, recycled );
 	}
 
-	public void forceChildLayout( View child, LayoutParams params ) {
-		int childHeightSpec = ViewGroup.getChildMeasureSpec( mHeightMeasureSpec, getPaddingTop() + getPaddingBottom(), params.height );
-		int childWidthSpec = ViewGroup.getChildMeasureSpec( mWidthMeasureSpec, getPaddingLeft() + getPaddingRight(), params.width );
-		child.measure( childWidthSpec, childHeightSpec );
+	public void forceChildLayout( View child, LayoutParams params, boolean recycled ) {
+		
+		boolean needToMeasure = !recycled || child.isLayoutRequested();
+		
+		if( needToMeasure ) {
+			int lpWidth = params.width;
+			int childWidthSpec;
+			
+            int childHeightSpec = ViewGroup.getChildMeasureSpec( mHeightMeasureSpec, getPaddingBottom() + getPaddingTop(), params.height );
+			
+			if( lpWidth > 0 ) {
+				childWidthSpec = MeasureSpec.makeMeasureSpec(lpWidth, MeasureSpec.EXACTLY );
+			} else {
+				childWidthSpec = MeasureSpec.makeMeasureSpec( 0, MeasureSpec.UNSPECIFIED );
+			}
+			child.measure( childWidthSpec, childHeightSpec );
+		}
+		
+		
+		//int childHeightSpec = ViewGroup.getChildMeasureSpec( mHeightMeasureSpec, getPaddingTop() + getPaddingBottom(), params.height );
+		//int childWidthSpec = ViewGroup.getChildMeasureSpec( mWidthMeasureSpec, getPaddingLeft() + getPaddingRight(), params.width );
+		//child.measure( childWidthSpec, childHeightSpec );
 		// measureChild( child, mWidthMeasureSpec, mHeightMeasureSpec );
 	}
 
@@ -757,10 +800,12 @@ public class HorizontalVariableListView extends HorizontalListView {
 		if ( mAdapter == null ) {
 			return;
 		}
+		
+		if( !isShown() && !( !changed && !mForceLayout ) ) {
+			return;
+		}
 
-		// if ( changed ) {
 		layoutChildren();
-		// }
 
 		if ( changed || mForceLayout ) {
 
@@ -790,6 +835,9 @@ public class HorizontalVariableListView extends HorizontalListView {
 	}
 
 	public void layoutChildren() {
+		if( LOG_ENABLED ) {
+			Log.i( LOG_TAG, "layoutChildren" );
+		}
 
 		int left, right;
 		int total = getChildCount();
@@ -797,12 +845,12 @@ public class HorizontalVariableListView extends HorizontalListView {
 		for ( int i = 0; i < total; i++ ) {
 			View child = getChildAt( i );
 
-			forceChildLayout( child, child.getLayoutParams() );
+			forceChildLayout( child, child.getLayoutParams(), true );
 
 			left = child.getLeft();
 			right = child.getRight();
 
-			int childHeight = child.getHeight();
+			int childHeight = child.getMeasuredHeight();
 			layoutChild( child, left, right, childHeight );
 		}
 	}
@@ -958,9 +1006,10 @@ public class HorizontalVariableListView extends HorizontalListView {
 
 	private View createNew( int position, int viewType, int layoutIndex ) {
 		final boolean selected = getIsSelected( position );
-		View child = mAdapter.getView( position, mRecycleBin.get( viewType ).poll(), this );
+		View newView = mRecycleBin.get( viewType ).poll();
+		View child = mAdapter.getView( position, newView, this );
 		child.setSelected( selected );
-		addAndMeasureChild( child, layoutIndex );
+		addAndMeasureChild( child, layoutIndex, newView != null );
 		return child;
 
 	}
@@ -980,8 +1029,9 @@ public class HorizontalVariableListView extends HorizontalListView {
 
 		if ( childWidth == -1 ) {
 			// otherwise create the child and measure it
-			View child = mAdapter.getView( position, mRecycleBin.get( viewType ).poll(), this );
-			addAndMeasureChild( child, -1 );
+			View recycledView = mRecycleBin.get( viewType ).poll();
+			View child = mAdapter.getView( position, recycledView, this );
+			addAndMeasureChild( child, -1, recycledView != null );
 			childWidth = child.getMeasuredWidth();
 			mChildWidths.set( viewType, childWidth );
 			mRecycleBin.get( viewType ).offer( child );
@@ -1546,13 +1596,20 @@ public class HorizontalVariableListView extends HorizontalListView {
 	protected void layoutChild( View child, int left, int right, int childHeight ) {
 
 		int top = getPaddingTop();
+		int bottom = getPaddingBottom();
 		int height = getHeight();
+		
 
 		if ( mAlignMode == Gravity.BOTTOM ) {
-			top = top + ( height - childHeight );
+			top = top + ( ( height - bottom ) - childHeight );
 		} else if ( mAlignMode == Gravity.CENTER ) {
-			top = top + ( height - childHeight ) / 2;
+			top = top + ( ( height - bottom - top ) - childHeight ) / 2;
 		}
+		
+		if( LOG_ENABLED ) {
+			Log.i( LOG_TAG, "layoutChild: top: " + top + ", bottom: " + bottom + ", height: " + height + ", childHeight: " + childHeight );
+		}
+		
 		child.layout( left, top, right, top + childHeight );
 	}
 
@@ -2136,18 +2193,101 @@ public class HorizontalVariableListView extends HorizontalListView {
 		return false;
 	}
 	
+	/**
+	 * Given an absolute position this method returns the clamped position in case the 
+	 * final position cannot be reached within a single scroll
+	 * @param finalX
+	 * @return
+	 */
+	public int computeScroll( int finalX ) {
+
+		if( getChildCount() < 1 ) {
+			return 0;
+		}
+
+		final int width = getWidth();
+		int offset = finalX - mCurrentX;
+		int delta = offset;
+		
+		if ( delta < 0 ) {
+			delta = Math.max( -( width - 1 ), delta );
+		} else {
+			delta = Math.min( width - 1, delta );
+		}
+		
+		return ( offset - delta );
+	}
+	
+	/**
+	 * Attempt to scroll to an absolute position
+	 * @param x
+	 * @return	returns the clamped x in case the amount to be scrolled it's to big 
+	 */
+	public int scrollTo( int x ) {
+		
+		if( getChildCount() < 1 ) {
+			Log.w( LOG_TAG, "can't scroll with no children" );
+			return 0;
+		}
+
+		final int width = getWidth();
+		int offset = x - mCurrentX;
+		int delta = offset;
+		
+		if ( LOG_ENABLED ) {
+			Log.d( LOG_TAG, "scrollTo: " + x + ", current: " + mCurrentX + ", delta: " + delta );
+		}
+
+		if ( delta < 0 ) {
+			delta = Math.max( -( width - 1 ), delta );
+		} else {
+			delta = Math.min( width - 1, delta );
+		}
+		
+		final int oldx = mCurrentX; 
+		mCurrentX = mCurrentX + delta;
+		
+		if ( LOG_ENABLED ) {
+			Log.d( LOG_TAG, "scrollTo: " + mCurrentX + ", delta: " + delta + ", width: " + width );
+		}
+
+		// first pass check
+		if( overScrollBy( mCurrentX - oldx, 0, oldx, 0, getScrollRange(), 0, 0, 0, false  )) {
+			return 0;
+		} else {
+			super.scrollTo( mCurrentX, 0 );
+
+			// second pass check for clamped x
+			if( mMaxX != MAX_SCROLL || mMinX != MIN_SCROLL ) {
+				if( overScrollBy( 0, 0, mCurrentX, 0, getScrollRange(), 0, 0, 0, false  ) ) {
+					return 0;
+				}
+			}
+			
+			return ( offset - delta );
+		}
+		
+	}
 
 	/**
 	 * Scroll the list to an absolute position.
 	 * Note that the allowed max "x" amount is the current list width.
-	 * You cannot scroll more than that. 
+	 * You cannot scroll more than that.<br /> 
+	 * <b>Don't use this method directly, instead use {@link #scrollTo(int)}</b>
 	 * 
+	 * @see #scrollTo(int)
 	 */
 	@Override
 	public void scrollTo( int x, int y ) {
 
+		if( getChildCount() < 1 ) {
+			Log.w( LOG_TAG, "can't scroll with no children" );
+			return;
+		}
+
 		final int width = getWidth();
-		int delta = x - mCurrentX;
+		int offset = x - mCurrentX;
+		int delta = offset;
 		
 		if ( LOG_ENABLED ) {
 			Log.d( LOG_TAG, "scrollTo: " + x + ", current: " + mCurrentX + ", delta: " + delta );
@@ -2165,9 +2305,7 @@ public class HorizontalVariableListView extends HorizontalListView {
 			Log.d( LOG_TAG, "scrollTo: " + mCurrentX + ", delta: " + delta + ", width: " + width );
 		}
 
-		if ( getChildCount() > 0 ) {
-			super.scrollTo( mCurrentX, 0 );
-		}
+		super.scrollTo( mCurrentX, 0 );
 	}
 
 	public int getCurrentScrollX() {
@@ -2283,8 +2421,6 @@ public class HorizontalVariableListView extends HorizontalListView {
 		final boolean toRight = deltaX < 0;
 		final boolean overScrollHorizontal = overScrollMode == OVER_SCROLL_ALWAYS;
 		
-
-
 		if ( LOG_ENABLED ) {
 			Log.d( LOG_TAG, "toLeft: " + toLeft + ", toRight: " + toRight );
 		}
@@ -2581,6 +2717,10 @@ public class HorizontalVariableListView extends HorizontalListView {
 				if( !mScroller.isFinished() ) {
 					mScroller.abortAnimation();
 				}
+				
+				if( LOG_ENABLED ) {
+					Log.d( LOG_TAG, "FlingScroller. start: " + offset + ", final position: " + mFinalPosition );
+				}
 				post( this );
 			}
 		}
@@ -2603,9 +2743,14 @@ public class HorizontalVariableListView extends HorizontalListView {
 			
 			if( hasMore() ) {
 				
+				if( LOG_ENABLED ) {
+					Log.d( LOG_TAG, "FlingScroller. final position: " + mFinalPosition + ", current: " + mCurrentX );
+					Log.d( LOG_TAG, "FlingScroller. minx: " + mMinX + ", max: " + mMaxX );
+				}
+				
 				if( mFinalPosition != mCurrentX ) {
 					
-					int offset = Math.max( mMinX, Math.min( mCurrentX + mOffset, mMaxX ) ) - mCurrentX;
+					int offset = mFinalPosition - mCurrentX;
 					mFinalPosition = mCurrentX + offset;
 					
 					mScroller.startScroll( mCurrentX, 0, offset, 0, mDuration );

@@ -30,7 +30,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	public static boolean USE_MULTIPLE_VIEWTYPES = false;
 	public static final int DIVIDER_WIDTH = 30;
-	
 	public static final boolean USE_VLIST = false;
 
 	int labelIndex = 0;
@@ -46,7 +45,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		setContentView( R.layout.activity_main );
 
 		List<String> data = new ArrayList<String>();
-		for ( int i = 0; i < 200; i++ ) {
+		for ( int i = 0; i < 7; i++ ) {
 			data.add( getNextValue() );
 		}
 
@@ -134,6 +133,14 @@ public class MainActivity extends Activity implements OnClickListener {
 				Log.d( LOG_TAG, "onNothingSelected" );
 			}
 			
+		} );
+		
+		mList2.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick( AdapterView<?> arg0, View arg1, int arg2, long arg3 ) {
+				Log.i( LOG_TAG, "onItemClick: " + arg2 );
+				
+			}
 		} );
 		
 
@@ -409,9 +416,33 @@ public class MainActivity extends Activity implements OnClickListener {
 			case R.id.button_smoothscroll:
 				
 				if( USE_VLIST ) {
-					mList2.smoothScrollBy( 15000, 250 );
+					mList2.smoothScrollBy( mList2.getChildAt( 0 ).getWidth() * 20, 250 );
 				} else {
-					mList.smoothScrollBy( mList.getChildAt( 0 ).getWidth() * 20, 500 );
+					
+					final int finalX = (int) (mList.getChildAt( 0 ).getWidth() * 3.5 );
+					
+					mList.post( new Runnable() {
+						
+						@Override
+						public void run() {
+							int clamped = mList.computeScroll( finalX );
+							Log.d( LOG_TAG, "run to: " + finalX + ", clamp: " + clamped );
+							
+							if( clamped != 0 ) {
+								mList.smoothScrollBy( finalX, 60 * 50 );
+							} else {
+								clamped = mList.scrollTo( finalX );
+							
+								if( clamped != 0 ) {
+									mList.post( this );
+								}
+							}
+						}
+					} );
+					
+					// int clamped = mList.scrollTo( mList.getChildAt( 0 ).getWidth() * 20 );
+					//Log.d( LOG_TAG, "clamped: " + clamped );
+					// mList.smoothScrollBy( mList.getChildAt( 0 ).getWidth() * 20, 500 );
 				}
 				break;
 		}

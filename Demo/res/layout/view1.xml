@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:clickable="false"
+    android:clickable="true"
     android:focusable="true"
     android:gravity="center_horizontal|bottom"
     android:background="@drawable/image_background_selector"

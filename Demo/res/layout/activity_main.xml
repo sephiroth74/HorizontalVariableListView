@@ -14,7 +14,7 @@
 	        android:layout_height="match_parent"
 	        android:smoothScrollbar="true"
 	        android:id="@+id/list2"
-	        android:choiceMode="multipleChoice"
+	        android:choiceMode="singleChoice"
 	        >
 	    </ListView>
 	
