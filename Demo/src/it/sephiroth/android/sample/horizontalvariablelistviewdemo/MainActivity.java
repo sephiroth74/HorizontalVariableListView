@@ -2,19 +2,13 @@ package it.sephiroth.android.sample.horizontalvariablelistviewdemo;
 
 import it.sephiroth.android.library.util.v11.MultiChoiceModeListener;
 import it.sephiroth.android.library.widget.HListView;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,16 +33,12 @@ public class MainActivity extends Activity implements OnClickListener, MultiChoi
 	Button mButton2;
 	Button mButton3;
 	TestAdapter mAdapter;
-	ExecutorService mExecutor;
 
 	@Override
 	protected void onCreate( Bundle savedInstanceState ) {
 		super.onCreate( savedInstanceState );
 		
 		setContentView( R.layout.activity_main );
-		
-		mExecutor = Executors.newCachedThreadPool();
-		
 		
 		List<String> items = new ArrayList<String>();
 		for( int i = 0; i < 50; i++ ) {
@@ -71,12 +61,6 @@ public class MainActivity extends Activity implements OnClickListener, MultiChoi
 		mButton3.setOnClickListener( this );
 		
 		Log.i( LOG_TAG, "choice mode: " + listView.getChoiceMode() );
-	}
-	
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		mExecutor.shutdownNow();
 	}
 	
 	@Override
@@ -134,15 +118,14 @@ public class MainActivity extends Activity implements OnClickListener, MultiChoi
 				sorted.add( checkedItems.keyAt( i ) );
 			}
 		}
-		
 
 		Collections.sort( sorted );
 		
-		for( int i = 0; i < sorted.size(); i++ ) {
-			Log.d( LOG_TAG, "Deleting item at: " + sorted.get( i ) );
-			mAdapter.mItems.remove( sorted.get( i ) );
+		for( int i = sorted.size()-1; i >= 0; i-- ) {
+			int position = sorted.get( i );
+			Log.d( LOG_TAG, "Deleting item at: " + position );
+			mAdapter.mItems.remove( position );
 		}
-		
 		mAdapter.notifyDataSetChanged();
 	}
 	
@@ -168,8 +151,6 @@ public class MainActivity extends Activity implements OnClickListener, MultiChoi
 		@Override
 		public View getView( int position, View convertView, ViewGroup parent ) {
 			
-			Log.i( LOG_TAG, "getView: " + position );
-			
 			View view = super.getView( position, convertView, parent );
 			
 			ImageView image = (ImageView) view.findViewById( R.id.image );
@@ -186,38 +167,6 @@ public class MainActivity extends Activity implements OnClickListener, MultiChoi
 			}
 			
 			return view;
-		}
-		
-		private void postSetImage( final ImageView view, final String assetName, final int position ) {
-			
-			mExecutor.submit( new Runnable() {
-				
-				@Override
-				public void run() {
-					
-					if( null != view ) {
-						InputStream stream;
-						try {
-							stream = getContext().getAssets().open( assetName );
-						} catch( IOException e ){
-							return;
-						}
-						Bitmap bitmap = BitmapFactory.decodeStream( stream );
-						
-						int finalW = 100;
-						int finalH = 100;
-						
-						int w = bitmap.getWidth();
-						int h = bitmap.getHeight();
-						
-						bitmap = Bitmap.createBitmap( bitmap, (w-finalW)/2, (h-finalH)/2, finalW, finalH );
-						
-						view.setImageBitmap( bitmap );
-						// ((ViewGroup)view.getParent()).requestLayout();
-					}
-					
-				}
-			} );
 		}
 	}
 
