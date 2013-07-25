@@ -2,18 +2,18 @@ Horizontal Variable ListView
 ==========================
 
 ## Description
- Horizontal list view for Android which allows variable items widths and heights.
+ This is an horizontal ListView for Android which allows different items widths <del>and heights</del>.
 
 ## Features
 * It extends the AdapterView in order to give the full support to adapters.
-* Customizable left and right edges. A left and right edge glow effect will be shown when the list reaches one of the edges. It can be enabled by setting the overscroll mode to OVER_SCROLL_ALWAYS:
+* Use the included `BaseAdapterExtended` to modify the list adapter more efficiently.
+* <del>Customizable left and right edges</del>. Now using the `EdgeEffectCompat`, so the effect will be available only on supported devices.
 
 		list.setOverScrollMode( HorizontalVariableListView.OVER_SCROLL_ALWAYS );
 		
 	
-* It supports multiple items type. Just override the ```getViewTypeCount()``` in your adapter. Each item (by type) can have a different width.
+* It supports multiple items type. Just override the `getViewTypeCount()` in your adapter. Each item (by type) can have a different width.
 * It uses a recycler in order to reuse recycled items instead of creating new ones every time.
-
 * It supports for single/multiple selection using the `setSelectionMode` method.
 
 ## Selection
