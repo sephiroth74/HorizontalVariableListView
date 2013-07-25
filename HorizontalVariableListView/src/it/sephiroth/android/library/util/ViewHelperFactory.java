@@ -9,10 +9,13 @@ public class ViewHelperFactory {
 
 	public static abstract class ViewHelper {
 
+		private static final String LOG_TAG = "ViewHelper";
+		
 		protected View view;
 
 		protected ViewHelper( View view ) {
 			this.view = view;
+			Log.i( LOG_TAG, this.getClass().getSimpleName() );
 		}
 
 		public abstract void postOnAnimation( Runnable action );
@@ -21,7 +24,7 @@ public class ViewHelperFactory {
 	}
 
 	public static class ViewHelperDefault extends ViewHelper {
-
+		
 		public ViewHelperDefault( View view ) {
 			super( view );
 		}

@@ -1921,7 +1921,6 @@ public class HListView extends AbsHListView {
 
 		final int w = child.getMeasuredWidth();
 		final int h = child.getMeasuredHeight();
-		Log.d( LOG_TAG, "needToMeasure: " + needToMeasure + ", child height: " + h );
 		final int childLeft = flowDown ? x : x - w;
 
 		if ( needToMeasure ) {
