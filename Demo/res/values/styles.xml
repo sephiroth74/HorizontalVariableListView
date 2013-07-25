@@ -1,5 +1,30 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="AppTheme" parent="android:Theme.Light" />
+    <style name="AppBaseTheme" parent="android:Theme.Light"></style>
+
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">
+        <item name="sephiroth_listViewStyle">@style/HListView</item>
+        <item name="sephiroth_absHListViewStyle">@style/AbsHListView</item>
+        <item name="sephiroth_listPreferredItemWidth">64dip</item>
+    </style>
+
+    <style name="AbsHListView">
+        <item name="android:scrollbars">horizontal</item>
+        <item name="android:fadingEdge">horizontal</item>
+    </style>
+
+    <style name="HListView" parent="AbsHListView">
+        <item name="android:listSelector">@android:drawable/list_selector_background</item>
+        <item name="android:cacheColorHint">?android:attr/colorBackgroundCacheHint</item>
+        <item name="android:divider">@android:drawable/divider_horizontal_bright</item>
+        <item name="dividerWidth">1dip</item>
+        <item name="stackFromRight">false</item>
+        <item name="measureWithChild">0</item>
+        <item name="android:smoothScrollbar">true</item>
+        <item name="android:scrollingCache">false</item>
+        <item name="android:choiceMode">multipleChoiceModal</item>
+        <item name="android:overScrollMode">always</item>
+    </style>
 
 </resources>
