@@ -1,146 +1,54 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" 
-    android:orientation="vertical">
-
-    <RelativeLayout 
-        android:layout_weight="1"
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:gravity="center_vertical">
-        
-	    <ListView android:layout_width="match_parent"
-	        android:layout_height="match_parent"
-	        android:smoothScrollbar="true"
-	        android:id="@+id/list2"
-	        android:choiceMode="singleChoice"
-	        >
-	    </ListView>
-	
-	    <it.sephiroth.android.library.widget.HorizontalVariableListView
-	        android:id="@+id/list"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:gravity="bottom|center_vertical"
-	        android:paddingBottom="0dp"
-	        android:paddingTop="0dp" />
-    </RelativeLayout>
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:weightSum="1"
+    tools:context=".MainActivity" >
 
     <LinearLayout
-        android:layout_weight="0"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_height="0dip"
+        android:layout_weight="1"
         android:orientation="vertical" >
 
-        <!-- add single -->
-
-        <LinearLayout
+        <it.sephiroth.android.library.widget.HListView
+            android:id="@+id/hListView1"
             android:layout_width="match_parent"
+            android:layout_height="250dip"
+            android:paddingTop="20dip"
+            android:paddingBottom="20dip"
+            android:background="#11000000" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal" >
+            android:text="Add" />
 
-            <Button
-                android:id="@+id/button_add_before"
-                style="@style/AppTheme.Button"
-                android:text="Add before" />
-
-            <Button
-                android:id="@+id/button_add_in_range"
-                style="@style/AppTheme.Button"
-                android:text="Add middle" />
-
-            <Button
-                android:id="@+id/button_add_after"
-                style="@style/AppTheme.Button"
-                android:text="Add after" />
-        </LinearLayout>
-
-        <!-- add multiple -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal" >
+            android:text="Remove" />
 
-            <Button
-                android:id="@+id/button_adds_before"
-                style="@style/AppTheme.Button"
-                android:text="Add n before" />
-
-            <Button
-                android:id="@+id/button_adds_in_range"
-                style="@style/AppTheme.Button"
-                android:text="Add n middle" />
-
-            <Button
-                android:id="@+id/button_adds_after"
-                style="@style/AppTheme.Button"
-                android:text="Add n after" />
-        </LinearLayout>
-
-        <!-- delete single -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal" >
-
-            <Button
-                android:id="@+id/button_delete_before"
-                style="@style/AppTheme.Button"
-                android:text="Delete before" />
-
-            <Button
-                android:id="@+id/button_delete_in_range"
-                style="@style/AppTheme.Button"
-                android:text="Delete middle" />
-
-            <Button
-                android:id="@+id/button_delete_after"
-                style="@style/AppTheme.Button"
-                android:text="Delete after" />
-        </LinearLayout>
-        
-        <!-- replace -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal" >
-
-            <Button
-                android:id="@+id/button_replace_before"
-                style="@style/AppTheme.Button"
-                android:text="Replace before" />
-
-            <Button
-                android:id="@+id/button_replace_in_range"
-                style="@style/AppTheme.Button"
-                android:text="Replace middle" />
-
-            <Button
-                android:id="@+id/button_replace_after"
-                style="@style/AppTheme.Button"
-                android:text="Replace after" />
-        </LinearLayout>
-        
-        <!-- scroll -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal" >
-
-            <Button
-                android:id="@+id/button_smoothscroll"
-                style="@style/AppTheme.Button"
-                android:text="Scroll 1" />
-        </LinearLayout>        
+            android:text="Scroll" />
     </LinearLayout>
 
 </LinearLayout>
