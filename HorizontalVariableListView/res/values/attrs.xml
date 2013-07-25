@@ -30,14 +30,14 @@
         <attr name="android:drawSelectorOnTop" />
         <attr name="android:cacheColorHint" />
         <attr name="android:scrollingCache" />
-        <attr name="stackFromRight" format="boolean" />
+        <attr name="android:choiceMode" />
         
+        <attr name="stackFromRight" format="boolean" />
         <attr name="transcriptMode">
             <enum name="disabled" value="0"/>
             <enum name="normal" value="1" />
             <enum name="alwaysScroll" value="2" />
         </attr>
         
-        <attr name="android:choiceMode" />
     </declare-styleable>    
 </resources>
