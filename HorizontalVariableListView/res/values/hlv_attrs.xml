@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="sephiroth_listViewStyle" format="reference" />
+    <attr name="sephiroth_absHListViewStyle" format="reference" />
+    <attr name="sephiroth_listPreferredItemWidth" format="dimension" />
+    
+    <attr name="entries" format="reference" />
+    
+    <declare-styleable name="HListView">
+        <attr name="android:entries" />
+        <attr name="android:divider" />
+        <attr name="dividerWidth" format="dimension" />
+        <attr name="headerDividersEnabled" format="boolean" />
+        <attr name="footerDividersEnabled" format="boolean" />
+        <attr name="overScrollHeader" format="reference|color" />
+        <attr name="overScrollFooter" format="reference|color" />
+        
+        <!-- 
+        When "wrap_content" is used as value of the layout_height property.
+        Pass the position, inside the adapter, of the view being used to measure the view
+        or '-1' to use the default behavior ( default is -1 )
+        -->
+        <attr name="measureWithChild" format="integer" />        
+    </declare-styleable>
+    
+
+    <declare-styleable name="AbsHListView">
+        <attr name="android:listSelector" />
+        <attr name="android:smoothScrollbar" />
+        <attr name="android:drawSelectorOnTop" />
+        <attr name="android:cacheColorHint" />
+        <attr name="android:scrollingCache" />
+        <attr name="android:choiceMode" />
+        
+        <attr name="stackFromRight" format="boolean" />
+        <attr name="transcriptMode">
+            <enum name="disabled" value="0"/>
+            <enum name="normal" value="1" />
+            <enum name="alwaysScroll" value="2" />
+        </attr>
+        
+    </declare-styleable>    
+</resources>
