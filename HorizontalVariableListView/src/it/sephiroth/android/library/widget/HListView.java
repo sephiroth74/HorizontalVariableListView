@@ -1164,6 +1164,15 @@ public class HListView extends AbsHListView {
 		}
 		child.measure( childWidthSpec, childHeightSpec );
 	}
+	
+	public int[] measureChild( View child ) {
+		measureItem( child );
+		
+		int w = child.getMeasuredWidth();
+		int h = child.getMeasuredHeight();
+		
+		return new int[]{ w, h };
+	}
 
 	/**
 	 * @return True to recycle the views used to measure this ListView in UNSPECIFIED/AT_MOST modes, false otherwise.

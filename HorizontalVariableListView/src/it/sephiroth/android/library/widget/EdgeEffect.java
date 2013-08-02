@@ -137,8 +137,8 @@ public class EdgeEffect {
      */
     public EdgeEffect(Context context, int direction ) {
         final Resources res = context.getResources();
-        mEdge = res.getDrawable(it.sephiroth.android.library.R.drawable.overscroll_edge);
-        mGlow = res.getDrawable(it.sephiroth.android.library.R.drawable.overscroll_glow);
+        mEdge = res.getDrawable(it.sephiroth.android.library.R.drawable.hlv_overscroll_edge);
+        mGlow = res.getDrawable(it.sephiroth.android.library.R.drawable.hlv_overscroll_glow);
         mDirection = direction;
 
         mEdgeHeight = mEdge.getIntrinsicHeight();

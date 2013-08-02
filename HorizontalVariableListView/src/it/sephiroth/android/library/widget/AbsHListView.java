@@ -5,8 +5,10 @@ import it.sephiroth.android.library.util.ViewHelperFactory;
 import it.sephiroth.android.library.util.ViewHelperFactory.ViewHelper;
 import it.sephiroth.android.library.util.v11.MultiChoiceModeListener;
 import it.sephiroth.android.library.util.v11.MultiChoiceModeWrapper;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -673,8 +675,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
 	@Override
 	public void setOverScrollMode( int mode ) {
-		Log.i( TAG, "setOverscrollMode: " + mode );
-
 		if ( mode != OVER_SCROLL_NEVER ) {
 			if ( mEdgeGlowTop == null ) {
 				Context context = getContext();
@@ -988,8 +988,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	 */
 	@TargetApi(11)
 	public void setChoiceMode( int choiceMode ) {
-		Log.i( TAG, "setChoiceMode: " + choiceMode );
-
 		mChoiceMode = choiceMode;
 
 		if ( android.os.Build.VERSION.SDK_INT >= 11 ) {
@@ -1074,7 +1072,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	 * @attr ref android.R.styleable#AbsListView_smoothScrollbar
 	 */
 	public void setSmoothScrollbarEnabled( boolean enabled ) {
-		Log.i( TAG, "setSmoothScrollbarEnabled: " + enabled );
 		mSmoothScrollbarEnabled = enabled;
 	}
 
@@ -1207,7 +1204,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	 * @see View#setDrawingCacheEnabled(boolean)
 	 */
 	public void setScrollingCacheEnabled( boolean enabled ) {
-		Log.i( TAG, "setScrollingCacheEnabled: " + enabled );
 		if ( mScrollingCacheEnabled && !enabled ) {
 			clearScrollingCache();
 		}
@@ -1248,8 +1244,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	 *           true to pin the view's content to the bottom edge, false to pin the view's content to the top edge
 	 */
 	public void setStackFromRight( boolean stackFromRight ) {
-		Log.i( TAG, "setStackFromRight: " + stackFromRight );
-		
 		if ( mStackFromRight != stackFromRight ) {
 			mStackFromRight = stackFromRight;
 			requestLayoutIfNecessary();
@@ -1439,7 +1433,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
 	@Override
 	public void onRestoreInstanceState( Parcelable state ) {
-		Log.i( TAG, "onRestoreInstanceState" );
 		SavedState ss = (SavedState) state;
 
 		super.onRestoreInstanceState( ss.getSuperState() );
@@ -3054,6 +3047,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 											mPendingCheckForTap : mPendingCheckForLongPress );
 								}
 								mLayoutMode = LAYOUT_NORMAL;
+								
 								if ( !mDataChanged && mAdapter.isEnabled( motionPosition ) ) {
 									mTouchMode = TOUCH_MODE_TAP;
 									setSelectedPositionInt( mMotionPosition );
@@ -5118,7 +5112,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	 * @see #TRANSCRIPT_MODE_ALWAYS_SCROLL
 	 */
 	public void setTranscriptMode( int mode ) {
-		Log.i( TAG, "setTranscriptMode: " + mode );
 		mTranscriptMode = mode;
 	}
 
@@ -5147,7 +5140,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	 *           The background color
 	 */
 	public void setCacheColorHint( int color ) {
-		Log.i( TAG, "setCacheColorHint: " + color );
 		if ( color != mCacheColorHint ) {
 			mCacheColorHint = color;
 			int count = getChildCount();

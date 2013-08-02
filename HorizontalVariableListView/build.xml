@@ -47,6 +47,7 @@
          This file is an integral part of the build system for your
          application and should be checked into Version Control Systems. -->
     <loadproperties srcFile="project.properties" />
+    <loadproperties srcFile="../../project.properties" />
 
     <!-- quick check on sdk.dir -->
     <fail
@@ -88,5 +89,23 @@
     -->
     <!-- version-tag: 1 -->
     <import file="${sdk.dir}/tools/ant/build.xml" />
+
+    <target name="-post-compile">
+        <antcall target="-rename-jar" />
+    </target>
+
+    <target name="-rename-jar">
+        <if>
+            <condition>
+                <and>
+                    <isset property="horizontallist.jar" />
+                </and>
+            </condition>
+            <then>
+                <copy tofile="./bin/${horizontallist.jar}" file="./bin/classes.jar" verbose="true" />
+                <delete file="./bin/classes.jar" verbose="true" />
+            </then>
+        </if>
+    </target>
 
 </project>
