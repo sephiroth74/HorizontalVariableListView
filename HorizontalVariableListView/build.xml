@@ -103,7 +103,6 @@
             </condition>
             <then>
                 <copy tofile="./bin/${horizontallist.jar}" file="./bin/classes.jar" verbose="true" />
-                <delete file="./bin/classes.jar" verbose="true" />
             </then>
         </if>
     </target>
