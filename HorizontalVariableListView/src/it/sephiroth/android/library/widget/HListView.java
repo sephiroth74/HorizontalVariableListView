@@ -1083,7 +1083,6 @@ public class HListView extends AbsHListView {
 
 	@Override
 	protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
-		Log.i( LOG_TAG, "onMeasure" );
 		// Sets up mListPadding
 		super.onMeasure( widthMeasureSpec, heightMeasureSpec );
 
@@ -1139,7 +1138,7 @@ public class HListView extends AbsHListView {
 			widthSize = measureWidthOfChildren( heightMeasureSpec, 0, NO_POSITION, widthSize, -1 );
 		}
 		
-		Log.d( LOG_TAG, "final size: " + widthSize + "x" + heightSize );
+		// Log.d( LOG_TAG, "final size: " + widthSize + "x" + heightSize );
 
 		setMeasuredDimension( widthSize, heightSize );
 		mHeightMeasureSpec = heightMeasureSpec;

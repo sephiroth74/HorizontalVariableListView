@@ -7,9 +7,10 @@ import android.view.View;
 
 public class ViewHelperFactory {
 
+	private static final String LOG_TAG = "ViewHelper";
+	
 	public static abstract class ViewHelper {
 
-		private static final String LOG_TAG = "ViewHelper";
 		
 		protected View view;
 
@@ -36,6 +37,7 @@ public class ViewHelperFactory {
 
 		@Override
 		public void setScrollX( int value ) {
+			Log.d( LOG_TAG, "setScrollX: " + value );
 			view.scrollTo( value, view.getScrollY() );
 		}
 

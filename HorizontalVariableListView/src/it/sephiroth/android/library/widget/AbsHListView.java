@@ -3651,6 +3651,8 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			reportScrollStateChange( OnScrollListener.SCROLL_STATE_IDLE );
 			clearScrollingCache();
 			mScroller.abortAnimation();
+			// ensure edges
+			overScrollBy( 0, 0, 0, 0, 0, 0, 0, 0, false );
 
 		}
 
@@ -3971,7 +3973,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			} else {
 				// On-screen, just scroll.
 				final int targetLeft = getChildAt( mTargetPos - firstPos ).getLeft();
-				smoothScrollBy( targetLeft - offset, duration, true );
+				smoothScrollBy( targetLeft - offset, duration, false );
 				return;
 			}
 
@@ -4318,7 +4320,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		smoothScrollBy( distance, duration, false );
 	}
 
-	void smoothScrollBy( int distance, int duration, boolean linear ) {
+	public void smoothScrollBy( int distance, int duration, boolean linear ) {
 		if ( mFlingRunnable == null ) {
 			mFlingRunnable = new FlingRunnable();
 		}
