@@ -957,7 +957,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	private void updateOnScreenCheckedViews() {
 		final int firstPos = mFirstPosition;
 		final int count = getChildCount();
-		final boolean useActivated = getContext().getApplicationInfo().targetSdkVersion >= 11;
+		final boolean useActivated = android.os.Build.VERSION.SDK_INT >= 11;
 		for ( int i = 0; i < count; i++ ) {
 			final View child = getChildAt( i );
 			final int position = firstPos + i;
