@@ -1417,7 +1417,12 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 				&& mChoiceActionMode != null;
 
 		if ( mCheckStates != null ) {
-			ss.checkState = mCheckStates.clone();
+			try {
+				ss.checkState = mCheckStates.clone();
+			} catch( NoSuchMethodError e ) {
+				e.printStackTrace();
+				ss.checkState = new SparseBooleanArray();
+			}
 		}
 		if ( mCheckedIdStates != null ) {
 			final LongSparseArray<Integer> idState = new LongSparseArray<Integer>();
