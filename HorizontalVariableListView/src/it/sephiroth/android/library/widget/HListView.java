@@ -25,7 +25,6 @@ import java.util.ArrayList;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -157,7 +156,7 @@ public class HListView extends AbsHListView {
 		// final project
 		// also the drawabled must be copied
 		
-		int[] styleableArray = getResourceDeclareStyleableIntArray( context, "HListView" );
+		int[] styleableArray = getFieldFromStyleable( context, "HListView" );
 		
 		if( null != styleableArray ) {
 			array = context.obtainStyledAttributes( attrs, styleableArray, defStyle, 0 );

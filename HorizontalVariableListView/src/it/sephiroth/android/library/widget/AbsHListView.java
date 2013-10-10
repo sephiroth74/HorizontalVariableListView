@@ -632,7 +632,9 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		
 		TypedArray array = null;
 		
-		int[] styleableArray = getResourceDeclareStyleableIntArray( context, "AbsHListView" );
+		int[] styleableArray = getFieldFromStyleable( context, "AbsHListView" );
+		
+		Log.d( TAG, "styleableArray: " + styleableArray );
 		
 		if( null != styleableArray ) {
 			array = context.obtainStyledAttributes( attrs, styleableArray, defStyle, 0 );
@@ -648,6 +650,32 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		int choiceMode = ListView.CHOICE_MODE_NONE;
 		
 		if( null != array ) {
+			
+			// int resId;
+			// resId = getFieldFromStyleable( context, "AbsHListView_android_listSelector" );
+			// Log.d( TAG, "AbsHListView_android_listSelector: " + resId );
+			
+			// resId = getFieldFromStyleable( context, "AbsHListView_android_drawSelectorOnTop" );
+			// Log.d( TAG, "AbsHListView_android_drawSelectorOnTop: " + resId );
+			
+			// resId = getFieldFromStyleable( context, "AbsHListView_stackFromRight" );
+			// Log.d( TAG, "AbsHListView_stackFromRight: " + resId );
+			
+			// resId = getFieldFromStyleable( context, "AbsHListView_android_scrollingCache" );
+			// Log.d( TAG, "AbsHListView_android_scrollingCache: " + resId );
+			
+			// resId = getFieldFromStyleable( context, "AbsHListView_transcriptMode" );
+			// Log.d( TAG, "AbsHListView_transcriptMode: " + resId );
+			
+			// resId = getFieldFromStyleable( context, "AbsHListView_android_cacheColorHint" );
+			// Log.d( TAG, "AbsHListView_android_cacheColorHint: " + resId );
+			
+			// resId = getFieldFromStyleable( context, "AbsHListView_android_smoothScrollbar" );
+			// Log.d( TAG, "AbsHListView_android_smoothScrollbar: " + resId );
+			
+			// resId = getFieldFromStyleable( context, "AbsHListView_android_choiceMode" );
+			// Log.d( TAG, "AbsHListView_android_choiceMode: " + resId );
+			
 			listSelector = array.getDrawable( 0 /*R.styleable.AbsHListView_android_listSelector*/ );
 			drawSelectorOnTop = array.getBoolean( 1 /*R.styleable.AbsHListView_android_drawSelectorOnTop*/, false );
 			stackFromRight = array.getBoolean( 6 /*R.styleable.AbsHListView_stackFromRight*/, false );
@@ -5752,16 +5780,17 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	*                       <declare-styleable>-resource or <code>null</code> if
 	*                       this tag could not be found or an error occured.
 	*********************************************************************************/
-	public static final int[] getResourceDeclareStyleableIntArray( Context context, String name ) {
+	@SuppressWarnings ( "unchecked" )
+	public static final <T> T getFieldFromStyleable( Context context, String name ) {
 		try {
 			// use reflection to access the resource class
 			Field field = Class.forName( context.getPackageName() + ".R$styleable" ).getField( name );
 			if ( null != field ) {
-				return (int[]) field.get( null );
+				return (T) field.get( null );
 			}
 		} catch ( Throwable t ) {
+			t.printStackTrace();
 		}
-
 		return null;
 	}	
 }
