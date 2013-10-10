@@ -21,10 +21,11 @@
 
 package it.sephiroth.android.library.widget;
 
-import it.sephiroth.android.library.R;
 import java.util.ArrayList;
+
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -143,48 +144,74 @@ public class HListView extends AbsHListView {
 	}
 
 	public HListView( Context context, AttributeSet attrs ) {
-		this( context, attrs, R.attr.sephiroth_listViewStyle );
+		this( context, attrs, context.getResources().getIdentifier( "sephiroth_listViewStyle", "attr", context.getPackageName() ) );
 	}
 
 	public HListView( Context context, AttributeSet attrs, int defStyle ) {
 		super( context, attrs, defStyle );
+		
+		TypedArray array = null;
+		
+		// styles are being loaded dynamically, so the library can be used as a .jar file
+		// the only things to do is to copy all the entries in the "res/values/hlv_attrs.xml" to the
+		// final project
+		// also the drawabled must be copied
+		
+		int[] styleableArray = getResourceDeclareStyleableIntArray( context, "HListView" );
+		
+		if( null != styleableArray ) {
+			array = context.obtainStyledAttributes( attrs, styleableArray, defStyle, 0 );
+		}
+		
+		CharSequence[] entries = null;
+		Drawable dividerDrawable = null;
+		Drawable overscrollHeader = null;
+		Drawable overscrollFooter = null;
+		int dividerWidth = 0;
 
-		TypedArray a = context.obtainStyledAttributes( attrs, R.styleable.HListView, defStyle, 0 );
+		boolean headerDividersEnabled = true;
+		boolean footerDividersEnabled = true;
+		int measureWithChild = -1;		
+		
+		if( null != array ) {
+			
+			entries = array.getTextArray( 0 /*R.styleable.HListView_android_entries*/ );
+			dividerDrawable = array.getDrawable( 1 /*R.styleable.HListView_android_divider*/ );
+			overscrollHeader = array.getDrawable( 5 /*R.styleable.HListView_overScrollHeader*/ );
+			overscrollFooter = array.getDrawable( 6 /*R.styleable.HListView_overScrollFooter*/ );
+			dividerWidth = array.getDimensionPixelSize( 2 /*R.styleable.HListView_dividerWidth*/, 0 );
+			headerDividersEnabled = array.getBoolean( 3 /*R.styleable.HListView_headerDividersEnabled*/, true );
+			footerDividersEnabled = array.getBoolean( 4 /*R.styleable.HListView_footerDividersEnabled*/, true );
+			measureWithChild = array.getInteger( 7 /*R.styleable.HListView_measureWithChild*/, -1 );			
+			array.recycle();
+		}
 
-		CharSequence[] entries = a.getTextArray( R.styleable.HListView_android_entries );
 		if ( entries != null ) {
 			setAdapter( new ArrayAdapter<CharSequence>( context, android.R.layout.simple_list_item_1, entries ) );
 		}
 
-		final Drawable d = a.getDrawable( R.styleable.HListView_android_divider );
-		if ( d != null ) {
+		if ( dividerDrawable != null ) {
 			// If a divider is specified use its intrinsic height for divider height
-			setDivider( d );
+			setDivider( dividerDrawable );
 		}
 
-		final Drawable osHeader = a.getDrawable( R.styleable.HListView_overScrollHeader );
-		if ( osHeader != null ) {
-			setOverscrollHeader( osHeader );
+		if ( overscrollHeader != null ) {
+			setOverscrollHeader( overscrollHeader );
 		}
 
-		final Drawable osFooter = a.getDrawable( R.styleable.HListView_overScrollFooter );
-		if ( osFooter != null ) {
-			setOverscrollFooter( osFooter );
+		if ( overscrollFooter != null ) {
+			setOverscrollFooter( overscrollFooter );
 		}
 
 		// Use the height specified, zero being the default
-		final int dividerWidth = a.getDimensionPixelSize( R.styleable.HListView_dividerWidth, 0 );
 		if ( dividerWidth != 0 ) {
 			setDividerWidth( dividerWidth );
 		}
 
-		mHeaderDividersEnabled = a.getBoolean( R.styleable.HListView_headerDividersEnabled, true );
-		mFooterDividersEnabled = a.getBoolean( R.styleable.HListView_footerDividersEnabled, true );
-		mMeasureWithChild = a.getInteger( R.styleable.HListView_measureWithChild, -1 );
-		
-		Log.d( LOG_TAG, "mMeasureWithChild: " + mMeasureWithChild );
+		mHeaderDividersEnabled = headerDividersEnabled;
+		mFooterDividersEnabled = footerDividersEnabled;
+		mMeasureWithChild = measureWithChild;
 
-		a.recycle();
 	}
 
 	/**
@@ -1081,6 +1108,7 @@ public class HListView extends AbsHListView {
 		super.onSizeChanged( w, h, oldw, oldh );
 	}
 
+	@TargetApi ( Build.VERSION_CODES.HONEYCOMB )
 	@Override
 	protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
 		// Sets up mListPadding
@@ -1871,6 +1899,7 @@ public class HListView extends AbsHListView {
 	 * @param recycled
 	 *           Has this view been pulled from the recycle bin? If so it does not need to be remeasured.
 	 */
+	@TargetApi ( Build.VERSION_CODES.HONEYCOMB )
 	private void setupChild( View child, int position, int x, boolean flowDown, int childrenTop, boolean selected, boolean recycled ) {
 		final boolean isSelected = selected && shouldShowSelector();
 		final boolean updateChildSelected = isSelected != child.isSelected();
