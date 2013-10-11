@@ -3347,12 +3347,21 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	 */
 	protected float getHorizontalScrollFactor() {
 		if ( mHorizontalScrollFactor == 0 ) {
-			TypedValue outValue = new TypedValue();
-			if ( !getContext().getTheme().resolveAttribute( R.attr.sephiroth_listPreferredItemWidth, outValue, true ) ) {
-				throw new IllegalStateException(
-						"Expected theme to define listPreferredItemHeight." );
+
+			int resId = getResources().getIdentifier( "sephiroth_listPreferredItemWidth", "attr", getContext().getPackageName() );
+			
+			if( resId != 0 ) {
+				TypedValue outValue = new TypedValue();
+				boolean success = getContext().getTheme().resolveAttribute( resId, outValue, true );
+				
+				if( success ) {
+					mHorizontalScrollFactor = outValue.getDimension( getContext().getResources().getDisplayMetrics() );
+				} else {
+					throw new IllegalStateException("Expected theme to define sephiroth_listPreferredItemWidth." );
+				}
+			} else {
+				throw new IllegalStateException("Expected theme to define sephiroth_listPreferredItemWidth." );
 			}
-			mHorizontalScrollFactor = outValue.getDimension( getContext().getResources().getDisplayMetrics() );
 		}
 		return mHorizontalScrollFactor;
 	}
