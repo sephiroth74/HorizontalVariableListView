@@ -634,8 +634,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		
 		int[] styleableArray = getFieldFromStyleable( context, "AbsHListView" );
 		
-		Log.d( TAG, "styleableArray: " + styleableArray );
-		
 		if( null != styleableArray ) {
 			array = context.obtainStyledAttributes( attrs, styleableArray, defStyle, 0 );
 		}
