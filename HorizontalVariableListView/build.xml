@@ -91,10 +91,11 @@
     <!-- version-tag: 1 -->
     <import file="${sdk.dir}/tools/ant/build.xml" />
 
+    <!-- 
     <target name="-post-build">
         <antcall target="-rename-jar">
             <param name="dst.file" value="${out.absolute.dir}/${horizontallist.jar}" />
         </antcall>
     </target>
-
+	-->
 </project>
