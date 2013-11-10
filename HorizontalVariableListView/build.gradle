@@ -1,25 +1,21 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.4'
-    }
-}
+
 apply plugin: 'android-library'
+apply plugin: 'maven-publish'
+apply plugin: 'maven'
 
 dependencies {
-    compile files('libs/android-support-v4.jar')
+    compile 'com.android.support:support-v4:19.0.+'
 }
 
 android {
-    compileSdkVersion 16
-    buildToolsVersion "16"
+    compileSdkVersion 19
+    buildToolsVersion "18.1.1"
 
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 17
+        versionCode 1
+        versionName version
     }
+
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -30,7 +26,68 @@ android {
             res.srcDirs = ['res']
             assets.srcDirs = ['assets']
         }
+        // Move the build types to build-types/<type>
+        // For instance, build-types/debug/java, build-types/debug/AndroidManifest.xml, ...
+        // This moves them out of them default location under src/<type>/... which would
+        // conflict with src/ being used by the main source set.
+        // Adding new build types or product flavors should be accompanied
+        // by a similar customization.
+    }
+}
 
-        instrumentTest.setRoot('tests')
+project.ext {
+    outJar = rootProject.name + '-' + version + '.jar'
+}
+
+task clearJar(type: Delete) {
+    println "[clearJar]"
+    delete 'build/libs/' + project.ext.outJar
+}
+
+task makeJar(type: Copy) {
+    println '[makeJar] ' + project.ext.outJar
+    from('build/bundles/release/')
+    into('build/libs/')
+    include('classes.jar')
+    rename ('classes.jar', project.ext.outJar)
+}
+
+makeJar.dependsOn(clearJar, build)
+
+
+build << {
+    makeJar.execute()
+}
+
+task createPom << {
+    pom {
+        project {
+            groupId 'it.sephiroth.android'
+            artifactId rootProject.name
+            version version
+
+            inceptionYear '2012'
+            description 'Horizontal ListView for Android. Based on the official ListView google code.'
+            url 'https://github.com/sephiroth74/HorizontalVariableListView'
+            licenses {
+                license {
+                    name 'MIT License'
+                    url 'http://opensource.org/licenses/MIT'
+                    distribution 'repo'
+                }
+            }
+        }
+    }.writeTo("pom.xml")
+}
+
+
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "file://$System.env.HOME/.m2/repository/")
+            pom.version = rootProject.version
+            pom.artifactId = rootProject.name
+        }
     }
 }
