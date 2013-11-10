@@ -1,0 +1,29 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.6.3+'
+    }
+}
+
+apply plugin: 'maven'
+
+allprojects {
+    group = 'it.sephiroth.android'
+    version = '1.0.0'
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven {
+            url "file://$System.env.HOME/.m2/repository/"
+        }
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.8'
+}
