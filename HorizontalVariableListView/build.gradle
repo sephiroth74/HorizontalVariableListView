@@ -40,24 +40,19 @@ project.ext {
 }
 
 task clearJar(type: Delete) {
-    println "[clearJar]"
     delete 'build/libs/' + project.ext.outJar
 }
 
 task makeJar(type: Copy) {
-    println '[makeJar] ' + project.ext.outJar
     from('build/bundles/release/')
     into('build/libs/')
     include('classes.jar')
     rename ('classes.jar', project.ext.outJar)
 }
 
-makeJar.dependsOn(clearJar, build)
-
-
-build << {
-    makeJar.execute()
-}
+makeJar.dependsOn(clearJar)
+build.dependsOn(makeJar)
+build.dependsOn(uploadArchives)
 
 task createPom << {
     pom {
@@ -79,8 +74,6 @@ task createPom << {
         }
     }.writeTo("pom.xml")
 }
-
-
 
 uploadArchives {
     repositories {

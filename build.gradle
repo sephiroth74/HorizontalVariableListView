@@ -18,9 +18,6 @@ allprojects {
     repositories {
         mavenCentral()
         mavenLocal()
-        maven {
-            url "file://$System.env.HOME/.m2/repository/"
-        }
     }
 }
 
