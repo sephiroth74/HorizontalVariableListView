@@ -15,7 +15,12 @@ gen/
 # Local configuration file (sdk path, etc)
 local.properties
 
+build/
 .gradle
 .idea
-Demo/build
-HorizontalVariableListView/build
+sample/build
+library/build
+library/bin
+library/gen
+sample/bin
+sample/gen

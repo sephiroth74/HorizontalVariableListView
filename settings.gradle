@@ -1,5 +1,5 @@
 
 rootProject.name = 'horizontallistview'
 
-include ':Demo'
-include ':HorizontalVariableListView'
+include ':library'
+include ':sample'

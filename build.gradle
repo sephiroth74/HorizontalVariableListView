@@ -9,12 +9,14 @@ buildscript {
     }
 }
 
-apply plugin: 'maven'
 
 allprojects {
-    group = 'it.sephiroth.android'
+    group = 'it.sephiroth.android.library.horizontallistview'
     version = '1.0.0'
 
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+    
     repositories {
         mavenCentral()
         mavenLocal()

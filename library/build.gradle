@@ -1,0 +1,109 @@
+
+apply plugin: 'android-library'
+
+dependencies {
+    compile 'com.android.support:support-v4:19.0.+'
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "18.1.1"
+
+    defaultConfig {
+        versionCode 1
+        versionName version
+        minSdkVersion 9
+        targetSdkVersion 19
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+    }
+}
+
+project.ext {
+    outJar = rootProject.name + '-' + version + '.jar'
+}
+
+task clearJar(type: Delete) {
+    delete 'build/libs/' + project.ext.outJar
+}
+
+task makeJar(type: Copy) {
+    from('build/bundles/release/')
+    into('build/libs/')
+    include('classes.jar')
+    rename ('classes.jar', project.ext.outJar)
+}
+
+def generatePom() {
+    def pom = pom{
+        project {
+            groupId groupId
+            artifactId 'horizontallistview'
+            version version
+            description 'Horizontal ListView for Android. Based on the official ListView google code.'
+            inceptionYear '2013'
+            url 'https://github.com/sephiroth74/HorizontalVariableListView'
+
+            licenses {
+                license {
+                    name 'MIT License'
+                    url 'http://opensource.org/licenses/MIT'
+                    distribution 'repo'
+                }
+            }
+
+            scm {
+                url                 "scm:git@github.com:sephiroth74/HorizontalVariableListView.git"
+                connection          "scm:git@github.com:sephiroth74/HorizontalVariableListView.git"
+                developerConnection "scm:git@github.com:sephiroth74/HorizontalVariableListView.git"
+            }
+
+
+            developers {
+                developer {
+                    id 'sephiroth74'
+                    name 'Alessandro Crugnola'
+                    email 'alessandro.crugnola@gmail.com'
+                    url 'http://blog.sephiroth.it'
+                    roles {
+                        role 'author'
+                        role 'developer'
+                    }
+                }
+            }
+        }
+    }
+}
+
+task writePom {
+    ext.pomXml = file("pom.xml")
+    inputs.file(project.buildFile)
+    outputs.file(pomXml)
+    doLast {
+        generatePom().writeTo(pomXml)
+    }
+}
+
+uploadArchives {
+    doFirst {
+        repositories.mavenDeployer.pom = generatePom()
+    }
+
+    repositories.mavenDeployer {
+        repository(url: "file://$System.env.HOME/.m2/repository/")
+    }
+}
+
+clean.dependsOn 'clearJar'
+build.dependsOn = ['writePom', 'makeJar']
+uploadArchives.dependsOn 'build'
