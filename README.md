@@ -34,8 +34,8 @@ The minimum supported Android version is android 2.3
 See the Demo [MainActivity][1] for a working sample.
 
 ## License
-This software is distributed under the MIT License:
-http://opensource.org/licenses/MIT
+This software is distributed under Apache License 2.0:
+http://www.apache.org/licenses/LICENSE-2.0
 
 ---
 
