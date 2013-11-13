@@ -50,6 +50,7 @@ def generatePom() {
             groupId groupId
             artifactId 'horizontallistview'
             version version
+            packaging 'aar'
             description 'Horizontal ListView for Android. Based on the official ListView google code.'
             inceptionYear '2013'
             url 'https://github.com/sephiroth74/HorizontalVariableListView'
