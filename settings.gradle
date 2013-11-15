@@ -1,5 +1,5 @@
 
 rootProject.name = 'horizontallistview'
 
-include ':library'
+include ':horizontallistview'
 include ':sample'

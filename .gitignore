@@ -19,8 +19,8 @@ build/
 .gradle
 .idea
 sample/build
-library/build
-library/bin
-library/gen
+horizontallistview/build
+horizontallistview/bin
+horizontallistview/gen
 sample/bin
 sample/gen

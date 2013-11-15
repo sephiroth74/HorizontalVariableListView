@@ -5,7 +5,6 @@
   <groupId>it.sephiroth.android.library.horizontallistview</groupId>
   <artifactId>horizontallistview</artifactId>
   <version>1.0.0</version>
-  <packaging>aar</packaging>
   <description>Horizontal ListView for Android. Based on the official ListView google code.</description>
   <url>https://github.com/sephiroth74/HorizontalVariableListView</url>
   <inceptionYear>2013</inceptionYear>
