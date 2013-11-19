@@ -30,8 +30,14 @@
   <scm>
     <connection>scm:git:git@github.com:sephiroth74/HorizontalVariableListView.git</connection>
     <developerConnection>scm:git:git@github.com:sephiroth74/HorizontalVariableListView.git</developerConnection>
-    <url>scm:git:git@github.com:sephiroth74/HorizontalVariableListView.git</url>
+    <url>https://github.com/sephiroth74/HorizontalVariableListView</url>
   </scm>
+  <repositories>
+    <repository>
+      <id>s3.release</id>
+      <url>http://maven.aviary.com/repo/release</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>com.android.support</groupId>
