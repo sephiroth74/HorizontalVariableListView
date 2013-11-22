@@ -3,6 +3,12 @@ Horizontal Variable ListView
 
 Horizontal ListView for Android. Based on the official [ListView][3] google code.
 
+## Usage (gradle)
+Add this line to your dependency group:
+
+
+	compile 'it.sephiroth.android.library.horizontallistview:library:+'
+
 ## Features
 It supports almost all the features of the ListView widget.
 There are minor differences in the attributes supported like "dividerWidth" instead of the default "dividerHeight".
@@ -28,10 +34,7 @@ This is the styleable used for the HListView class:
 </pre>
 
 ### API Requirements
-The minimum supported Android version is android 2.3
-
-### Example
-See the Demo [MainActivity][1] for a working sample.
+The minimum supported Android version is android 2.3 (API Level 9)
 
 ## License
 This software is distributed under Apache License 2.0:
@@ -43,7 +46,6 @@ http://www.apache.org/licenses/LICENSE-2.0
 > [Alessandro Crugnola][2]
 
 
-[1]: https://github.com/sephiroth74/HorizontalVariableListView/blob/master/Demo/src/it/sephiroth/android/sample/horizontalvariablelistviewdemo/MainActivity.java        "MainActivity"
 
 [2]: http://www.sephiroth.it
 
