@@ -1,7 +1,2 @@
-
-rootProject.name = 'horizontallistview'
-
-gradle.ext.versionModifier = '-SNAPSHOT'
-
-include ':horizontallistview'
-include ':sample'
+include ':library'
+include ':demo'

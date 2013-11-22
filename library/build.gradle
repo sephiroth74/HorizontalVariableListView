@@ -1,7 +1,8 @@
 apply plugin: 'android-library'
+apply plugin: 'signing'
 
 group 'it.sephiroth.android.library.horizontallistview'
-version '1.0.0'+gradle.ext.versionModifier
+version '1.0.0'
 
 dependencies {
     compile 'com.android.support:support-v4:19.0.+'
@@ -56,6 +57,7 @@ task makeJar(type: Copy) {
 def generatePom() {
     def pom = pom{
         project {
+            name 'HorizontalListView'
             groupId project.group
             artifactId project.name
             version project.version
@@ -90,18 +92,6 @@ def generatePom() {
                     }
                 }
             }
-
-            repositories {
-                project.repositories.each { repo ->
-
-                    if (repo.name != 'MavenRepo' && repo.name != 'MavenLocal' && !repo.url.toString().startsWith('file:/') ) {
-                        repository {
-                            id = repo.name
-                            url = repo.url
-                        }
-                    }
-                }
-            }
         }
     }
 }
@@ -115,34 +105,25 @@ task writePom {
     }
 }
 
+
 uploadArchives {
     repositories {
-        if( project.hasProperty('username') && project.hasProperty('password')) {
-
-
-            mavenDeployer {
-                pom = generatePom()
-                configuration = configurations.deployerJars
-
-                repository(url: mavenUploadServer + mavenRepo + mavenReleases){
-                    authentication(userName: username, password: password)
-                }
-
-                snapshotRepository(url: mavenUploadServer + mavenRepo + mavenSnapshot){
-                    authentication(userName: username, password: password)
-                }
+        mavenDeployer {
+            beforeDeployment {
+                MavenDeployment deployment -> signing.signPom(deployment)
             }
-        } else {
-        }
-    }
+            pom = generatePom()
 
-    doLast {
-        if( !project.hasProperty('username') || !project.hasProperty('password')) {
-            logger.error '\tError: Cannot upload artifacts, username and password missing'
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword )
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword )
+            }
         }
     }
 }
-
 
 task updateVersion {
     def source = new File("src/it/sephiroth/android/library/widget/HListView.java")
@@ -178,6 +159,20 @@ task updateVersion {
         }
 
     }
+}
+
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.allSource
+}
+
+signing {
+    sign configurations.archives
+}
+
+artifacts {
+    archives sourcesJar
 }
 
 clean.dependsOn(clearJar)

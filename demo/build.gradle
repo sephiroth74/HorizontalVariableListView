@@ -1,7 +1,8 @@
 apply plugin: 'android'
 
 dependencies {
-    compile project(':horizontallistview')
+    compile project(':library')
+    // compile 'it.sephiroth.android.library.horizontallistview'
 }
 
 android {
