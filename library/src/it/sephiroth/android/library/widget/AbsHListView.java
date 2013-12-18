@@ -1191,7 +1191,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		}
 	}
 
-	@TargetApi(14)
+	@TargetApi(16)
 	@Override
 	public boolean performAccessibilityAction( int action, Bundle arguments ) {
 		if ( super.performAccessibilityAction( action, arguments ) ) {
