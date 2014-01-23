@@ -2,15 +2,15 @@ apply plugin: 'android-library'
 apply plugin: 'signing'
 
 group 'it.sephiroth.android.library.horizontallistview'
-version '1.0.0'
+version '1.0.1'
 
 dependencies {
-    compile 'com.android.support:support-v4:19.0.+'
+    compile 'com.android.support:support-v4:19.0.1'
 }
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "18.1.1"
+    buildToolsVersion "19.0.1"
 
     defaultConfig {
         versionCode 1

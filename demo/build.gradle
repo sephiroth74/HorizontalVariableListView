@@ -2,12 +2,11 @@ apply plugin: 'android'
 
 dependencies {
     compile project(':library')
-    // compile 'it.sephiroth.android.library.horizontallistview'
 }
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "18.1.1"
+    buildToolsVersion "19.0.1"
 
     defaultConfig {
         versionCode 1

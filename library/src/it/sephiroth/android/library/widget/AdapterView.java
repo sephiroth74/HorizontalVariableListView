@@ -220,6 +220,7 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 		super( context, attrs );
 	}
 
+	@TargetApi(16)
 	public AdapterView( Context context, AttributeSet attrs, int defStyle ) {
 		super( context, attrs, defStyle );
 
@@ -653,6 +654,7 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 	/**
 	 * Sets the view to show if the adapter is empty
 	 */
+	@TargetApi(16)
 	public void setEmptyView( View emptyView ) {
 		mEmptyView = emptyView;
 

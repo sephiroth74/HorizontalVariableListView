@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>it.sephiroth.android.library.horizontallistview</groupId>
   <artifactId>library</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <name>HorizontalListView</name>
   <description>Horizontal ListView for Android. Based on the official ListView google code.</description>
   <url>https://github.com/sephiroth74/HorizontalVariableListView</url>
@@ -37,7 +37,7 @@
     <dependency>
       <groupId>com.android.support</groupId>
       <artifactId>support-v4</artifactId>
-      <version>19.0.+</version>
+      <version>19.0.1</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>
