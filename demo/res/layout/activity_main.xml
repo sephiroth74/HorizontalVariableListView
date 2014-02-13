@@ -19,7 +19,7 @@
         <it.sephiroth.android.library.widget.HListView
             android:id="@+id/hListView1"
             android:layout_width="match_parent"
-            android:layout_height="250dip"
+            android:layout_height="200dip"
             android:paddingTop="20dip"
             android:paddingBottom="20dip"
             style="@style/HListView"

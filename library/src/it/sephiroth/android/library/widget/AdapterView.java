@@ -34,7 +34,6 @@ import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.AccessibilityNodeInfo;
-import android.webkit.MimeTypeMap;
 import android.widget.Adapter;
 
 /**
@@ -43,6 +42,7 @@ import android.widget.Adapter;
 public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 	
 	public static final String TAG = "AdapterView";
+	public static final boolean LOG_ENABLED = false;
 
 	/**
 	 * The item view type returned by {@link Adapter#getItemViewType(int)} when the adapter does not want the item's view recycled.
@@ -808,7 +808,9 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 
 		@Override
 		public void onChanged() {
-			Log.i( TAG, "AdapterDataSetObserver::onChanged" );
+			if( LOG_ENABLED ) {
+				Log.i( TAG, "AdapterDataSetObserver::onChanged" );
+			}
 			mDataChanged = true;
 			mOldItemCount = mItemCount;
 			mItemCount = getAdapter().getCount();
@@ -818,11 +820,15 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 			
 			if ( AdapterView.this.getAdapter().hasStableIds() && mInstanceState != null
 					&& mOldItemCount == 0 && mItemCount > 0 ) {
-				Log.d( TAG, "calling onRestoreInstanceState");
+				if( LOG_ENABLED ) {
+					Log.d( TAG, "calling onRestoreInstanceState");
+				}
 				AdapterView.this.onRestoreInstanceState( mInstanceState );
 				mInstanceState = null;
 			} else {
-				Log.d( TAG, "else calling rememberSyncState" );
+				if( LOG_ENABLED ) {
+					Log.d( TAG, "else calling rememberSyncState" );
+				}
 				rememberSyncState();
 			}
 			checkFocus();
@@ -831,14 +837,15 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 
 		@Override
 		public void onInvalidated() {
-			Log.i( TAG, "AdapterDataSetObserver::onInvalidated" );
+			if( LOG_ENABLED ) {
+				Log.i( TAG, "AdapterDataSetObserver::onInvalidated" );
+			}
 			mDataChanged = true;
 
 			if ( AdapterView.this.getAdapter().hasStableIds() ) {
 				// Remember the current state for the case where our hosting activity is being
 				// stopped and later restarted
 				mInstanceState = AdapterView.this.onSaveInstanceState();
-				Log.d( TAG, "mInstanceState: " + mInstanceState );
 			}
 
 			// Data is invalid so we should reset our state
@@ -855,7 +862,6 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 		}
 
 		public void clearSavedState() {
-			Log.i( TAG, "clearSavedState" );
 			mInstanceState = null;
 		}
 	}
@@ -870,7 +876,6 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 
 		@Override
 		public void run() {
-			Log.i( TAG, "SelectionNotifier::run. dataChanged: " + mDataChanged );
 			if ( mDataChanged ) {
 				// Data has changed between when this SelectionNotifier
 				// was posted and now. We need to wait until the AdapterView
@@ -886,7 +891,9 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 	}
 
 	void selectionChanged() {
-		Log.i( TAG, "selectionChanged" );
+		if( LOG_ENABLED ) {
+			Log.i( TAG, "selectionChanged" );
+		}
 		if ( mOnItemSelectedListener != null
 				|| mAccessibilityManager.isEnabled() ) {
 			if ( mInLayout || mBlockLayoutRequests ) {
@@ -999,7 +1006,9 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 	}
 
 	void handleDataChanged() {
-		Log.i( TAG, "handleDataChanged" );
+		if( LOG_ENABLED ) {
+			Log.i( TAG, "handleDataChanged" );
+		}
 		final int count = mItemCount;
 		boolean found = false;
 
@@ -1068,7 +1077,9 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 	}
 
 	protected void checkSelectionChanged() {
-		Log.i( TAG, "checkSelectionChanged" );
+		if( LOG_ENABLED ) {
+			Log.i( TAG, "checkSelectionChanged" );
+		}
 		if ( ( mSelectedPosition != mOldSelectedPosition ) || ( mSelectedColId != mOldSelectedColId ) ) {
 			selectionChanged();
 			mOldSelectedPosition = mSelectedPosition;
@@ -1207,7 +1218,9 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 	 * @hide
 	 */
 	public void rememberSyncState() {
-		Log.i( TAG, "rememberSyncState" );
+		if( LOG_ENABLED ) {
+			Log.i( TAG, "rememberSyncState" );
+		}
 		if ( getChildCount() > 0 ) {
 			mNeedSync = true;
 			mSyncWidth = mLayoutWidth;

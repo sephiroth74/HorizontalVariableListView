@@ -46,8 +46,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		for( int i = 0; i < 50; i++ ) {
 			items.add( String.valueOf( i ) );
 		}
-		
-		mAdapter = new TestAdapter( this, android.R.layout.simple_list_item_checked, android.R.id.text1, items );
+		mAdapter = new TestAdapter( this, R.layout.test_item_1, android.R.id.text1, items );
 		listView.setHeaderDividersEnabled( true );
 		listView.setFooterDividersEnabled( true );
 		

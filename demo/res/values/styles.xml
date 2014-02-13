@@ -18,12 +18,12 @@
         <item name="android:listSelector">@android:drawable/list_selector_background</item>
         <item name="android:cacheColorHint">?android:attr/colorBackgroundCacheHint</item>
         <item name="android:divider">@android:drawable/divider_horizontal_bright</item>
-        <item name="dividerWidth">1dip</item>
+        <item name="dividerWidth">3dip</item>
         <item name="stackFromRight">false</item>
         <item name="measureWithChild">0</item>
-        <item name="android:smoothScrollbar">true</item>
         <item name="android:scrollingCache">false</item>
         <item name="android:overScrollMode">always</item>
+        <item name="android:fastScrollEnabled">true</item>
         <item name="android:choiceMode">multipleChoice</item>
     </style>
 

@@ -1336,7 +1336,9 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		}
 		
 		private LongSparseArray<Integer> readSparseLongArray( Parcel in ) {
-			Log.i( TAG, "readSparseLongArray" );
+			if( LOG_ENABLED ) {
+				Log.i( TAG, "readSparseLongArray" );
+			}
 			final int N = in.readInt();
 			if( N <= 0 ) {
 				return null;
@@ -1347,7 +1349,9 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		}
 
 		private SparseArrayCompat<Boolean> readSparseBooleanArray( Parcel in ) {
-			Log.i( TAG, "readSparseBooleanArray" );
+			if( LOG_ENABLED ) {
+				Log.i( TAG, "readSparseBooleanArray" );
+			}
 			int N = in.readInt();
 			if ( N < 0 ) {
 				return null;
@@ -1361,7 +1365,9 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			while ( N > 0 ) {
 				final long key = in.readLong();
 				final int value = in.readInt();
-				Log.i( TAG, "Unmarshalling key=" + key + " value=" + value );
+				if( LOG_ENABLED ) {
+					Log.i( TAG, "Unmarshalling key=" + key + " value=" + value );
+				}
 				outVal.put( key, value );
 				N--;
 			}
@@ -1371,14 +1377,18 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			while ( N > 0 ) {
 				int key = in.readInt();
 				boolean value = in.readByte() == 1;
-				Log.i( TAG, "Unmarshalling key=" + key + " value=" + value );
+				if( LOG_ENABLED ) {
+					Log.i( TAG, "Unmarshalling key=" + key + " value=" + value );
+				}
 				outVal.append( key, value );
 				N--;
 			}
 		}
 		
 		private void writeSparseLongArray( LongSparseArray<Integer> array, Parcel out ) {
-			Log.i( TAG, "writeSparseLongArray" );
+			if( LOG_ENABLED ) {
+				Log.i( TAG, "writeSparseLongArray" );
+			}
 			final int N = array != null ? array.size() : 0;
 			out.writeInt( N );
 			for ( int i = 0; i < N; i++ ) {
@@ -1388,7 +1398,9 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		}
 
 		private void writeSparseBooleanArray( SparseArrayCompat<Boolean> val, Parcel out ) {
-			Log.i( TAG, "writeSparseBooleanArray" );
+			if( LOG_ENABLED ) {
+				Log.i( TAG, "writeSparseBooleanArray" );
+			}
 			if ( val == null ) {
 				out.writeInt( -1 );
 				return;
@@ -1405,7 +1417,9 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
 		@Override
 		public void writeToParcel( Parcel out, int flags ) {
-			Log.i( TAG, "writeToParcel" );
+			if( LOG_ENABLED ) {
+				Log.i( TAG, "writeToParcel" );
+			}
 			super.writeToParcel( out, flags );
 			out.writeLong( selectedId );
 			out.writeLong( firstId );
@@ -1416,8 +1430,10 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			out.writeByte( (byte) ( inActionMode ? 1 : 0 ) );
 			out.writeInt( checkedItemCount );
 			
-			Log.d( TAG, "writing checkState: " + checkState );
-			Log.d( TAG, "writing checkIdState: " + checkIdState );
+			if( LOG_ENABLED ) {
+				Log.d( TAG, "writing checkState: " + checkState );
+				Log.d( TAG, "writing checkIdState: " + checkIdState );
+			}
 			
 			writeSparseBooleanArray( checkState, out );
 			writeSparseLongArray( checkIdState, out );
@@ -1452,7 +1468,10 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
 	@Override
 	public Parcelable onSaveInstanceState() {
-		Log.i( TAG, "onSaveInstanceState" );
+		if( LOG_ENABLED ) {
+			Log.i( TAG, "onSaveInstanceState" );
+			Log.d( TAG, "mPendingSync: " + mPendingSync );
+		}
 		/*
 		 * This doesn't really make sense as the place to dismiss the popups, but there don't seem to be any other useful hooks that
 		 * happen early enough to keep from getting complaints about having leaked the window.
@@ -1461,7 +1480,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
 		SavedState ss = new SavedState( superState );
 		
-		Log.d( TAG, "mPendingSync: " + mPendingSync );
 
 		if ( mPendingSync != null ) {
 			// Just keep what we last restored.
@@ -1541,7 +1559,9 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
 	@Override
 	public void onRestoreInstanceState( Parcelable state ) {
-		Log.i( TAG, "onRestoreInstanceState" );
+		if( LOG_ENABLED ) {
+			Log.i( TAG, "onRestoreInstanceState" );
+		}
 		SavedState ss = (SavedState) state;
 
 		super.onRestoreInstanceState( ss.getSuperState() );
@@ -1569,8 +1589,10 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			mSyncMode = SYNC_FIRST_POSITION;
 		}
 		
-		Log.d( TAG, "checkState: " + ss.checkState );
-		Log.d( TAG, "checkIdState: " + ss.checkIdState );
+		if( LOG_ENABLED ) {
+			Log.d( TAG, "checkState: " + ss.checkState );
+			Log.d( TAG, "checkIdState: " + ss.checkIdState );
+		}
 
 		if ( ss.checkState != null ) {
 			mCheckStates = ss.checkState;
@@ -3444,7 +3466,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 				final int topPadding = mListPadding.top + mGlowPaddingTop;
 				final int bottomPadding = mListPadding.bottom + mGlowPaddingBottom;
 				final int height = getHeight() - topPadding - bottomPadding;
-				final int width = getWidth();
+				// final int width = getWidth();
 
 				int edgeX = Math.min( 0, scrollX + mFirstPositionDistanceGuess );
 				// canvas.translate(edgeX, topPadding);
@@ -4940,7 +4962,9 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	}
 
 	void confirmCheckedPositionsById() {
-		Log.i( TAG, "confirmCheckedPositionsById" );
+		if( LOG_ENABLED ) {
+			Log.i( TAG, "confirmCheckedPositionsById" );
+		}
 		// Clear out the positional check states, we'll rebuild it below from IDs.
 		mCheckStates.clear();
 
@@ -4989,7 +5013,9 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
 	@Override
 	protected void handleDataChanged() {
-		Log.i( TAG, "handleDataChanged" );
+		if( LOG_ENABLED ) {
+			Log.i( TAG, "handleDataChanged" );
+		}
 		int count = mItemCount;
 		int lastHandledItemCount = mLastHandledItemCount;
 		mLastHandledItemCount = mItemCount;
@@ -5351,13 +5377,17 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
 		@Override
 		public void onChanged() {
-			Log.i( TAG, "AdapterDataSetObserver::onChanged" );
+			if( LOG_ENABLED ) {
+				Log.i( TAG, "AdapterDataSetObserver::onChanged" );
+			}
 			super.onChanged();
 		}
 
 		@Override
 		public void onInvalidated() {
-			Log.i( TAG, "AdapterDataSetObserver::onInvalidated" );
+			if( LOG_ENABLED ) {
+				Log.i( TAG, "AdapterDataSetObserver::onInvalidated" );
+			}
 			super.onInvalidated();
 		}
 	}
