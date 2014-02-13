@@ -141,11 +141,15 @@ public class HListView extends AbsHListView {
 	}
 
 	public HListView( Context context, AttributeSet attrs ) {
-		this( context, attrs, context.getResources().getIdentifier( "sephiroth_listViewStyle", "attr", context.getPackageName() ) );
+		this( context, attrs, context.getResources().getIdentifier( "hlv_listViewStyle", "attr", context.getPackageName() ) );
 	}
 
 	public HListView( Context context, AttributeSet attrs, int defStyle ) {
 		super( context, attrs, defStyle );
+
+		if( LOG_ENABLED ) {
+			Log.i( LOG_TAG, "defStyle: " + defStyle );
+		}
 		
 		TypedArray array = null;
 		
@@ -155,6 +159,10 @@ public class HListView extends AbsHListView {
 		// also the drawabled must be copied
 		
 		int[] styleableArray = getFieldFromStyleable( context, "HListView" );
+
+		if( LOG_ENABLED ) {
+			Log.d( LOG_TAG, "styleableArray: " + styleableArray );
+		}
 		
 		if( null != styleableArray ) {
 			array = context.obtainStyledAttributes( attrs, styleableArray, defStyle, 0 );
@@ -171,7 +179,6 @@ public class HListView extends AbsHListView {
 		int measureWithChild = -1;		
 		
 		if( null != array ) {
-			
 			entries = array.getTextArray( 0 /*R.styleable.HListView_android_entries*/ );
 			dividerDrawable = array.getDrawable( 1 /*R.styleable.HListView_android_divider*/ );
 			overscrollHeader = array.getDrawable( 5 /*R.styleable.HListView_overScrollHeader*/ );
@@ -181,6 +188,16 @@ public class HListView extends AbsHListView {
 			footerDividersEnabled = array.getBoolean( 4 /*R.styleable.HListView_footerDividersEnabled*/, true );
 			measureWithChild = array.getInteger( 7 /*R.styleable.HListView_measureWithChild*/, -1 );			
 			array.recycle();
+
+			if( LOG_ENABLED ) {
+				Log.d( LOG_TAG, "divider: " + dividerDrawable );
+				Log.d( LOG_TAG, "overscrollHeader: " + overscrollHeader );
+				Log.d( LOG_TAG, "overscrollFooter: " + overscrollFooter );
+				Log.d( LOG_TAG, "dividerWith: " + dividerWidth );
+				Log.d( LOG_TAG, "headerDividersEnabled: " + headerDividersEnabled );
+				Log.d( LOG_TAG, "footerDividersEnabled: " + footerDividersEnabled );
+				Log.d( LOG_TAG, "measureWithChild: " + measureWithChild );
+			}
 		}
 
 		if ( entries != null ) {

@@ -41,8 +41,9 @@ import android.widget.Adapter;
  */
 public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 	
-	public static final String TAG = "AdapterView";
-	public static final boolean LOG_ENABLED = false;
+	public static final String LOG_TAG = "AdapterView";
+
+	public static final boolean LOG_ENABLED = true;
 
 	/**
 	 * The item view type returned by {@link Adapter#getItemViewType(int)} when the adapter does not want the item's view recycled.
@@ -809,7 +810,7 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 		@Override
 		public void onChanged() {
 			if( LOG_ENABLED ) {
-				Log.i( TAG, "AdapterDataSetObserver::onChanged" );
+				Log.i( LOG_TAG, "AdapterDataSetObserver::onChanged" );
 			}
 			mDataChanged = true;
 			mOldItemCount = mItemCount;
@@ -821,13 +822,13 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 			if ( AdapterView.this.getAdapter().hasStableIds() && mInstanceState != null
 					&& mOldItemCount == 0 && mItemCount > 0 ) {
 				if( LOG_ENABLED ) {
-					Log.d( TAG, "calling onRestoreInstanceState");
+					Log.d( LOG_TAG, "calling onRestoreInstanceState");
 				}
 				AdapterView.this.onRestoreInstanceState( mInstanceState );
 				mInstanceState = null;
 			} else {
 				if( LOG_ENABLED ) {
-					Log.d( TAG, "else calling rememberSyncState" );
+					Log.d( LOG_TAG, "else calling rememberSyncState" );
 				}
 				rememberSyncState();
 			}
@@ -838,7 +839,7 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 		@Override
 		public void onInvalidated() {
 			if( LOG_ENABLED ) {
-				Log.i( TAG, "AdapterDataSetObserver::onInvalidated" );
+				Log.i( LOG_TAG, "AdapterDataSetObserver::onInvalidated" );
 			}
 			mDataChanged = true;
 
@@ -892,7 +893,7 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 
 	void selectionChanged() {
 		if( LOG_ENABLED ) {
-			Log.i( TAG, "selectionChanged" );
+			Log.i( LOG_TAG, "selectionChanged" );
 		}
 		if ( mOnItemSelectedListener != null
 				|| mAccessibilityManager.isEnabled() ) {
@@ -1007,7 +1008,7 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 
 	void handleDataChanged() {
 		if( LOG_ENABLED ) {
-			Log.i( TAG, "handleDataChanged" );
+			Log.i( LOG_TAG, "handleDataChanged" );
 		}
 		final int count = mItemCount;
 		boolean found = false;
@@ -1078,7 +1079,7 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 
 	protected void checkSelectionChanged() {
 		if( LOG_ENABLED ) {
-			Log.i( TAG, "checkSelectionChanged" );
+			Log.i( LOG_TAG, "checkSelectionChanged" );
 		}
 		if ( ( mSelectedPosition != mOldSelectedPosition ) || ( mSelectedColId != mOldSelectedColId ) ) {
 			selectionChanged();
@@ -1219,7 +1220,7 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 	 */
 	public void rememberSyncState() {
 		if( LOG_ENABLED ) {
-			Log.i( TAG, "rememberSyncState" );
+			Log.i( LOG_TAG, "rememberSyncState" );
 		}
 		if ( getChildCount() > 0 ) {
 			mNeedSync = true;

@@ -619,16 +619,25 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	}
 
 	public AbsHListView( Context context, AttributeSet attrs ) {
-		this( context, attrs, context.getResources().getIdentifier( "sephiroth_absHListViewStyle", "attr", context.getPackageName() ) );
+		this( context, attrs, context.getResources().getIdentifier( "hlv_absHListViewStyle", "attr", context.getPackageName() ) );
 	}
 
 	public AbsHListView( Context context, AttributeSet attrs, int defStyle ) {
 		super( context, attrs, defStyle );
+
+		if( LOG_ENABLED ) {
+			Log.i( LOG_TAG, "defStyle: " + defStyle );
+		}
+
 		initAbsListView();
 		
 		TypedArray array = null;
 		
 		int[] styleableArray = getFieldFromStyleable( context, "AbsHListView" );
+
+		if( LOG_ENABLED ) {
+			Log.i( LOG_TAG, "styleableArray: " + styleableArray );
+		}
 		
 		if( null != styleableArray ) {
 			array = context.obtainStyledAttributes( attrs, styleableArray, defStyle, 0 );
@@ -647,28 +656,28 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			
 			// int resId;
 			// resId = getFieldFromStyleable( context, "AbsHListView_android_listSelector" );
-			// Log.d( TAG, "AbsHListView_android_listSelector: " + resId );
+			// Log.d( LOG_TAG, "AbsHListView_android_listSelector: " + resId );
 			
 			// resId = getFieldFromStyleable( context, "AbsHListView_android_drawSelectorOnTop" );
-			// Log.d( TAG, "AbsHListView_android_drawSelectorOnTop: " + resId );
+			// Log.d( LOG_TAG, "AbsHListView_android_drawSelectorOnTop: " + resId );
 			
 			// resId = getFieldFromStyleable( context, "AbsHListView_stackFromRight" );
-			// Log.d( TAG, "AbsHListView_stackFromRight: " + resId );
+			// Log.d( LOG_TAG, "AbsHListView_stackFromRight: " + resId );
 			
 			// resId = getFieldFromStyleable( context, "AbsHListView_android_scrollingCache" );
-			// Log.d( TAG, "AbsHListView_android_scrollingCache: " + resId );
+			// Log.d( LOG_TAG, "AbsHListView_android_scrollingCache: " + resId );
 			
 			// resId = getFieldFromStyleable( context, "AbsHListView_transcriptMode" );
-			// Log.d( TAG, "AbsHListView_transcriptMode: " + resId );
+			// Log.d( LOG_TAG, "AbsHListView_transcriptMode: " + resId );
 			
 			// resId = getFieldFromStyleable( context, "AbsHListView_android_cacheColorHint" );
-			// Log.d( TAG, "AbsHListView_android_cacheColorHint: " + resId );
+			// Log.d( LOG_TAG, "AbsHListView_android_cacheColorHint: " + resId );
 			
 			// resId = getFieldFromStyleable( context, "AbsHListView_android_smoothScrollbar" );
-			// Log.d( TAG, "AbsHListView_android_smoothScrollbar: " + resId );
+			// Log.d( LOG_TAG, "AbsHListView_android_smoothScrollbar: " + resId );
 			
 			// resId = getFieldFromStyleable( context, "AbsHListView_android_choiceMode" );
-			// Log.d( TAG, "AbsHListView_android_choiceMode: " + resId );
+			// Log.d( LOG_TAG, "AbsHListView_android_choiceMode: " + resId );
 			
 			listSelector = array.getDrawable( 0 /*R.styleable.AbsHListView_android_listSelector*/ );
 			drawSelectorOnTop = array.getBoolean( 1 /*R.styleable.AbsHListView_android_drawSelectorOnTop*/, false );
@@ -679,6 +688,16 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			smoothScrollbar = array.getBoolean( 5 /*R.styleable.AbsHListView_android_smoothScrollbar*/, true );
 			choiceMode = array.getInt( 4 /*R.styleable.AbsHListView_android_choiceMode*/, ListView.CHOICE_MODE_NONE );
 			array.recycle();
+
+			if( LOG_ENABLED ) {
+				Log.d( TAG, "listSelector: " + listSelector );
+				Log.d( TAG, "drawSelectorOnTop: " + drawSelectorOnTop );
+				Log.d( TAG, "stackFromRight: " + stackFromRight );
+				Log.d( TAG, "scrollingCacheEnabled: " + scrollingCacheEnabled );
+				Log.d( TAG, "transcriptMode: " + transcriptMode );
+				Log.d( TAG, "smoothScrollbar: " + smoothScrollbar );
+				Log.d( TAG, "choiceMode: " + choiceMode );
+			}
 		}
 		
 
@@ -3435,7 +3454,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	protected float getHorizontalScrollFactor() {
 		if ( mHorizontalScrollFactor == 0 ) {
 
-			int resId = getResources().getIdentifier( "sephiroth_listPreferredItemWidth", "attr", getContext().getPackageName() );
+			int resId = getResources().getIdentifier( "hlv_listPreferredItemWidth", "attr", getContext().getPackageName() );
 			
 			if( resId != 0 ) {
 				TypedValue outValue = new TypedValue();
@@ -3444,10 +3463,10 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 				if( success ) {
 					mHorizontalScrollFactor = outValue.getDimension( getContext().getResources().getDisplayMetrics() );
 				} else {
-					throw new IllegalStateException("Expected theme to define sephiroth_listPreferredItemWidth." );
+					throw new IllegalStateException("Expected theme to define hlv_listPreferredItemWidth." );
 				}
 			} else {
-				throw new IllegalStateException("Expected theme to define sephiroth_listPreferredItemWidth." );
+				throw new IllegalStateException("Expected theme to define hlv_listPreferredItemWidth." );
 			}
 		}
 		return mHorizontalScrollFactor;
