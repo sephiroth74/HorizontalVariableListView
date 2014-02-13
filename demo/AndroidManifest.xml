@@ -11,7 +11,8 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        android:hardwareAccelerated="true">
+        android:hardwareAccelerated="true"
+        android:name=".DemoApplication">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"

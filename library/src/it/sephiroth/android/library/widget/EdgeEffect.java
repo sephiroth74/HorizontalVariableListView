@@ -137,14 +137,15 @@ public class EdgeEffect {
      */
     public EdgeEffect(Context context, int direction ) {
         final Resources res = context.getResources();
-        int resId = res.getIdentifier( "hlv_overscroll_edge", "drawable", context.getPackageName() );
+        String resourcePackageName = ResourcePackageName.getResourcePackageName(context);
+        int resId = res.getIdentifier( "hlv_overscroll_edge", "drawable", resourcePackageName );
         if( resId > 0 ) {
         	mEdge = res.getDrawable(resId);
         } else {
         	throw new IllegalStateException( "Cannot find resource 'hlv_overscroll_edge'" );
         }
         
-        resId = res.getIdentifier( "hlv_overscroll_glow", "drawable", context.getPackageName() );
+        resId = res.getIdentifier( "hlv_overscroll_glow", "drawable", resourcePackageName );
         if( resId > 0 ) {
         	mGlow = res.getDrawable(resId);
         } else {
