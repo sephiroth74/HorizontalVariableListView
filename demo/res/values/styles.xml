@@ -23,15 +23,13 @@
         <item name="android:overScrollMode">always</item>
         <item name="android:fastScrollEnabled">true</item>
 	    <item name="android:smoothScrollbar">false</item>
-        <item name="android:choiceMode">multipleChoice</item>
+        <item name="android:choiceMode">multipleChoiceModal</item>
         <item name="hlv_stackFromRight">false</item>
         <item name="hlv_measureWithChild">0</item>
         <item name="hlv_dividerWidth">3dip</item>
 	    <item name="hlv_headerDividersEnabled">true</item>
 	    <item name="hlv_footerDividersEnabled">true</item>
-	    <item name="hlv_transcriptMode">alwaysScroll</item>
-	    <item name="hlv_overScrollFooter">@android:color/black</item>
-	    <item name="hlv_overScrollHeader">@android:color/black</item>
+	    <item name="hlv_transcriptMode">disabled</item>
     </style>
 
 </resources>

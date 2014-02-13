@@ -1,15 +1,9 @@
 package it.sephiroth.android.library.widget;
 
-import it.sephiroth.android.library.util.ViewHelperFactory;
-import it.sephiroth.android.library.util.ViewHelperFactory.ViewHelper;
-import it.sephiroth.android.library.util.v11.MultiChoiceModeListener;
-import it.sephiroth.android.library.util.v11.MultiChoiceModeWrapper;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -51,6 +45,15 @@ import android.widget.Adapter;
 import android.widget.Checkable;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import it.sephiroth.android.library.R;
+import it.sephiroth.android.library.util.ViewHelperFactory;
+import it.sephiroth.android.library.util.ViewHelperFactory.ViewHelper;
+import it.sephiroth.android.library.util.v11.MultiChoiceModeListener;
+import it.sephiroth.android.library.util.v11.MultiChoiceModeWrapper;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public abstract class AbsHListView extends AdapterView<ListAdapter> implements ViewTreeObserver.OnGlobalLayoutListener,
@@ -619,7 +622,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	}
 
 	public AbsHListView( Context context, AttributeSet attrs ) {
-		this( context, attrs, context.getResources().getIdentifier( "hlv_absHListViewStyle", "attr", context.getPackageName() ) );
+		this( context, attrs, R.attr.hlv_absHListViewStyle );
 	}
 
 	public AbsHListView( Context context, AttributeSet attrs, int defStyle ) {
@@ -630,19 +633,11 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		}
 
 		initAbsListView();
-		
-		TypedArray array = null;
-		
-		int[] styleableArray = getFieldFromStyleable( context, "AbsHListView" );
 
-		if( LOG_ENABLED ) {
-			Log.i( LOG_TAG, "styleableArray: " + styleableArray );
-		}
+		final Resources.Theme theme = context.getTheme();
 		
-		if( null != styleableArray ) {
-			array = context.obtainStyledAttributes( attrs, styleableArray, defStyle, 0 );
-		}
-		
+		TypedArray array = theme.obtainStyledAttributes( attrs, R.styleable.AbsHListView, defStyle, 0 );
+
 		Drawable listSelector = null;
 		boolean drawSelectorOnTop = false;
 		boolean stackFromRight = false;
@@ -653,40 +648,14 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		int choiceMode = ListView.CHOICE_MODE_NONE;
 		
 		if( null != array ) {
-			
-			// int resId;
-			// resId = getFieldFromStyleable( context, "AbsHListView_android_listSelector" );
-			// Log.d( LOG_TAG, "AbsHListView_android_listSelector: " + resId );
-			
-			// resId = getFieldFromStyleable( context, "AbsHListView_android_drawSelectorOnTop" );
-			// Log.d( LOG_TAG, "AbsHListView_android_drawSelectorOnTop: " + resId );
-			
-			// resId = getFieldFromStyleable( context, "AbsHListView_stackFromRight" );
-			// Log.d( LOG_TAG, "AbsHListView_stackFromRight: " + resId );
-			
-			// resId = getFieldFromStyleable( context, "AbsHListView_android_scrollingCache" );
-			// Log.d( LOG_TAG, "AbsHListView_android_scrollingCache: " + resId );
-			
-			// resId = getFieldFromStyleable( context, "AbsHListView_transcriptMode" );
-			// Log.d( LOG_TAG, "AbsHListView_transcriptMode: " + resId );
-			
-			// resId = getFieldFromStyleable( context, "AbsHListView_android_cacheColorHint" );
-			// Log.d( LOG_TAG, "AbsHListView_android_cacheColorHint: " + resId );
-			
-			// resId = getFieldFromStyleable( context, "AbsHListView_android_smoothScrollbar" );
-			// Log.d( LOG_TAG, "AbsHListView_android_smoothScrollbar: " + resId );
-			
-			// resId = getFieldFromStyleable( context, "AbsHListView_android_choiceMode" );
-			// Log.d( LOG_TAG, "AbsHListView_android_choiceMode: " + resId );
-			
-			listSelector = array.getDrawable( 0 /*R.styleable.AbsHListView_android_listSelector*/ );
-			drawSelectorOnTop = array.getBoolean( 1 /*R.styleable.AbsHListView_android_drawSelectorOnTop*/, false );
-			stackFromRight = array.getBoolean( 6 /*R.styleable.AbsHListView_stackFromRight*/, false );
-			scrollingCacheEnabled = array.getBoolean( 2 /*R.styleable.AbsHListView_android_scrollingCache*/, true );
-			transcriptMode = array.getInt( 7 /*R.styleable.AbsHListView_transcriptMode*/, TRANSCRIPT_MODE_DISABLED );
-			color = array.getColor( 3 /*R.styleable.AbsHListView_android_cacheColorHint*/, 0 );
-			smoothScrollbar = array.getBoolean( 5 /*R.styleable.AbsHListView_android_smoothScrollbar*/, true );
-			choiceMode = array.getInt( 4 /*R.styleable.AbsHListView_android_choiceMode*/, ListView.CHOICE_MODE_NONE );
+			listSelector = array.getDrawable( R.styleable.AbsHListView_android_listSelector );
+			drawSelectorOnTop = array.getBoolean( R.styleable.AbsHListView_android_drawSelectorOnTop, false );
+			stackFromRight = array.getBoolean( R.styleable.AbsHListView_hlv_stackFromRight, false );
+			scrollingCacheEnabled = array.getBoolean( R.styleable.AbsHListView_android_scrollingCache, true );
+			transcriptMode = array.getInt( R.styleable.AbsHListView_hlv_transcriptMode, TRANSCRIPT_MODE_DISABLED );
+			color = array.getColor( R.styleable.AbsHListView_android_cacheColorHint, 0 );
+			smoothScrollbar = array.getBoolean( R.styleable.AbsHListView_android_smoothScrollbar, true );
+			choiceMode = array.getInt( R.styleable.AbsHListView_android_choiceMode, ListView.CHOICE_MODE_NONE );
 			array.recycle();
 
 			if( LOG_ENABLED ) {
@@ -3422,7 +3391,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		}
 	}
 
-	@TargetApi(12)
+	@TargetApi( Build.VERSION_CODES.HONEYCOMB_MR1 )
 	@Override
 	public boolean onGenericMotionEvent( MotionEvent event ) {
 		if ( ( event.getSource() & InputDevice.SOURCE_CLASS_POINTER ) != 0 ) {
@@ -3454,19 +3423,14 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	protected float getHorizontalScrollFactor() {
 		if ( mHorizontalScrollFactor == 0 ) {
 
-			int resId = getResources().getIdentifier( "hlv_listPreferredItemWidth", "attr", getContext().getPackageName() );
-			
-			if( resId != 0 ) {
-				TypedValue outValue = new TypedValue();
-				boolean success = getContext().getTheme().resolveAttribute( resId, outValue, true );
-				
-				if( success ) {
-					mHorizontalScrollFactor = outValue.getDimension( getContext().getResources().getDisplayMetrics() );
-				} else {
-					throw new IllegalStateException("Expected theme to define hlv_listPreferredItemWidth." );
-				}
-			} else {
-				throw new IllegalStateException("Expected theme to define hlv_listPreferredItemWidth." );
+			TypedValue outValue = new TypedValue();
+			boolean success = getContext().getTheme().resolveAttribute( R.attr.hlv_listPreferredItemWidth, outValue, true );
+
+			if( success ) {
+				mHorizontalScrollFactor = outValue.getDimension( getContext().getResources().getDisplayMetrics() );
+			}
+			else {
+				throw new IllegalStateException( "Expected theme to define hlv_listPreferredItemWidth." );
 			}
 		}
 		return mHorizontalScrollFactor;
@@ -5892,28 +5856,4 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			return null;
 		}
 	}
-	
-	/*********************************************************************************
-	*   Returns the resource-IDs for all attributes specified in the
-	*   given <declare-styleable>-resource tag as an int array.
-	*
-	*   @param  context     The current application context.
-	*   @param  name        The name of the <declare-styleable>-resource-tag to pick.
-	*   @return             All resource-IDs of the child-attributes for the given
-	*                       <declare-styleable>-resource or <code>null</code> if
-	*                       this tag could not be found or an error occured.
-	*********************************************************************************/
-	@SuppressWarnings ( "unchecked" )
-	public static final <T> T getFieldFromStyleable( Context context, String name ) {
-		try {
-			// use reflection to access the resource class
-			Field field = Class.forName( context.getPackageName() + ".R$styleable" ).getField( name );
-			if ( null != field ) {
-				return (T) field.get( null );
-			}
-		} catch ( Throwable t ) {
-			t.printStackTrace();
-		}
-		return null;
-	}	
 }

@@ -24,6 +24,7 @@ package it.sephiroth.android.library.widget;
 import java.util.ArrayList;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -48,6 +49,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RemoteViews.RemoteView;
 import android.widget.WrapperListAdapter;
+
+import it.sephiroth.android.library.R;
 
 /*
  * Implementation Notes:
@@ -141,7 +144,7 @@ public class HListView extends AbsHListView {
 	}
 
 	public HListView( Context context, AttributeSet attrs ) {
-		this( context, attrs, context.getResources().getIdentifier( "hlv_listViewStyle", "attr", context.getPackageName() ) );
+		this( context, attrs, R.attr.hlv_listViewStyle );
 	}
 
 	public HListView( Context context, AttributeSet attrs, int defStyle ) {
@@ -150,24 +153,10 @@ public class HListView extends AbsHListView {
 		if( LOG_ENABLED ) {
 			Log.i( LOG_TAG, "defStyle: " + defStyle );
 		}
-		
-		TypedArray array = null;
-		
-		// styles are being loaded dynamically, so the library can be used as a .jar file
-		// the only things to do is to copy all the entries in the "res/values/hlv_attrs.xml" to the
-		// final project
-		// also the drawabled must be copied
-		
-		int[] styleableArray = getFieldFromStyleable( context, "HListView" );
 
-		if( LOG_ENABLED ) {
-			Log.d( LOG_TAG, "styleableArray: " + styleableArray );
-		}
-		
-		if( null != styleableArray ) {
-			array = context.obtainStyledAttributes( attrs, styleableArray, defStyle, 0 );
-		}
-		
+		final Resources.Theme theme = context.getTheme();
+		TypedArray array = theme.obtainStyledAttributes( attrs, R.styleable.HListView, defStyle, 0 );
+
 		CharSequence[] entries = null;
 		Drawable dividerDrawable = null;
 		Drawable overscrollHeader = null;
@@ -179,14 +168,14 @@ public class HListView extends AbsHListView {
 		int measureWithChild = -1;		
 		
 		if( null != array ) {
-			entries = array.getTextArray( 0 /*R.styleable.HListView_android_entries*/ );
-			dividerDrawable = array.getDrawable( 1 /*R.styleable.HListView_android_divider*/ );
-			overscrollHeader = array.getDrawable( 5 /*R.styleable.HListView_overScrollHeader*/ );
-			overscrollFooter = array.getDrawable( 6 /*R.styleable.HListView_overScrollFooter*/ );
-			dividerWidth = array.getDimensionPixelSize( 2 /*R.styleable.HListView_dividerWidth*/, 0 );
-			headerDividersEnabled = array.getBoolean( 3 /*R.styleable.HListView_headerDividersEnabled*/, true );
-			footerDividersEnabled = array.getBoolean( 4 /*R.styleable.HListView_footerDividersEnabled*/, true );
-			measureWithChild = array.getInteger( 7 /*R.styleable.HListView_measureWithChild*/, -1 );			
+			entries = array.getTextArray( R.styleable.HListView_android_entries );
+			dividerDrawable = array.getDrawable( R.styleable.HListView_android_divider );
+			overscrollHeader = array.getDrawable( R.styleable.HListView_hlv_overScrollHeader );
+			overscrollFooter = array.getDrawable( R.styleable.HListView_hlv_overScrollFooter );
+			dividerWidth = array.getDimensionPixelSize( R.styleable.HListView_hlv_dividerWidth, 0 );
+			headerDividersEnabled = array.getBoolean( R.styleable.HListView_hlv_headerDividersEnabled, true );
+			footerDividersEnabled = array.getBoolean( R.styleable.HListView_hlv_footerDividersEnabled, true );
+			measureWithChild = array.getInteger( R.styleable.HListView_hlv_measureWithChild, -1 );
 			array.recycle();
 
 			if( LOG_ENABLED ) {

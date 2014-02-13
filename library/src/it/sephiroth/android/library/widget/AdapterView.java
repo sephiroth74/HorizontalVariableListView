@@ -43,7 +43,7 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 	
 	public static final String LOG_TAG = "AdapterView";
 
-	public static final boolean LOG_ENABLED = true;
+	public static final boolean LOG_ENABLED = false;
 
 	/**
 	 * The item view type returned by {@link Adapter#getItemViewType(int)} when the adapter does not want the item's view recycled.
