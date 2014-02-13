@@ -1,9 +1,10 @@
 package it.sephiroth.android.library.util;
 
-import it.sephiroth.android.library.util.v14.ViewHelper14;
-import it.sephiroth.android.library.util.v16.ViewHelper16;
 import android.util.Log;
 import android.view.View;
+
+import it.sephiroth.android.library.util.v14.ViewHelper14;
+import it.sephiroth.android.library.util.v16.ViewHelper16;
 
 public class ViewHelperFactory {
 
@@ -16,7 +17,6 @@ public class ViewHelperFactory {
 
 		protected ViewHelper( View view ) {
 			this.view = view;
-			Log.i( LOG_TAG, this.getClass().getSimpleName() );
 		}
 
 		public abstract void postOnAnimation( Runnable action );

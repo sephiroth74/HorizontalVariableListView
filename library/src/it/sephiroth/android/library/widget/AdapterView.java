@@ -559,7 +559,7 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 	}
 
 	/**
-	 * @return The id corresponding to the currently selected item, or {@link #INVALID_ROW_ID} if nothing is selected.
+	 * @return The id corresponding to the currently selected item, or INVALID_ROW_ID if nothing is selected.
 	 */
 	@ViewDebug.CapturedViewProperty
 	public long getSelectedItemId() {
