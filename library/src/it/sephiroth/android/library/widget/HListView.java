@@ -22,7 +22,6 @@
 package it.sephiroth.android.library.widget;
 
 import java.util.ArrayList;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -31,10 +30,9 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
+import android.support.v4.util.SparseArrayCompat;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.FocusFinder;
 import android.view.KeyEvent;
 import android.view.SoundEffectConstants;
@@ -76,7 +74,7 @@ import android.widget.WrapperListAdapter;
 @RemoteView
 public class HListView extends AbsHListView {
 
-	public static final String VERSION = "1.0.1";
+	public static final String VERSION = "1.0.2";
 
 	/**
 	 * Used to indicate a no preference for a position type.
@@ -1109,7 +1107,7 @@ public class HListView extends AbsHListView {
 		super.onSizeChanged( w, h, oldw, oldh );
 	}
 
-	@TargetApi ( Build.VERSION_CODES.HONEYCOMB )
+	@TargetApi (11)
 	@Override
 	protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
 		// Sets up mListPadding
@@ -1900,7 +1898,7 @@ public class HListView extends AbsHListView {
 	 * @param recycled
 	 *           Has this view been pulled from the recycle bin? If so it does not need to be remeasured.
 	 */
-	@TargetApi ( Build.VERSION_CODES.HONEYCOMB )
+	@TargetApi (11)
 	private void setupChild( View child, int position, int x, boolean flowDown, int childrenTop, boolean selected, boolean recycled ) {
 		final boolean isSelected = selected && shouldShowSelector();
 		final boolean updateChildSelected = isSelected != child.isSelected();
@@ -1937,9 +1935,9 @@ public class HListView extends AbsHListView {
 
 		if ( mChoiceMode != ListView.CHOICE_MODE_NONE && mCheckStates != null ) {
 			if ( child instanceof Checkable ) {
-				( (Checkable) child ).setChecked( mCheckStates.get( position ) );
+				( (Checkable) child ).setChecked( mCheckStates.get( position, false ) );
 			} else if ( android.os.Build.VERSION.SDK_INT >= 11 ) {
-				child.setActivated( mCheckStates.get( position ) );
+				child.setActivated( mCheckStates.get( position, false ) );
 			}
 		}
 
@@ -3578,7 +3576,7 @@ public class HListView extends AbsHListView {
 		// Old behavior was buggy, but would sort of work for adapters without stable IDs.
 		// Fall back to it to support legacy apps.
 		if ( mChoiceMode != ListView.CHOICE_MODE_NONE && mCheckStates != null && mAdapter != null ) {
-			final SparseBooleanArray states = mCheckStates;
+			final SparseArrayCompat<Boolean> states = mCheckStates;
 			final int count = states.size();
 			final long[] ids = new long[count];
 			final ListAdapter adapter = mAdapter;
@@ -3610,7 +3608,7 @@ public class HListView extends AbsHListView {
 		event.setClassName( HListView.class.getName() );
 	}
 
-	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	@TargetApi(14)
 	@Override
 	public void onInitializeAccessibilityNodeInfo( AccessibilityNodeInfo info ) {
 		super.onInitializeAccessibilityNodeInfo( info );

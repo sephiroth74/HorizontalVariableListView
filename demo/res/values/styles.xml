@@ -23,8 +23,8 @@
         <item name="measureWithChild">0</item>
         <item name="android:smoothScrollbar">true</item>
         <item name="android:scrollingCache">false</item>
-        <item name="android:choiceMode">multipleChoiceModal</item>
         <item name="android:overScrollMode">always</item>
+        <item name="android:choiceMode">multipleChoice</item>
     </style>
 
 </resources>

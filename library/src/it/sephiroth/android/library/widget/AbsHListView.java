@@ -1,15 +1,12 @@
 package it.sephiroth.android.library.widget;
 
-import it.sephiroth.android.library.R;
 import it.sephiroth.android.library.util.ViewHelperFactory;
 import it.sephiroth.android.library.util.ViewHelperFactory.ViewHelper;
 import it.sephiroth.android.library.util.v11.MultiChoiceModeListener;
 import it.sephiroth.android.library.util.v11.MultiChoiceModeWrapper;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -30,7 +27,6 @@ import android.support.v4.view.accessibility.AccessibilityEventCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -186,7 +182,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	/**
 	 * Running state of which positions are currently checked
 	 */
-	protected SparseBooleanArray mCheckStates;
+	protected SparseArrayCompat<Boolean> mCheckStates;
 
 	/**
 	 * Running state of which IDs are currently checked. If there is a value for a given key, the checked state for that ID is true
@@ -781,7 +777,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	 */
 	public boolean isItemChecked( int position ) {
 		if ( mChoiceMode != ListView.CHOICE_MODE_NONE && mCheckStates != null ) {
-			return mCheckStates.get( position );
+			return mCheckStates.get( position, false );
 		}
 
 		return false;
@@ -809,7 +805,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	 * @return A SparseBooleanArray which will return true for each call to get(int position) where position is a position in the
 	 *         list, or <code>null</code> if the choice mode is set to {@link #CHOICE_MODE_NONE}.
 	 */
-	public SparseBooleanArray getCheckedItemPositions() {
+	public SparseArrayCompat<Boolean> getCheckedItemPositions() {
 		if ( mChoiceMode != ListView.CHOICE_MODE_NONE ) {
 			return mCheckStates;
 		}
@@ -880,7 +876,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
 		if ( mChoiceMode == ListView.CHOICE_MODE_MULTIPLE
 				|| ( android.os.Build.VERSION.SDK_INT >= 11 && mChoiceMode == ListView.CHOICE_MODE_MULTIPLE_MODAL ) ) {
-			boolean oldValue = mCheckStates.get( position );
+			boolean oldValue = mCheckStates.get( position, false );
 			mCheckStates.put( position, value );
 			if ( mCheckedIdStates != null && mAdapter.hasStableIds() ) {
 				if ( value ) {
@@ -1004,9 +1000,9 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			final int position = firstPos + i;
 
 			if ( child instanceof Checkable ) {
-				( (Checkable) child ).setChecked( mCheckStates.get( position ) );
+				( (Checkable) child ).setChecked( mCheckStates.get( position, false ) );
 			} else if ( useActivated ) {
-				child.setActivated( mCheckStates.get( position ) );
+				child.setActivated( mCheckStates.get( position, false ) );
 			}
 		}
 	}
@@ -1044,7 +1040,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
 		if ( mChoiceMode != ListView.CHOICE_MODE_NONE ) {
 			if ( mCheckStates == null ) {
-				mCheckStates = new SparseBooleanArray();
+				mCheckStates = new SparseArrayCompat<Boolean>();
 			}
 			if ( mCheckedIdStates == null && mAdapter != null && mAdapter.hasStableIds() ) {
 				mCheckedIdStates = new LongSparseArray<Integer>();
@@ -1169,13 +1165,15 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		super.sendAccessibilityEvent( eventType );
 	}
 
+	@TargetApi(14)
 	@Override
 	public void onInitializeAccessibilityEvent( AccessibilityEvent event ) {
 		super.onInitializeAccessibilityEvent( event );
 		event.setClassName( AbsHListView.class.getName() );
 	}
 
-	@TargetApi(14)
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	@SuppressLint("Override")
 	@Override
 	public void onInitializeAccessibilityNodeInfo( AccessibilityNodeInfo info ) {
 		super.onInitializeAccessibilityNodeInfo( info );
@@ -1310,7 +1308,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		String filter;
 		boolean inActionMode;
 		int checkedItemCount;
-		SparseBooleanArray checkState;
+		SparseArrayCompat<Boolean> checkState;
 		LongSparseArray<Integer> checkIdState;
 
 		/**
@@ -1333,20 +1331,81 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			filter = in.readString();
 			inActionMode = in.readByte() != 0;
 			checkedItemCount = in.readInt();
-			checkState = in.readSparseBooleanArray();
+			checkState = readSparseBooleanArray( in );
+			checkIdState = readSparseLongArray( in );
+		}
+		
+		private LongSparseArray<Integer> readSparseLongArray( Parcel in ) {
+			Log.i( TAG, "readSparseLongArray" );
 			final int N = in.readInt();
-			if ( N > 0 ) {
-				checkIdState = new LongSparseArray<Integer>();
-				for ( int i = 0; i < N; i++ ) {
-					final long key = in.readLong();
-					final int value = in.readInt();
-					checkIdState.put( key, value );
-				}
+			if( N <= 0 ) {
+				return null;
+			}
+			LongSparseArray<Integer> array = new LongSparseArray<Integer>( N );
+			readSparseLongArrayInternal( array, in, N );
+			return array;
+		}
+
+		private SparseArrayCompat<Boolean> readSparseBooleanArray( Parcel in ) {
+			Log.i( TAG, "readSparseBooleanArray" );
+			int N = in.readInt();
+			if ( N < 0 ) {
+				return null;
+			}
+			SparseArrayCompat<Boolean> sa = new SparseArrayCompat<Boolean>( N );
+			readSparseBooleanArrayInternal( sa, in, N );
+			return sa;
+		}
+		
+		private void readSparseLongArrayInternal( LongSparseArray<Integer> outVal, Parcel in, int N ) {
+			while ( N > 0 ) {
+				final long key = in.readLong();
+				final int value = in.readInt();
+				Log.i( TAG, "Unmarshalling key=" + key + " value=" + value );
+				outVal.put( key, value );
+				N--;
+			}
+		}
+
+		private void readSparseBooleanArrayInternal( SparseArrayCompat<Boolean> outVal, Parcel in, int N ) {
+			while ( N > 0 ) {
+				int key = in.readInt();
+				boolean value = in.readByte() == 1;
+				Log.i( TAG, "Unmarshalling key=" + key + " value=" + value );
+				outVal.append( key, value );
+				N--;
+			}
+		}
+		
+		private void writeSparseLongArray( LongSparseArray<Integer> array, Parcel out ) {
+			Log.i( TAG, "writeSparseLongArray" );
+			final int N = array != null ? array.size() : 0;
+			out.writeInt( N );
+			for ( int i = 0; i < N; i++ ) {
+				out.writeLong( array.keyAt( i ) );
+				out.writeInt( array.valueAt( i ) );
+			}
+		}
+
+		private void writeSparseBooleanArray( SparseArrayCompat<Boolean> val, Parcel out ) {
+			Log.i( TAG, "writeSparseBooleanArray" );
+			if ( val == null ) {
+				out.writeInt( -1 );
+				return;
+			}
+			int N = val.size();
+			out.writeInt( N );
+			int i = 0;
+			while ( i < N ) {
+				out.writeInt( val.keyAt( i ) );
+				out.writeByte( (byte) ( val.valueAt( i ) ? 1 : 0 ) );
+				i++;
 			}
 		}
 
 		@Override
 		public void writeToParcel( Parcel out, int flags ) {
+			Log.i( TAG, "writeToParcel" );
 			super.writeToParcel( out, flags );
 			out.writeLong( selectedId );
 			out.writeLong( firstId );
@@ -1356,13 +1415,12 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			out.writeString( filter );
 			out.writeByte( (byte) ( inActionMode ? 1 : 0 ) );
 			out.writeInt( checkedItemCount );
-			out.writeSparseBooleanArray( checkState );
-			final int N = checkIdState != null ? checkIdState.size() : 0;
-			out.writeInt( N );
-			for ( int i = 0; i < N; i++ ) {
-				out.writeLong( checkIdState.keyAt( i ) );
-				out.writeInt( checkIdState.valueAt( i ) );
-			}
+			
+			Log.d( TAG, "writing checkState: " + checkState );
+			Log.d( TAG, "writing checkIdState: " + checkIdState );
+			
+			writeSparseBooleanArray( checkState, out );
+			writeSparseLongArray( checkIdState, out );
 		}
 
 		@Override
@@ -1394,6 +1452,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
 	@Override
 	public Parcelable onSaveInstanceState() {
+		Log.i( TAG, "onSaveInstanceState" );
 		/*
 		 * This doesn't really make sense as the place to dismiss the popups, but there don't seem to be any other useful hooks that
 		 * happen early enough to keep from getting complaints about having leaked the window.
@@ -1401,6 +1460,8 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		Parcelable superState = super.onSaveInstanceState();
 
 		SavedState ss = new SavedState( superState );
+		
+		Log.d( TAG, "mPendingSync: " + mPendingSync );
 
 		if ( mPendingSync != null ) {
 			// Just keep what we last restored.
@@ -1462,7 +1523,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 				ss.checkState = mCheckStates.clone();
 			} catch( NoSuchMethodError e ) {
 				e.printStackTrace();
-				ss.checkState = new SparseBooleanArray();
+				ss.checkState = new SparseArrayCompat<Boolean>();
 			}
 		}
 		if ( mCheckedIdStates != null ) {
@@ -1480,6 +1541,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
 	@Override
 	public void onRestoreInstanceState( Parcelable state ) {
+		Log.i( TAG, "onRestoreInstanceState" );
 		SavedState ss = (SavedState) state;
 
 		super.onRestoreInstanceState( ss.getSuperState() );
@@ -1506,6 +1568,9 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			mSpecificLeft = ss.viewLeft;
 			mSyncMode = SYNC_FIRST_POSITION;
 		}
+		
+		Log.d( TAG, "checkState: " + ss.checkState );
+		Log.d( TAG, "checkIdState: " + ss.checkIdState );
 
 		if ( ss.checkState != null ) {
 			mCheckStates = ss.checkState;
@@ -2226,6 +2291,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		updateSelectorState();
 	}
 
+	@SuppressLint("Override")
 	@Override
 	protected int[] onCreateDrawableState( int extraSpace ) {
 		// If the child view is enabled then do the default behavior.
@@ -2938,6 +3004,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		return false;
 	}
 
+	@SuppressLint("Override")
 	@Override
 	public boolean onTouchEvent( MotionEvent ev ) {
 		if ( !isEnabled() ) {
@@ -4872,8 +4939,8 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		return selectedPos >= 0;
 	}
 
-	@TargetApi(16)
 	void confirmCheckedPositionsById() {
+		Log.i( TAG, "confirmCheckedPositionsById" );
 		// Clear out the positional check states, we'll rebuild it below from IDs.
 		mCheckStates.clear();
 
@@ -4915,19 +4982,19 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			}
 		}
 
-		if ( checkedCountChanged && mChoiceActionMode != null ) {
+		if ( checkedCountChanged && mChoiceActionMode != null && android.os.Build.VERSION.SDK_INT > 11 ) {
 			( (ActionMode) mChoiceActionMode ).invalidate();
 		}
 	}
 
 	@Override
 	protected void handleDataChanged() {
+		Log.i( TAG, "handleDataChanged" );
 		int count = mItemCount;
 		int lastHandledItemCount = mLastHandledItemCount;
 		mLastHandledItemCount = mItemCount;
 
-		if ( android.os.Build.VERSION.SDK_INT >= 16 && mChoiceMode != ListView.CHOICE_MODE_NONE && mAdapter != null
-				&& mAdapter.hasStableIds() ) {
+		if ( mChoiceMode != ListView.CHOICE_MODE_NONE && mAdapter != null && mAdapter.hasStableIds() ) {
 			confirmCheckedPositionsById();
 		}
 
@@ -5284,13 +5351,13 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
 		@Override
 		public void onChanged() {
-			Log.i( TAG, "onChanged" );
+			Log.i( TAG, "AdapterDataSetObserver::onChanged" );
 			super.onChanged();
 		}
 
 		@Override
 		public void onInvalidated() {
-			Log.i( TAG, "onInvalidated" );
+			Log.i( TAG, "AdapterDataSetObserver::onInvalidated" );
 			super.onInvalidated();
 		}
 	}

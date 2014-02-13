@@ -1,19 +1,20 @@
 package it.sephiroth.android.sample.horizontalvariablelistviewdemo;
 
 import it.sephiroth.android.library.util.v11.MultiChoiceModeListener;
+import it.sephiroth.android.library.widget.AdapterView;
+import it.sephiroth.android.library.widget.AdapterView.OnItemClickListener;
 import it.sephiroth.android.library.widget.HListView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,10 +23,11 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
-public class MainActivity extends Activity implements OnClickListener, MultiChoiceModeListener {
+@TargetApi(11)
+public class MainActivity extends Activity implements OnClickListener, OnItemClickListener {
 	
 	private static final String LOG_TAG = "MainActivity";
 	HListView listView;
@@ -42,15 +44,52 @@ public class MainActivity extends Activity implements OnClickListener, MultiChoi
 		
 		List<String> items = new ArrayList<String>();
 		for( int i = 0; i < 50; i++ ) {
-			items.add( "Image " + i );
+			items.add( String.valueOf( i ) );
 		}
 		
-		mAdapter = new TestAdapter( this, R.layout.test_item_1, android.R.id.text1, items );
+		mAdapter = new TestAdapter( this, android.R.layout.simple_list_item_checked, android.R.id.text1, items );
 		listView.setHeaderDividersEnabled( true );
 		listView.setFooterDividersEnabled( true );
 		
 		if( listView.getChoiceMode() == ListView.CHOICE_MODE_MULTIPLE_MODAL ) {
-			listView.setMultiChoiceModeListener( this );
+			listView.setMultiChoiceModeListener( new MultiChoiceModeListener() {
+				
+				@Override
+				public boolean onPrepareActionMode( ActionMode mode, Menu menu ) {
+					return true;
+				}
+				
+				@Override
+				public void onDestroyActionMode( ActionMode mode ) {
+				}
+				
+				@Override
+				public boolean onCreateActionMode( ActionMode mode, Menu menu ) {
+					menu.add( 0, 0, 0, "Delete" );
+					return true;
+				}
+				
+				@Override
+				public boolean onActionItemClicked( ActionMode mode, MenuItem item ) {
+					Log.d( LOG_TAG, "onActionItemClicked: " + item.getItemId() );
+					
+					final int itemId = item.getItemId();
+					if( itemId == 0 ) {
+						deleteSelectedItems();
+					}
+					
+					mode.finish();
+					return false;
+				}
+				
+				@Override
+				public void onItemCheckedStateChanged( ActionMode mode, int position, long id, boolean checked ) {
+					mode.setTitle( "What the fuck!" );
+					mode.setSubtitle( "Selected items: " + listView.getCheckedItemCount() );
+				}
+			} );
+		} else if( listView.getChoiceMode() == ListView.CHOICE_MODE_MULTIPLE ) {
+			listView.setOnItemClickListener( this );
 		}
 		
 		
@@ -93,7 +132,7 @@ public class MainActivity extends Activity implements OnClickListener, MultiChoi
 	
 	private void addElements() {
 		for( int i = 0; i < 5; i++ ) {
-			mAdapter.mItems.add( Math.min( mAdapter.mItems.size(), 2), "Image " + mAdapter.mItems.size() );
+			mAdapter.mItems.add( Math.min( mAdapter.mItems.size(), 2), String.valueOf( mAdapter.mItems.size() ) );
 		}
 		mAdapter.notifyDataSetChanged();
 	}
@@ -108,7 +147,7 @@ public class MainActivity extends Activity implements OnClickListener, MultiChoi
 	}
 	
 	private void deleteSelectedItems() {
-		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+		SparseArrayCompat<Boolean> checkedItems = listView.getCheckedItemPositions();
 		ArrayList<Integer> sorted = new ArrayList<Integer>( checkedItems.size() );
 		
 		Log.i( LOG_TAG, "deleting: " + checkedItems.size() );
@@ -129,13 +168,36 @@ public class MainActivity extends Activity implements OnClickListener, MultiChoi
 		mAdapter.notifyDataSetChanged();
 	}
 	
+	@Override
+	public void onItemClick( AdapterView<?> parent, View view, int position, long id ) {
+		Log.i( LOG_TAG, "onItemClick: " + position );
+		Log.d( LOG_TAG, "checked items: " + listView.getCheckedItemCount() );
+		Log.d( LOG_TAG, "checked positions: " + listView.getCheckedItemPositions() );
+	}
+	
 	class TestAdapter extends ArrayAdapter<String> {
 		
 		List<String> mItems;
+		LayoutInflater mInflater;
+		int mResource;
+		int mTextResId;
 		
 		public TestAdapter( Context context, int resourceId, int textViewResourceId, List<String> objects ) {
 			super( context, resourceId, textViewResourceId, objects );
+			mInflater = LayoutInflater.from( context );
+			mResource = resourceId;
+			mTextResId = textViewResourceId;
 			mItems = objects;
+		}
+		
+		@Override
+		public boolean hasStableIds() {
+			return true;
+		}
+		
+		@Override
+		public long getItemId( int position ) {
+			return getItem( position ).hashCode();
 		}
 		
 		@Override
@@ -151,54 +213,25 @@ public class MainActivity extends Activity implements OnClickListener, MultiChoi
 		@Override
 		public View getView( int position, View convertView, ViewGroup parent ) {
 			
-			View view = super.getView( position, convertView, parent );
+			if( null == convertView ) {
+				convertView = mInflater.inflate( mResource, parent, false );
+			}
 			
-			ImageView image = (ImageView) view.findViewById( R.id.image );
+			TextView textView = (TextView) convertView.findViewById( mTextResId );
+			textView.setText( getItem( position ) );
 			
 			int type = getItemViewType( position );
 			
-			LayoutParams params = view.getLayoutParams();
+			LayoutParams params = convertView.getLayoutParams();
 			if( type == 0 ) {
-				params.width = 200;
+				params.width = getResources().getDimensionPixelSize( R.dimen.item_size_1 );
 			} else if( type == 1 ) {
-				params.width = 250;
+				params.width = getResources().getDimensionPixelSize( R.dimen.item_size_2 );
 			} else {
-				params.width = 300;
+				params.width = getResources().getDimensionPixelSize( R.dimen.item_size_3 );
 			}
 			
-			return view;
+			return convertView;
 		}
-	}
-
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public boolean onActionItemClicked( ActionMode mode, MenuItem item ) {
-		Log.d( LOG_TAG, "onActionItemClicked: " + item.getItemId() );
-		
-		final int itemId = item.getItemId();
-		if( itemId == 0 ) {
-			deleteSelectedItems();
-		}
-		
-		mode.finish();
-		return false;
-	}
-
-	public boolean onCreateActionMode( ActionMode mode, Menu menu ) {
-		menu.add( 0, 0, 0, "Delete" );
-		return true;
-	}
-
-	public void onDestroyActionMode( ActionMode mode ) {
-		
-	}
-
-	public boolean onPrepareActionMode( ActionMode mode, Menu menu ) {
-		return true;
-	}
-
-	@SuppressLint("NewApi")
-	public void onItemCheckedStateChanged( ActionMode mode, int position, long id, boolean checked ) {
-		mode.setTitle( "What the fuck!" );
-		mode.setSubtitle( "Selected items: " + listView.getCheckedItemCount() );
 	}
 }

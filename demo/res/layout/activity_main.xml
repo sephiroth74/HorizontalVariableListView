@@ -22,6 +22,7 @@
             android:layout_height="250dip"
             android:paddingTop="20dip"
             android:paddingBottom="20dip"
+            style="@style/HListView"
             android:background="#11000000" />
     </LinearLayout>
 
