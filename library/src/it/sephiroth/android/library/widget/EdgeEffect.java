@@ -24,6 +24,7 @@ import android.graphics.drawable.Drawable;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
+import it.sephiroth.android.library.R;
 
 /**
  * This class performs the graphical effect used at the edges of scrollable widgets
@@ -137,20 +138,9 @@ public class EdgeEffect {
      */
     public EdgeEffect(Context context, int direction ) {
         final Resources res = context.getResources();
-        int resId = res.getIdentifier( "hlv_overscroll_edge", "drawable", context.getPackageName() );
-        if( resId > 0 ) {
-        	mEdge = res.getDrawable(resId);
-        } else {
-        	throw new IllegalStateException( "Cannot find resource 'hlv_overscroll_edge'" );
-        }
-        
-        resId = res.getIdentifier( "hlv_overscroll_glow", "drawable", context.getPackageName() );
-        if( resId > 0 ) {
-        	mGlow = res.getDrawable(resId);
-        } else {
-        	throw new IllegalStateException( "Cannot find resource 'hlv_overscroll_glow'" );
-        }
-        
+        mEdge = res.getDrawable(R.drawable.hlv_overscroll_edge);
+        mGlow = res.getDrawable(R.drawable.hlv_overscroll_glow);
+
         mDirection = direction;
 
         mEdgeHeight = mEdge.getIntrinsicHeight();
