@@ -1,41 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="hlv_listViewStyle" format="reference" />
-    <attr name="hlv_absHListViewStyle" format="reference" />
-    <attr name="hlv_listPreferredItemWidth" format="dimension" />
-    
-    <declare-styleable name="HListView">
-        <attr name="android:entries" />
-        <attr name="android:divider" />
-        <attr name="hlv_dividerWidth" format="dimension" />
-        <attr name="hlv_headerDividersEnabled" format="boolean" />
-        <attr name="hlv_footerDividersEnabled" format="boolean" />
-        <attr name="hlv_overScrollHeader" format="reference|color" />
-        <attr name="hlv_overScrollFooter" format="reference|color" />
-        
-        <!-- 
-        When "wrap_content" is used as value of the layout_height property.
-        Pass the position, inside the adapter, of the view being used to measure the view
-        or '-1' to use the default behavior ( default is -1 )
-        -->
-        <attr name="hlv_measureWithChild" format="integer" />
-    </declare-styleable>
-    
+	<attr name="hlv_listViewStyle" format="reference" />
+	<attr name="hlv_absHListViewStyle" format="reference" />
+	<attr name="hlv_listPreferredItemWidth" format="dimension" />
 
-    <declare-styleable name="AbsHListView">
-        <attr name="android:listSelector" />
-        <attr name="android:smoothScrollbar" />
-        <attr name="android:drawSelectorOnTop" />
-        <attr name="android:cacheColorHint" />
-        <attr name="android:scrollingCache" />
-        <attr name="android:choiceMode" />
-        
-        <attr name="hlv_stackFromRight" format="boolean" />
-        <attr name="hlv_transcriptMode">
-            <enum name="disabled" value="0"/>
-            <enum name="normal" value="1" />
-            <enum name="alwaysScroll" value="2" />
-        </attr>
-        
-    </declare-styleable>    
+	<attr name="hlv_expandableListViewStyle" format="reference" />
+
+	<declare-styleable name="HListView">
+		<attr name="android:entries" />
+		<attr name="android:divider" />
+		<attr name="hlv_dividerWidth" format="dimension" />
+		<attr name="hlv_headerDividersEnabled" format="boolean" />
+		<attr name="hlv_footerDividersEnabled" format="boolean" />
+		<attr name="hlv_overScrollHeader" format="reference|color" />
+		<attr name="hlv_overScrollFooter" format="reference|color" />
+
+		<!--
+		When "wrap_content" is used as value of the layout_height property.
+		Pass the position, inside the adapter, of the view being used to measure the view
+		or '-1' to use the default behavior ( default is -1 )
+		-->
+		<attr name="hlv_measureWithChild" format="integer" />
+	</declare-styleable>
+
+
+	<declare-styleable name="AbsHListView">
+		<attr name="android:listSelector" />
+		<attr name="android:smoothScrollbar" />
+		<attr name="android:drawSelectorOnTop" />
+		<attr name="android:cacheColorHint" />
+		<attr name="android:scrollingCache" />
+		<attr name="android:choiceMode" />
+
+		<attr name="hlv_stackFromRight" format="boolean" />
+		<attr name="hlv_transcriptMode">
+			<enum name="disabled" value="0" />
+			<enum name="normal" value="1" />
+			<enum name="alwaysScroll" value="2" />
+		</attr>
+
+	</declare-styleable>
+
+
+	<declare-styleable name="ExpandableHListView">
+
+		<attr name="hlv_indicatorGravity">
+			<flag name="top" value="0x30" />
+			<flag name="bottom" value="0x50" />
+			<flag name="left" value="0x03" />
+			<flag name="right" value="0x05" />
+			<flag name="center_vertical" value="0x10" />
+			<flag name="fill_vertical" value="0x70" />
+			<flag name="center_horizontal" value="0x01" />
+			<flag name="fill_horizontal" value="0x07" />
+			<flag name="center" value="0x11" />
+			<flag name="fill" value="0x77" />
+			<flag name="clip_vertical" value="0x80" />
+			<flag name="clip_horizontal" value="0x08" />
+			<flag name="start" value="0x00800003" />
+			<flag name="end" value="0x00800005" />
+		</attr>
+
+		<attr name="hlv_childIndicatorGravity">
+			<flag name="top" value="0x30" />
+			<flag name="bottom" value="0x50" />
+			<flag name="left" value="0x03" />
+			<flag name="right" value="0x05" />
+			<flag name="center_vertical" value="0x10" />
+			<flag name="fill_vertical" value="0x70" />
+			<flag name="center_horizontal" value="0x01" />
+			<flag name="fill_horizontal" value="0x07" />
+			<flag name="center" value="0x11" />
+			<flag name="fill" value="0x77" />
+			<flag name="clip_vertical" value="0x80" />
+			<flag name="clip_horizontal" value="0x08" />
+			<flag name="start" value="0x00800003" />
+			<flag name="end" value="0x00800005" />
+		</attr>
+
+		<attr name="hlv_childDivider" format="reference|color" />
+		<attr name="hlv_groupIndicator" format="reference" />
+		<attr name="hlv_childIndicator" format="reference" />
+
+		<!-- after gravity for the indicator has been set -->
+		<!-- a custom padding can be set -->
+		<attr name="hlv_indicatorPaddingLeft" format="dimension" />
+		<attr name="hlv_indicatorPaddingTop" format="dimension" />
+
+		<!-- after gravity for the child indicator has been set -->
+		<!-- a custom padding can be set -->
+		<attr name="hlv_childIndicatorPaddingLeft" format="dimension" />
+		<attr name="hlv_childIndicatorPaddingTop" format="dimension" />
+	</declare-styleable>
+
 </resources>
