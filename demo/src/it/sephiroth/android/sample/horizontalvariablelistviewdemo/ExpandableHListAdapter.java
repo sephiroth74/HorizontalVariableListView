@@ -31,11 +31,6 @@ public class ExpandableHListAdapter extends BaseExpandableListAdapter {
 	}
 
 	@Override
-	public long getChildId( int groupPosition, int childPosition ) {
-		return childPosition;
-	}
-
-	@Override
 	public View getChildView(
 			int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent ) {
 
@@ -69,7 +64,12 @@ public class ExpandableHListAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public long getGroupId( int groupPosition ) {
-		return groupPosition;
+		return getGroup( groupPosition ).hashCode();
+	}
+
+	@Override
+	public long getChildId( int groupPosition, int childPosition ) {
+		return ( getGroup( groupPosition ) + "_" + getChild( groupPosition, childPosition ) ).hashCode();
 	}
 
 	@Override
@@ -90,7 +90,17 @@ public class ExpandableHListAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public boolean hasStableIds() {
-		return false;
+		return true;
+	}
+
+	@Override
+	public long getCombinedChildId( final long groupId, final long childId ) {
+		return super.getCombinedChildId( groupId, childId );
+	}
+
+	@Override
+	public long getCombinedGroupId( final long groupId ) {
+		return super.getCombinedGroupId( groupId );
 	}
 
 	@Override
