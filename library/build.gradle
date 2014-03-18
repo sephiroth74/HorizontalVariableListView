@@ -2,7 +2,7 @@ apply plugin: 'android-library'
 apply plugin: 'signing'
 
 group 'it.sephiroth.android.library.horizontallistview'
-version '1.2.0'
+version '1.2.1'
 
 dependencies {
     compile 'com.android.support:support-v4:19.0.1+'
