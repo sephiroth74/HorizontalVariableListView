@@ -116,7 +116,7 @@ task writePom {
 
 
 uploadArchives {
-    if (hasProperty('sonatypeUsername')) {
+    if (project.hasProperty('sonatypeUsername')) {
         repositories {
             mavenDeployer {
                 beforeDeployment {
