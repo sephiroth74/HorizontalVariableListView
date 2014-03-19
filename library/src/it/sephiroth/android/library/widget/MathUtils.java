@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package it.sephiroth.android.library.util;
+package it.sephiroth.android.library.widget;
 
 import java.util.Random;
 
@@ -23,7 +23,7 @@ import java.util.Random;
  * 
  * @hide Pending API council approval
  */
-public final class MathUtils {
+final class MathUtils {
     private static final Random sRandom = new Random();
     private static final float DEG_TO_RAD = 3.1415926f / 180.0f;
     private static final float RAD_TO_DEG = 180.0f / 3.1415926f;

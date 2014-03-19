@@ -21,7 +21,6 @@
 
 package it.sephiroth.android.library.widget;
 
-import java.util.ArrayList;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
@@ -32,6 +31,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.v4.util.SparseArrayCompat;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.FocusFinder;
@@ -49,6 +49,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RemoteViews.RemoteView;
 import android.widget.WrapperListAdapter;
+
+import java.util.ArrayList;
 
 import it.sephiroth.android.library.R;
 
@@ -285,22 +287,23 @@ public class HListView extends AbsHListView {
 	 *           whether the item is selectable
 	 */
 	public void addHeaderView( View v, Object data, boolean isSelectable ) {
-
-		if ( mAdapter != null && !( mAdapter instanceof HeaderViewListAdapter ) ) {
-			throw new IllegalStateException(
-					"Cannot add header view to list -- setAdapter has already been called." );
-		}
-
-		FixedViewInfo info = new FixedViewInfo();
+		final FixedViewInfo info = new FixedViewInfo();
 		info.view = v;
 		info.data = data;
 		info.isSelectable = isSelectable;
 		mHeaderViewInfos.add( info );
 
-		// in the case of re-adding a header view, or adding one later on,
-		// we need to notify the observer
-		if ( mAdapter != null && mDataSetObserver != null ) {
-			mDataSetObserver.onChanged();
+		// Wrap the adapter if it wasn't already wrapped.
+		if( mAdapter != null ) {
+			if( ! ( mAdapter instanceof HeaderViewListAdapter ) ) {
+				mAdapter = new HeaderViewListAdapter( mHeaderViewInfos, mFooterViewInfos, mAdapter );
+			}
+
+			// In the case of re-adding a header view, or adding one later on,
+			// we need to notify the observer.
+			if( mDataSetObserver != null ) {
+				mDataSetObserver.onChanged();
+			}
 		}
 	}
 
@@ -371,22 +374,23 @@ public class HListView extends AbsHListView {
 	 *           true if the footer view can be selected
 	 */
 	public void addFooterView( View v, Object data, boolean isSelectable ) {
-
-		// NOTE: do not enforce the adapter being null here, since unlike in
-		// addHeaderView, it was never enforced here, and so existing apps are
-		// relying on being able to add a footer and then calling setAdapter to
-		// force creation of the HeaderViewListAdapter wrapper
-
-		FixedViewInfo info = new FixedViewInfo();
+		final FixedViewInfo info = new FixedViewInfo();
 		info.view = v;
 		info.data = data;
 		info.isSelectable = isSelectable;
 		mFooterViewInfos.add( info );
 
-		// in the case of re-adding a footer view, or adding one later on,
-		// we need to notify the observer
-		if ( mAdapter != null && mDataSetObserver != null ) {
-			mDataSetObserver.onChanged();
+		// Wrap the adapter if it wasn't already wrapped.
+		if( mAdapter != null ) {
+			if( ! ( mAdapter instanceof HeaderViewListAdapter ) ) {
+				mAdapter = new HeaderViewListAdapter( mHeaderViewInfos, mFooterViewInfos, mAdapter );
+			}
+
+			// In the case of re-adding a footer view, or adding one later on,
+			// we need to notify the observer.
+			if( mDataSetObserver != null ) {
+				mDataSetObserver.onChanged();
+			}
 		}
 	}
 
@@ -1529,11 +1533,11 @@ public class HListView extends AbsHListView {
 	@Override
 	protected void layoutChildren() {
 		final boolean blockLayoutRequests = mBlockLayoutRequests;
-		if ( !blockLayoutRequests ) {
-			mBlockLayoutRequests = true;
-		} else {
+		if ( blockLayoutRequests ) {
 			return;
 		}
+
+		mBlockLayoutRequests = true;
 
 		try {
 			super.layoutChildren();
@@ -1546,10 +1550,10 @@ public class HListView extends AbsHListView {
 				return;
 			}
 
-			int childrenLeft = mListPadding.left;
-			int childrenRight = getRight() - getLeft() - mListPadding.right;
+			final int childrenLeft = mListPadding.left;
+			final int childrenRight = getRight() - getLeft() - mListPadding.right;
+			final int childCount = getChildCount();
 
-			int childCount = getChildCount();
 			int index = 0;
 			int delta = 0;
 
@@ -1557,12 +1561,6 @@ public class HListView extends AbsHListView {
 			View oldSel = null;
 			View oldFirst = null;
 			View newSel = null;
-
-			View focusLayoutRestoreView = null;
-
-			// AccessibilityNodeInfo accessibilityFocusLayoutRestoreNode = null;
-			// View accessibilityFocusLayoutRestoreView = null;
-			// int accessibilityFocusPosition = INVALID_POSITION;
 
 			// Remember stuff we will need down below
 			switch ( mLayoutMode ) {
@@ -1617,16 +1615,32 @@ public class HListView extends AbsHListView {
 
 			setSelectedPositionInt( mNextSelectedPosition );
 
+			// Remember which child, if any, had accessibility focus.
+			final int accessibilityFocusPosition;
+			final View accessFocusedChild = getAccessibilityFocusedChild();
+			if( accessFocusedChild != null ) {
+				accessibilityFocusPosition = getPositionForView( accessFocusedChild );
+				ViewCompat.setHasTransientState( accessFocusedChild, true );
+			}
+			else {
+				accessibilityFocusPosition = INVALID_POSITION;
+			}
+
+			// Ensure the child containing focus, if any, has transient state.
+			// If the list data hasn't changed, or if the adapter has stable
+			// IDs, this will maintain focus.
+			final View focusedChild = getFocusedChild();
+			if( focusedChild != null ) {
+				ViewCompat.setHasTransientState( focusedChild, true );
+			}
+
+
 			// Pull all children into the RecycleBin.
 			// These views will be reused if possible
 			final int firstPosition = mFirstPosition;
 			final RecycleBin recycleBin = mRecycler;
 
-			// reset the focus restoration
-			View focusLayoutRestoreDirectChild = null;
 
-			// Don't put header or footer views into the Recycler. Those are
-			// already cached in mHeaderViews;
 			if ( dataChanged ) {
 				for ( int i = 0; i < childCount; i++ ) {
 					recycleBin.addScrapView( getChildAt( i ), firstPosition + i );
@@ -1634,39 +1648,6 @@ public class HListView extends AbsHListView {
 			} else {
 				recycleBin.fillActiveViews( childCount, firstPosition );
 			}
-
-			// take focus back to us temporarily to avoid the eventual
-			// call to clear focus when removing the focused child below
-			// from messing things up when ViewAncestor assigns focus back
-			// to someone else
-			final View focusedChild = getFocusedChild();
-			if ( focusedChild != null ) {
-				// TODO: in some cases focusedChild.getParent() == null
-
-				// we can remember the focused view to restore after relayout if the
-				// data hasn't changed, or if the focused position is a header or footer
-				if ( !dataChanged || isDirectChildHeaderOrFooter( focusedChild ) ) {
-					focusLayoutRestoreDirectChild = focusedChild;
-					// remember the specific view that had focus
-					focusLayoutRestoreView = findFocus();
-					if ( focusLayoutRestoreView != null ) {
-						// tell it we are going to mess with it
-						focusLayoutRestoreView.onStartTemporaryDetach();
-					}
-				}
-				requestFocus();
-			}
-
-			/*
-			 * // Remember which child, if any, had accessibility focus. final ViewRootImpl viewRootImpl = getViewRootImpl(); if (
-			 * viewRootImpl != null ) { final View accessFocusedView = viewRootImpl.getAccessibilityFocusedHost(); if (
-			 * accessFocusedView != null ) { final View accessFocusedChild = findAccessibilityFocusedChild( accessFocusedView ); if (
-			 * accessFocusedChild != null ) { if ( !dataChanged || isDirectChildHeaderOrFooter( accessFocusedChild ) ) { // If the
-			 * views won't be changing, try to maintain // focus on the current view host and (if // applicable) its virtual view.
-			 * accessibilityFocusLayoutRestoreView = accessFocusedView; accessibilityFocusLayoutRestoreNode = viewRootImpl
-			 * .getAccessibilityFocusedVirtualView(); } else { // Otherwise, try to maintain focus at the same // position.
-			 * accessibilityFocusPosition = getPositionForView( accessFocusedChild ); } } } }
-			 */
 
 			// Clear out old views
 			detachAllViewsFromParent();
@@ -1725,66 +1706,57 @@ public class HListView extends AbsHListView {
 			recycleBin.scrapActiveViews();
 
 			if ( sel != null ) {
-				// the current selected item should get focus if items
-				// are focusable
-				if ( mItemsCanFocus && hasFocus() && !sel.hasFocus() ) {
-					final boolean focusWasTaken = ( sel == focusLayoutRestoreDirectChild &&
-							focusLayoutRestoreView != null &&
-							focusLayoutRestoreView.requestFocus() ) || sel.requestFocus();
-					if ( !focusWasTaken ) {
-						// selected item didn't take focus, fine, but still want
-						// to make sure something else outside of the selected view
-						// has focus
+				final boolean shouldPlaceFocus = mItemsCanFocus && hasFocus();
+				final boolean maintainedFocus = focusedChild != null && focusedChild.hasFocus();
+				if (shouldPlaceFocus && !maintainedFocus && !sel.hasFocus()) {
+					if (sel.requestFocus()) {
+						// Successfully placed focus, clear selection.
+						sel.setSelected(false);
+						mSelectorRect.setEmpty();
+					} else {
+						// Failed to place focus, clear current (invalid) focus.
 						final View focused = getFocusedChild();
 						if ( focused != null ) {
 							focused.clearFocus();
 						}
 						positionSelector( INVALID_POSITION, sel );
-					} else {
-						sel.setSelected( false );
-						mSelectorRect.setEmpty();
 					}
 				} else {
 					positionSelector( INVALID_POSITION, sel );
 				}
 				mSelectedLeft = sel.getLeft();
 			} else {
-				if ( mTouchMode > TOUCH_MODE_DOWN && mTouchMode < TOUCH_MODE_SCROLL ) {
-					View child = getChildAt( mMotionPosition - mFirstPosition );
-					if ( child != null ) positionSelector( mMotionPosition, child );
-				} else {
+				// If the user's finger is down, select the motion position.
+				// Otherwise, clear selection.
+				if( mTouchMode == TOUCH_MODE_TAP || mTouchMode == TOUCH_MODE_DONE_WAITING ) {
+					final View child = getChildAt( mMotionPosition - mFirstPosition );
+					if( child != null ) {
+						positionSelector( mMotionPosition, child );
+					}
+				}
+				else {
 					mSelectedLeft = 0;
 					mSelectorRect.setEmpty();
 				}
+			}
 
-				// even if there is not selected position, we may need to restore
-				// focus (i.e. something focusable in touch mode)
-				if ( hasFocus() && focusLayoutRestoreView != null ) {
-					focusLayoutRestoreView.requestFocus();
+			if( accessFocusedChild != null ) {
+				ViewCompat.setHasTransientState( accessFocusedChild, false );
+
+				// If we failed to maintain accessibility focus on the previous
+				// view, attempt to restore it to the previous position.
+				if( ! ViewCompatExt.isAccessibilityFocused( accessFocusedChild ) && accessibilityFocusPosition != INVALID_POSITION ) {
+					// Bound the position within the visible children.
+					final int position = MathUtils.constrain( accessibilityFocusPosition - mFirstPosition, 0, getChildCount() - 1 );
+					final View restoreView = getChildAt( position );
+					if( restoreView != null ) {
+						ViewCompatExt.requestAccessibilityFocus( restoreView );
+					}
 				}
 			}
 
-			// Attempt to restore accessibility focus.
-			// if ( accessibilityFocusLayoutRestoreNode != null ) {
-			// accessibilityFocusLayoutRestoreNode.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS );
-			// } else if ( accessibilityFocusLayoutRestoreView != null ) {
-			// this method is marked as hidden. Shame on you google!
-			// accessibilityFocusLayoutRestoreView.requestAccessibilityFocus();
-			// } else if ( accessibilityFocusPosition != INVALID_POSITION ) {
-			// Bound the position within the visible children.
-			// final int position = MathUtils.constrain( ( accessibilityFocusPosition - mFirstPosition ), 0, ( getChildCount() - 1 ) );
-			// final View restoreView = getChildAt( position );
-			// if ( restoreView != null ) {
-			// this method is marked as hidden. Shame on you google!
-			// restoreView.requestAccessibilityFocus();
-			// }
-			// }
-
-			// tell focus view we are done mucking with it, if it is still in
-			// our view hierarchy.
-			if ( focusLayoutRestoreView != null
-					&& focusLayoutRestoreView.getWindowToken() != null ) {
-				focusLayoutRestoreView.onFinishTemporaryDetach();
+			if (focusedChild != null) {
+				ViewCompat.setHasTransientState( focusedChild, false );
 			}
 			
 			mLayoutMode = LAYOUT_NORMAL;
@@ -1811,45 +1783,50 @@ public class HListView extends AbsHListView {
 	}
 
 	/**
-	 * @param focusedView
-	 *           the view that has accessibility focus.
-	 * @return the direct child that contains accessibility focus.
+	 * @return the direct child that contains accessibility focus, or null if no
+	 * child contains accessibility focus
 	 */
-	@SuppressWarnings("unused")
-	private View findAccessibilityFocusedChild( View focusedView ) {
+	private View getAccessibilityFocusedChild() {
+		// TODO: not the best way to implement this using reflections
+		// find a better way
+		return null;
+		/*
+		Log.i( LOG_TAG, "getAccessibilityFocusedChild" );
+		final Object viewRootImpl;
+		try {
+			viewRootImpl = ReflectionUtils.invokeMethod( this, "getViewRootImpl" );
+		} catch( ReflectionUtils.ReflectionException e ) {
+			e.printStackTrace();
+			return null;
+		}
+
+		if( viewRootImpl == null ) {
+			return null;
+		}
+
+		View focusedView = null;
+		try {
+			focusedView = ReflectionUtils.invokeMethod( viewRootImpl, "getAccessibilityFocusedHost" );
+		} catch( ReflectionUtils.ReflectionException e ) {
+			e.printStackTrace();
+		}
+
+		if( focusedView == null ) {
+			return null;
+		}
+
 		ViewParent viewParent = focusedView.getParent();
-		while ( ( viewParent instanceof View ) && ( viewParent != this ) ) {
+		while( ( viewParent instanceof View ) && ( viewParent != this ) ) {
 			focusedView = (View) viewParent;
 			viewParent = viewParent.getParent();
 		}
-		if ( !( viewParent instanceof View ) ) {
+
+		if( ! ( viewParent instanceof View ) ) {
 			return null;
 		}
+
 		return focusedView;
-	}
-
-	/**
-	 * @param child
-	 *           a direct child of this list.
-	 * @return Whether child is a header or footer view.
-	 */
-	private boolean isDirectChildHeaderOrFooter( View child ) {
-
-		final ArrayList<FixedViewInfo> headers = mHeaderViewInfos;
-		final int numHeaders = headers.size();
-		for ( int i = 0; i < numHeaders; i++ ) {
-			if ( child == headers.get( i ).view ) {
-				return true;
-			}
-		}
-		final ArrayList<FixedViewInfo> footers = mFooterViewInfos;
-		final int numFooters = footers.size();
-		for ( int i = 0; i < numFooters; i++ ) {
-			if ( child == footers.get( i ).view ) {
-				return true;
-			}
-		}
-		return false;
+		*/
 	}
 
 	/**
@@ -2109,17 +2086,62 @@ public class HListView extends AbsHListView {
 					position--;
 				}
 			}
-
-			if ( position < 0 || position >= count ) {
-				return INVALID_POSITION;
-			}
-			return position;
-		} else {
-			if ( position < 0 || position >= count ) {
-				return INVALID_POSITION;
-			}
-			return position;
 		}
+
+		if (position < 0 || position >= count) {
+			return INVALID_POSITION;
+		}
+
+		return position;
+	}
+
+	/**
+	 * Find a position that can be selected (i.e., is not a separator). If there
+	 * are no selectable positions in the specified direction from the starting
+	 * position, searches in the opposite direction from the starting position
+	 * to the current position.
+	 *
+	 * @param current the current position
+	 * @param position the starting position
+	 * @param lookDown whether to look down for other positions
+	 * @return the next selectable position, or {@link #INVALID_POSITION} if
+	 *         nothing can be found
+	 */
+	int lookForSelectablePositionAfter( int current, int position, boolean lookDown ) {
+		final ListAdapter adapter = mAdapter;
+		if( adapter == null || isInTouchMode() ) {
+			return INVALID_POSITION;
+		}
+
+		// First check after the starting position in the specified direction.
+		final int after = lookForSelectablePosition( position, lookDown );
+		if( after != INVALID_POSITION ) {
+			return after;
+		}
+
+		// Then check between the starting position and the current position.
+		final int count = adapter.getCount();
+		current = MathUtils.constrain( current, - 1, count - 1 );
+		if( lookDown ) {
+			position = Math.min( position - 1, count - 1 );
+			while( ( position > current ) && ! adapter.isEnabled( position ) ) {
+				position--;
+			}
+			if( position <= current ) {
+				return INVALID_POSITION;
+			}
+		}
+		else {
+			position = Math.max( 0, position + 1 );
+			while( ( position < current ) && ! adapter.isEnabled( position ) ) {
+				position++;
+			}
+			if( position >= current ) {
+				return INVALID_POSITION;
+			}
+		}
+
+		return position;
 	}
 
 	/**
@@ -2319,26 +2341,30 @@ public class HListView extends AbsHListView {
 	 * @return whether selection was moved
 	 */
 	boolean pageScroll( int direction ) {
-		int nextPage = -1;
-		boolean down = false;
+		final int nextPage;
+		final boolean down;
 
-		if ( direction == FOCUS_UP ) { nextPage = Math.max( 0, mSelectedPosition - getChildCount() - 1 );
+		if ( direction == FOCUS_UP ) {
+			nextPage = Math.max( 0, mSelectedPosition - getChildCount() - 1 );
+			down = false;
 		} else if ( direction == FOCUS_DOWN ) {
 			nextPage = Math.min( mItemCount - 1, mSelectedPosition + getChildCount() - 1 );
 			down = true;
+		} else {
+			return false;
 		}
 
 		if ( nextPage >= 0 ) {
-			int position = lookForSelectablePosition( nextPage, down );
+			final int position = lookForSelectablePositionAfter( mSelectedPosition, nextPage, down );
 			if ( position >= 0 ) {
 				mLayoutMode = LAYOUT_SPECIFIC;
 				mSpecificLeft = getPaddingLeft() + getHorizontalFadingEdgeLength();
 
-				if ( down && position > mItemCount - getChildCount() ) {
+				if( down && ( position > ( mItemCount - getChildCount() ) ) ) {
 					mLayoutMode = LAYOUT_FORCE_RIGHT;
 				}
 
-				if ( !down && position < getChildCount() ) {
+				if( ! down && ( position < getChildCount() ) ) {
 					mLayoutMode = LAYOUT_FORCE_LEFT;
 				}
 
@@ -2356,19 +2382,18 @@ public class HListView extends AbsHListView {
 	}
 
 	/**
-	 * Go to the last or first item if possible (not worrying about panning across or navigating within the internal focus of the
-	 * currently selected item.)
-	 * 
-	 * @param direction
-	 *           either {@link View#FOCUS_UP} or {@link View#FOCUS_DOWN}
-	 * 
+	 * Go to the last or first item if possible (not worrying about panning
+	 * across or navigating within the internal focus of the currently selected
+	 * item.)
+	 *
+	 * @param direction either {@link View#FOCUS_UP} or {@link View#FOCUS_DOWN}
 	 * @return whether selection was moved
 	 */
 	boolean fullScroll( int direction ) {
 		boolean moved = false;
 		if ( direction == FOCUS_UP ) {
 			if ( mSelectedPosition != 0 ) {
-				int position = lookForSelectablePosition( 0, true );
+				final int position = lookForSelectablePositionAfter( mSelectedPosition, 0, true );
 				if ( position >= 0 ) {
 					mLayoutMode = LAYOUT_FORCE_LEFT;
 					setSelectionInt( position );
@@ -2377,8 +2402,10 @@ public class HListView extends AbsHListView {
 				moved = true;
 			}
 		} else if ( direction == FOCUS_DOWN ) {
-			if ( mSelectedPosition < mItemCount - 1 ) {
-				int position = lookForSelectablePosition( mItemCount - 1, true );
+			final int lastItem = ( mItemCount - 1 );
+			if( mSelectedPosition < lastItem ) {
+				final int position = lookForSelectablePositionAfter(
+						mSelectedPosition, lastItem, false );
 				if ( position >= 0 ) {
 					mLayoutMode = LAYOUT_FORCE_RIGHT;
 					setSelectionInt( position );
@@ -2465,6 +2492,46 @@ public class HListView extends AbsHListView {
 	}
 
 	/**
+	 * Used by {@link #arrowScrollImpl(int)} to help determine the next selected position
+	 * to move to. This return a position in the direction given if the selected item
+	 * is fully visible.
+	 *
+	 * @param selectedView Current selected view to move from
+	 * @param selectedPos  Current selected position to move from
+	 * @param direction    Direction to move in
+	 * @return Desired selected position after moving in the given direction
+	 */
+	private final int nextSelectedPositionForDirection(
+			View selectedView, int selectedPos, int direction ) {
+		int nextSelected;
+
+		if( direction == View.FOCUS_DOWN ) {
+			final int listRight = getWidth() - mListPadding.right;
+			if( selectedView != null && selectedView.getRight() <= listRight ) {
+				nextSelected = selectedPos != INVALID_POSITION && selectedPos >= mFirstPosition ? selectedPos + 1 : mFirstPosition;
+			}
+			else {
+				return INVALID_POSITION;
+			}
+		}
+		else {
+			final int listLeft = mListPadding.left;
+			if( selectedView != null && selectedView.getLeft() >= listLeft ) {
+				final int lastPos = mFirstPosition + getChildCount() - 1;
+				nextSelected = selectedPos != INVALID_POSITION && selectedPos <= lastPos ? selectedPos - 1 : lastPos;
+			}
+			else {
+				return INVALID_POSITION;
+			}
+		}
+
+		if( nextSelected < 0 || nextSelected >= mAdapter.getCount() ) {
+			return INVALID_POSITION;
+		}
+		return lookForSelectablePosition( nextSelected, direction == View.FOCUS_DOWN );
+	}
+
+	/**
 	 * Handle an arrow scroll going up or down. Take into account whether items are selectable, whether there are focusable items
 	 * etc.
 	 * 
@@ -2480,7 +2547,7 @@ public class HListView extends AbsHListView {
 		View selectedView = getSelectedView();
 		int selectedPos = mSelectedPosition;
 
-		int nextSelectedPosition = lookForSelectablePositionOnScreen( direction );
+		int nextSelectedPosition = nextSelectedPositionForDirection( selectedView, selectedPos, direction );
 		int amountToScroll = amountToScroll( direction, nextSelectedPosition );
 
 		// if we are moving focus, we may OVERRIDE the default behavior
@@ -2698,12 +2765,17 @@ public class HListView extends AbsHListView {
 		final int listRight = getWidth() - mListPadding.right;
 		final int listLeft = mListPadding.left;
 
-		final int numChildren = getChildCount();
+		int numChildren = getChildCount();
 
 		if ( direction == View.FOCUS_DOWN ) {
 			int indexToMakeVisible = numChildren - 1;
 			if ( nextSelectedPosition != INVALID_POSITION ) {
 				indexToMakeVisible = nextSelectedPosition - mFirstPosition;
+			}
+			while( numChildren <= indexToMakeVisible ) {
+				// Child to view is not attached yet.
+				addViewAfter( getChildAt( numChildren - 1 ), mFirstPosition + numChildren - 1 );
+				numChildren++;
 			}
 
 			final int positionToMakeVisible = mFirstPosition + indexToMakeVisible;
@@ -2737,6 +2809,12 @@ public class HListView extends AbsHListView {
 		} else {
 			int indexToMakeVisible = 0;
 			if ( nextSelectedPosition != INVALID_POSITION ) {
+				indexToMakeVisible = nextSelectedPosition - mFirstPosition;
+			}
+			while( indexToMakeVisible < 0 ) {
+				// Child to view is not attached yet.
+				addViewBefore( getChildAt( 0 ), mFirstPosition );
+				mFirstPosition--;
 				indexToMakeVisible = nextSelectedPosition - mFirstPosition;
 			}
 			final int positionToMakeVisible = mFirstPosition + indexToMakeVisible;
@@ -3039,11 +3117,9 @@ public class HListView extends AbsHListView {
 			while ( first.getRight() < listLeft ) {
 				AbsHListView.LayoutParams layoutParams = (LayoutParams) first.getLayoutParams();
 				if ( recycleBin.shouldRecycleViewType( layoutParams.viewType ) ) {
-					detachViewFromParent( first );
 					recycleBin.addScrapView( first, mFirstPosition );
-				} else {
-					removeViewInLayout( first );
 				}
+				detachViewFromParent( first );
 				first = getChildAt( 0 );
 				mFirstPosition++;
 			}
@@ -3070,11 +3146,9 @@ public class HListView extends AbsHListView {
 			while ( last.getLeft() > listRight ) {
 				AbsHListView.LayoutParams layoutParams = (LayoutParams) last.getLayoutParams();
 				if ( recycleBin.shouldRecycleViewType( layoutParams.viewType ) ) {
-					detachViewFromParent( last );
 					recycleBin.addScrapView( last, mFirstPosition + lastIndex );
-				} else {
-					removeViewInLayout( last );
 				}
+				detachViewFromParent( last );
 				last = getChildAt( --lastIndex );
 			}
 		}
@@ -3205,7 +3279,7 @@ public class HListView extends AbsHListView {
 			final int count = getChildCount();
 			final int headerCount = mHeaderViewInfos.size();
 			final int itemCount = mItemCount;
-			final int footerLimit = itemCount - mFooterViewInfos.size() - 1;
+			final int footerLimit = ( itemCount - mFooterViewInfos.size() );
 			final boolean headerDividers = mHeaderDividersEnabled;
 			final boolean footerDividers = mFooterDividersEnabled;
 			final int first = mFirstPosition;
@@ -3249,16 +3323,24 @@ public class HListView extends AbsHListView {
 				}
 
 				for ( int i = 0; i < count; i++ ) {
-					if ( ( headerDividers || first + i >= headerCount ) &&
-							( footerDividers || first + i < footerLimit ) ) {
-						View child = getChildAt( i );
+					final int itemIndex = ( first + i );
+					final boolean isHeader = ( itemIndex < headerCount );
+					final boolean isFooter = ( itemIndex >= footerLimit );
+					if( ( headerDividers || ! isHeader ) && ( footerDividers || ! isFooter ) ) {
+						final View child = getChildAt( i );
 						right = child.getRight();
-						// Don't draw dividers next to items that are not enabled
+						final boolean isLastItem = ( i == ( count - 1 ) );
 
-						if ( drawDividers &&
-								( right < listRight && !( drawOverscrollFooter && i == count - 1 ) ) ) {
-							if ( ( areAllItemsSelectable || ( adapter.isEnabled( first + i ) && ( i == count - 1 || adapter
-									.isEnabled( first + i + 1 ) ) ) ) ) {
+						if( drawDividers && ( right < listRight ) && ! ( drawOverscrollFooter && isLastItem ) ) {
+							final int nextIndex = ( itemIndex + 1 );
+							// Draw dividers between enabled items, headers and/or
+							// footers when enabled, and the end of the list.
+							if( areAllItemsSelectable || ( ( adapter.isEnabled( itemIndex )
+									|| ( headerDividers && isHeader )
+									|| ( footerDividers && isFooter ) ) && ( isLastItem
+									|| adapter.isEnabled( nextIndex )
+									|| ( headerDividers && ( nextIndex < headerCount ) )
+									|| ( footerDividers && ( nextIndex >= footerLimit ) ) ) ) ) {
 								bounds.left = right;
 								bounds.right = right + dividerWidth;
 								drawDivider( canvas, bounds, i );
@@ -3291,14 +3373,20 @@ public class HListView extends AbsHListView {
 
 				final int start = drawOverscrollHeader ? 1 : 0;
 				for ( int i = start; i < count; i++ ) {
-					if ( ( headerDividers || first + i >= headerCount ) &&
-							( footerDividers || first + i < footerLimit ) ) {
-						View child = getChildAt( i );
+					final int itemIndex = (first + i);
+					final boolean isHeader = ( itemIndex < headerCount );
+					final boolean isFooter = ( itemIndex >= footerLimit );
+					if ((headerDividers || !isHeader) && (footerDividers || !isFooter)) {
+						final View child = getChildAt( i );
 						left = child.getLeft();
-						// Don't draw dividers next to items that are not enabled
-						if ( left > effectivePaddingLeft ) {
-							if ( ( areAllItemsSelectable || ( adapter.isEnabled( first + i ) && ( i == count - 1 || adapter
-									.isEnabled( first + i + 1 ) ) ) ) ) {
+						if (drawDividers && (left   > effectivePaddingLeft)) {
+							final boolean isFirstItem = (i == start);
+							final int previousIndex = (itemIndex - 1);
+							// Draw dividers between enabled items, headers and/or
+							// footers when enabled, and the end of the list.
+							if( areAllItemsSelectable || ( ( adapter.isEnabled( itemIndex ) || ( headerDividers && isHeader ) || ( footerDividers && isFooter ) ) &&
+							                               ( isFirstItem || adapter.isEnabled( previousIndex ) || ( headerDividers && ( previousIndex < headerCount ) ) ||
+							                                 ( footerDividers && ( previousIndex >= footerLimit ) ) ) ) ) {
 								bounds.left = left - dividerWidth;
 								bounds.right = left;
 								// Give the method the child ABOVE the divider, so we
@@ -3373,7 +3461,7 @@ public class HListView extends AbsHListView {
 
 	/**
 	 * Sets the drawable that will be drawn between each item in the list. If the drawable does not have an intrinsic height, you
-	 * should also call {@link #setDividerHeight(int)}
+	 * should also call {@link #setDividerWidth(int)}
 	 * 
 	 * @param divider
 	 *           The drawable to use.
@@ -3405,7 +3493,7 @@ public class HListView extends AbsHListView {
 	 * Sets the height of the divider that will be drawn between each item in the list. Calling this will override the intrinsic
 	 * height as set by {@link #setDivider(Drawable)}
 	 * 
-	 * @param height
+	 * @param width
 	 *           The new height of the divider in pixels.
 	 */
 	public void setDividerWidth( int width ) {
@@ -3432,6 +3520,15 @@ public class HListView extends AbsHListView {
 	}
 
 	/**
+	 * @return Whether the drawing of the divider for header views is enabled
+	 *
+	 * @see #setHeaderDividersEnabled(boolean)
+	 */
+	public boolean areHeaderDividersEnabled() {
+		return mHeaderDividersEnabled;
+	}
+
+	/**
 	 * Enables or disables the drawing of the divider for footer views.
 	 * 
 	 * @param footerDividersEnabled
@@ -3443,6 +3540,15 @@ public class HListView extends AbsHListView {
 	public void setFooterDividersEnabled( boolean footerDividersEnabled ) {
 		mFooterDividersEnabled = footerDividersEnabled;
 		invalidate();
+	}
+
+	/**
+	 * @return Whether the drawing of the divider for footer views is enabled
+	 *
+	 * @see #setFooterDividersEnabled(boolean)
+	 */
+	public boolean areFooterDividersEnabled() {
+		return mFooterDividersEnabled;
 	}
 
 	/**
@@ -3554,29 +3660,32 @@ public class HListView extends AbsHListView {
 		}
 	}
 
-	/*
-	 * @Override protected View findViewByPredicateTraversal( Predicate<View> predicate, View childToSkip ) { View v; v =
-	 * super.findViewByPredicateTraversal( predicate, childToSkip ); if ( v == null ) { v = findViewByPredicateInHeadersOrFooters(
-	 * mHeaderViewInfos, predicate, childToSkip ); if ( v != null ) { return v; }
-	 * 
-	 * v = findViewByPredicateInHeadersOrFooters( mFooterViewInfos, predicate, childToSkip ); if ( v != null ) { return v; } } return
-	 * v; }
-	 */
+	/**
+	 * TODO: To Be Implemented
+	 * @see android.view.View#findViewByPredicate(Predicate)
+	 * First look in our children, then in any header and footer views that may be scrolled off.
+	@Override
+	protected View findViewByPredicateTraversal( Predicate<View> predicate, View childToSkip ) {
+		View v;
+		v = super.findViewByPredicateTraversal( predicate, childToSkip );
+		if( v == null ) {
+			v = findViewByPredicateInHeadersOrFooters( mHeaderViewInfos, predicate, childToSkip );
+			if( v != null ) {
+				return v;
+			}
 
-	/*
-	 * View findViewByPredicateInHeadersOrFooters( ArrayList<FixedViewInfo> where, Predicate<View> predicate, View childToSkip ) { if
-	 * ( where != null ) { int len = where.size(); View v;
-	 * 
-	 * for ( int i = 0; i < len; i++ ) { v = where.get( i ).view;
-	 * 
-	 * if ( v != childToSkip && !v.isRootNamespace() ) { v = v.findViewByPredicate( predicate );
-	 * 
-	 * if ( v != null ) { return v; } } } } return null; }
+			v = findViewByPredicateInHeadersOrFooters( mFooterViewInfos, predicate, childToSkip );
+			if( v != null ) {
+				return v;
+			}
+		}
+		return v;
+	}
 	 */
 
 	/**
 	 * Returns the set of checked items ids. The result is only valid if the choice mode has not been set to
-	 * {@link #CHOICE_MODE_NONE}.
+	 * {@link android.widget.ListView#CHOICE_MODE_NONE}.
 	 * 
 	 * @return A new array which contains the id of each checked item in the list.
 	 * 
@@ -3629,7 +3738,25 @@ public class HListView extends AbsHListView {
 	public void onInitializeAccessibilityNodeInfo( AccessibilityNodeInfo info ) {
 		super.onInitializeAccessibilityNodeInfo( info );
 		info.setClassName( HListView.class.getName() );
+
+		final int count = getCount();
+		final AccessibilityNodeInfo.CollectionInfo collectionInfo = AccessibilityNodeInfo.CollectionInfo.obtain( 1, count, false );
+		info.setCollectionInfo( collectionInfo );
 	}
+
+	/*
+	TODO: To Be Implemented
+	@Override
+	public void onInitializeAccessibilityNodeInfoForItem(
+			View view, int position, AccessibilityNodeInfo info ) {
+		super.onInitializeAccessibilityNodeInfoForItem( view, position, info );
+
+		final LayoutParams lp = (LayoutParams) view.getLayoutParams();
+		final boolean isHeading = lp != null && lp.viewType != ITEM_VIEW_TYPE_HEADER_OR_FOOTER;
+		final AccessibilityNodeInfo.CollectionItemInfo itemInfo = AccessibilityNodeInfo.CollectionItemInfo.obtain( 0, 1, position, 1, isHeading );
+		info.setCollectionItemInfo( itemInfo );
+	}
+	 */
 
 	@Override
 	public void onGlobalLayout() {}

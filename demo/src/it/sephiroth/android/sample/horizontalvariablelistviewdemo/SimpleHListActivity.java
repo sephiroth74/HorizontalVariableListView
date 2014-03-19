@@ -1,6 +1,6 @@
 package it.sephiroth.android.sample.horizontalvariablelistviewdemo;
 
-import it.sephiroth.android.library.util.v11.MultiChoiceModeListener;
+import it.sephiroth.android.library.widget.MultiChoiceModeListener;
 import it.sephiroth.android.library.widget.AdapterView;
 import it.sephiroth.android.library.widget.AdapterView.OnItemClickListener;
 import it.sephiroth.android.library.widget.HListView;

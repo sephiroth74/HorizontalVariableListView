@@ -1,19 +1,23 @@
-package it.sephiroth.android.library.util.v16;
-
-import it.sephiroth.android.library.util.v14.ViewHelper14;
+package it.sephiroth.android.library.widget.v16;
 
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.view.View;
 
+import it.sephiroth.android.library.widget.v14.ViewHelper14;
+
+/**
+ * @hide
+ */
 public class ViewHelper16 extends ViewHelper14 {
 	public ViewHelper16( View view ) {
 		super( view );
 	}
 
-	@TargetApi( Build.VERSION_CODES.JELLY_BEAN )
+	@TargetApi( 16 )
 	@Override
 	public void postOnAnimation( Runnable action ) {
-		view.postOnAnimation(action);
+		view.postOnAnimation( action );
 	}
+
 }

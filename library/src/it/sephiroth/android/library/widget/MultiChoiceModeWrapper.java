@@ -1,8 +1,6 @@
-package it.sephiroth.android.library.util.v11;
+package it.sephiroth.android.library.widget;
 
-import it.sephiroth.android.library.widget.AbsHListView;
 import android.annotation.TargetApi;
-import android.os.Build;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,7 +9,7 @@ public class MultiChoiceModeWrapper implements MultiChoiceModeListener {
 
 	private MultiChoiceModeListener mWrapped;
 	private AbsHListView mView;
-	
+
 	public MultiChoiceModeWrapper( AbsHListView view ) {
 		mView = view;
 	}
@@ -24,29 +22,29 @@ public class MultiChoiceModeWrapper implements MultiChoiceModeListener {
 		return mWrapped != null;
 	}
 
-	@TargetApi( Build.VERSION_CODES.HONEYCOMB )
+	@TargetApi(11)
 	@Override
 	public boolean onCreateActionMode( ActionMode mode, Menu menu ) {
-		if ( mWrapped.onCreateActionMode( mode, menu ) ) {
+		if( mWrapped.onCreateActionMode( mode, menu ) ) {
 			mView.setLongClickable( false );
 			return true;
 		}
 		return false;
 	}
 
-	@TargetApi( Build.VERSION_CODES.HONEYCOMB )
+	@TargetApi(11)
 	@Override
 	public boolean onPrepareActionMode( ActionMode mode, Menu menu ) {
 		return mWrapped.onPrepareActionMode( mode, menu );
 	}
 
-	@TargetApi( Build.VERSION_CODES.HONEYCOMB )
+	@TargetApi(11)
 	@Override
 	public boolean onActionItemClicked( ActionMode mode, MenuItem item ) {
 		return mWrapped.onActionItemClicked( mode, item );
 	}
 
-	@TargetApi( Build.VERSION_CODES.HONEYCOMB )
+	@TargetApi(11)
 	@Override
 	public void onDestroyActionMode( ActionMode mode ) {
 		mWrapped.onDestroyActionMode( mode );
@@ -60,13 +58,13 @@ public class MultiChoiceModeWrapper implements MultiChoiceModeListener {
 		mView.setLongClickable( true );
 	}
 
-	@TargetApi( Build.VERSION_CODES.HONEYCOMB )
+	@TargetApi(11)
 	@Override
 	public void onItemCheckedStateChanged( ActionMode mode, int position, long id, boolean checked ) {
 		mWrapped.onItemCheckedStateChanged( mode, position, id, checked );
-		
+
 		// If there are no items selected we no longer need the selection mode.
-		if ( mView.getCheckedItemCount() == 0 ) {
+		if( mView.getCheckedItemCount() == 0 ) {
 			mode.finish();
 		}
 	}
