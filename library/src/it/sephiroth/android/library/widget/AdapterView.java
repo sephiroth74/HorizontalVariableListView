@@ -235,9 +235,9 @@ public abstract class AdapterView<T extends Adapter> extends ViewGroup {
 			}
 		}
 
-        if(!isInEditMode()) {
-		    mAccessibilityManager = (AccessibilityManager) getContext().getSystemService( Context.ACCESSIBILITY_SERVICE );
-        }
+		if( ! isInEditMode() ) {
+			mAccessibilityManager = (AccessibilityManager) getContext().getSystemService( Context.ACCESSIBILITY_SERVICE );
+		}
 	}
 
 	/**

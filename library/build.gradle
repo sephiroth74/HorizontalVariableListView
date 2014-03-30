@@ -2,7 +2,7 @@ apply plugin: 'android-library'
 apply plugin: 'signing'
 
 group 'it.sephiroth.android.library.horizontallistview'
-version '1.1.1'
+version '1.2.1'
 
 dependencies {
     compile 'com.android.support:support-v4:19.0.1+'
@@ -116,19 +116,21 @@ task writePom {
 
 
 uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment {
-                MavenDeployment deployment -> signing.signPom(deployment)
-            }
-            pom = generatePom()
+    if (hasProperty('sonatypeUsername')) {
+        repositories {
+            mavenDeployer {
+                beforeDeployment {
+                    MavenDeployment deployment -> signing.signPom(deployment)
+                }
+                pom = generatePom()
 
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                }
 
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                }
             }
         }
     }

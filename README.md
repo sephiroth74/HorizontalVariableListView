@@ -2,6 +2,8 @@ Horizontal Variable ListView
 ==========================
 
 Horizontal ListView for Android. Based on the official [ListView][3] google code.
+The library includes also an ExpandableHListView, also based on the official [ExpandableListView][4]. <br />
+See the demo project for sample implementations
 
 ## Usage (gradle)
 Add this line to your dependency group:
@@ -52,7 +54,11 @@ This is the styleable used for the HListView class:
 
 </pre>
 
-### API Requirements
+## ChangeLog
+
+* 1.2.0 Added the **ExpandableHListView**
+
+## API Requirements
 The minimum supported Android version is android 2.3 (API Level 9)
 
 ## License
@@ -69,3 +75,5 @@ http://www.apache.org/licenses/LICENSE-2.0
 [2]: http://www.sephiroth.it
 
 [3]: http://developer.android.com/reference/android/widget/ListView.html
+
+[4]: http://developer.android.com/reference/android/widget/ExpandableListView.html

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical"
+	android:background="#f4f4f4">
+
+	<it.sephiroth.android.library.widget.ExpandableHListView
+		android:paddingTop="20dip"
+		android:id="@+id/list"
+		android:layout_height="150dip"
+		android:layout_width="match_parent"
+		app:hlv_childDivider="@drawable/child_divider"
+		app:hlv_dividerWidth="1dip"
+		android:divider="@drawable/group_divider"
+		app:hlv_groupIndicator="@drawable/group_indicator"
+		app:hlv_childIndicator="@drawable/child_indicator"
+		app:hlv_indicatorGravity="center"
+		app:hlv_childIndicatorGravity="center"
+		app:hlv_indicatorPaddingTop="-42dip"
+		app:hlv_indicatorPaddingLeft="32dip" />
+
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:gravity="bottom|center_horizontal"
+		android:padding="10dip"
+		android:orientation="horizontal">
+
+		<Button
+			android:id="@+id/button1"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Add" />
+
+		<Button
+			android:id="@+id/button2"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Remove" />
+
+		<Button
+			android:id="@+id/button3"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Scroll" />
+	</LinearLayout>
+
+</LinearLayout>
