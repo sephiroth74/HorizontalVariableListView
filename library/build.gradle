@@ -5,18 +5,17 @@ group 'it.sephiroth.android.library.horizontallistview'
 version '1.2.1'
 
 dependencies {
-    compile 'com.android.support:support-v4:19.0.1+'
+    compile 'com.android.support:support-v4:19.0.3+'
 }
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.1"
+    buildToolsVersion "19.0.3"
 
     defaultConfig {
         versionCode 1
         versionName version
         minSdkVersion 9
-        targetSdkVersion 19
     }
 
     sourceSets {
