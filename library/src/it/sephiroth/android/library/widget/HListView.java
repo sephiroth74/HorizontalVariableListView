@@ -2191,7 +2191,7 @@ public class HListView extends AbsHListView {
 
 		if ( action != KeyEvent.ACTION_UP ) {
 			switch ( keyCode ) {
-				case KeyEvent.KEYCODE_DPAD_UP:
+				case KeyEvent.KEYCODE_DPAD_LEFT:
 					if ( event.hasNoModifiers() ) {
 						handled = resurrectSelectionIfNeeded();
 						if ( !handled ) {
@@ -2208,7 +2208,7 @@ public class HListView extends AbsHListView {
 					}
 					break;
 
-				case KeyEvent.KEYCODE_DPAD_DOWN:
+				case KeyEvent.KEYCODE_DPAD_RIGHT:
 					if ( event.hasNoModifiers() ) {
 						handled = resurrectSelectionIfNeeded();
 						if ( !handled ) {
@@ -2225,15 +2225,15 @@ public class HListView extends AbsHListView {
 					}
 					break;
 
-				case KeyEvent.KEYCODE_DPAD_LEFT:
+				case KeyEvent.KEYCODE_DPAD_UP:
 					if ( event.hasNoModifiers() ) {
-						handled = handleHorizontalFocusWithinListItem( View.FOCUS_LEFT );
+						handled = handleHorizontalFocusWithinListItem( View.FOCUS_UP );
 					}
 					break;
 
-				case KeyEvent.KEYCODE_DPAD_RIGHT:
+				case KeyEvent.KEYCODE_DPAD_DOWN:
 					if ( event.hasNoModifiers() ) {
-						handled = handleHorizontalFocusWithinListItem( View.FOCUS_RIGHT );
+						handled = handleHorizontalFocusWithinListItem( View.FOCUS_DOWN );
 					}
 					break;
 
@@ -2406,9 +2406,9 @@ public class HListView extends AbsHListView {
 	 */
 	private boolean handleHorizontalFocusWithinListItem( int direction ) {
 		// TODO: implement this
-		if ( direction != View.FOCUS_LEFT && direction != View.FOCUS_RIGHT ) {
+		if ( direction != View.FOCUS_UP && direction != View.FOCUS_DOWN ) {
 			throw new IllegalArgumentException( "direction must be one of"
-					+ " {View.FOCUS_LEFT, View.FOCUS_RIGHT}" );
+					+ " {View.FOCUS_UP, View.FOCUS_DOWN}" );
 		}
 
 		final int numChildren = getChildCount();
