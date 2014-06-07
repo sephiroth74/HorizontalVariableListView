@@ -1,14 +1,14 @@
 package it.sephiroth.android.sample.horizontalvariablelistviewdemo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends ListActivity {
 
@@ -19,6 +19,7 @@ public class MainActivity extends ListActivity {
 		List<String> activities = new ArrayList<String>();
 		activities.add( "Simple List" );
 		activities.add( "Expandable List" );
+		activities.add( "Scrollable Grid View" );
 
 
 		setListAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_list_item_1, activities ) );
@@ -33,6 +34,9 @@ public class MainActivity extends ListActivity {
 				break;
 			case 1:
 				startActivity( new Intent( this, ExpandableListActivity.class ) );
+				break;
+			case 2:
+				startActivity( new Intent( this, GridViewActivity.class ) );
 				break;
 		}
 

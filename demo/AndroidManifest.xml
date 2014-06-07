@@ -28,6 +28,10 @@
 			android:label="Simple List" />
 
 		<activity
+			android:name=".GridViewActivity"
+			android:label="Scrollable Grid" />
+
+		<activity
 			android:name=".ExpandableListActivity"
 			android:label="Expandable List" />
 	</application>
