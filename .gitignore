@@ -26,3 +26,12 @@ horizontallistview/gen
 sample/bin
 sample/gen
 library/pom.xml
+
+# Files to be ignored
+*~
+android-support-v4.jar
+R.java
+project.properties
+lint.xml
+.DS_STORE
+.factorypath
