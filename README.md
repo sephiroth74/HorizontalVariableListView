@@ -9,7 +9,7 @@ See the demo project for sample implementations
 Add this line to your dependency group:
 
 
-	compile 'it.sephiroth.android.library.horizontallistview:library:+'
+	compile 'it.sephiroth.android.library.horizontallistview:hlistview:1.2.2'
 
 ## Features
 It supports almost all the features of the ListView widget.
