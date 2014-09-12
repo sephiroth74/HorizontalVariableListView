@@ -30,6 +30,9 @@
 		<activity
 			android:name=".ExpandableListActivity"
 			android:label="Expandable List" />
+
+        <activity android:name=".SimpleDraggableHListViewActivity"
+            android:label="Simple Draggable HListView" />
 	</application>
 
 </manifest>

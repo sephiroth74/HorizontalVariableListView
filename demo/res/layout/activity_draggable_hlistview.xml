@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <it.sephiroth.android.library.widget.DraggableHorizontalListView
+            android:id="@+id/draggable_hListView"
+            android:layout_width="match_parent"
+            android:layout_height="300dip"
+            android:paddingTop="20dip"
+            android:paddingBottom="20dip"
+            android:background="#11000000" />
+    </LinearLayout>
+
+
+</LinearLayout>
