@@ -19,6 +19,7 @@ import android.support.v4.util.SparseArrayCompat;
 import android.support.v4.view.AccessibilityDelegateCompat;
 import android.support.v4.view.accessibility.AccessibilityEventCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
+import android.support.v4.widget.EdgeEffectCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -488,12 +489,12 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	/**
 	 * Tracks the state of the top edge glow.
 	 */
-	private EdgeEffect mEdgeGlowTop;
+	private EdgeEffectCompat mEdgeGlowTop;
 
 	/**
 	 * Tracks the state of the bottom edge glow.
 	 */
-	private EdgeEffect mEdgeGlowBottom;
+	private EdgeEffectCompat mEdgeGlowBottom;
 
 	/**
 	 * An estimate of how many pixels are between the top of the list and the top of the first position in the adapter, based on the
@@ -704,8 +705,8 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		if ( mode != OVER_SCROLL_NEVER ) {
 			if ( mEdgeGlowTop == null ) {
 				Context context = getContext();
-				mEdgeGlowTop = new EdgeEffect( context, EdgeEffect.DIRECTION_HORIZONTAL );
-				mEdgeGlowBottom = new EdgeEffect( context, EdgeEffect.DIRECTION_HORIZONTAL );
+				mEdgeGlowTop = new EdgeEffectCompat(context);
+				mEdgeGlowBottom = new EdgeEffectCompat(context);
 			}
 		} else {
 			mEdgeGlowTop = null;
@@ -2875,13 +2876,13 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 								if ( !mEdgeGlowBottom.isFinished() ) {
 									mEdgeGlowBottom.onRelease();
 								}
-								invalidate( mEdgeGlowTop.getBounds( false ) );
+								invalidate();
 							} else if ( rawDeltaX < 0 ) {
 								mEdgeGlowBottom.onPull( (float) overscroll / getWidth() );
 								if ( !mEdgeGlowTop.isFinished() ) {
 									mEdgeGlowTop.onRelease();
 								}
-								invalidate( mEdgeGlowBottom.getBounds( true ) );
+								invalidate();
 							}
 						}
 					}
@@ -2916,13 +2917,13 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 							if ( !mEdgeGlowBottom.isFinished() ) {
 								mEdgeGlowBottom.onRelease();
 							}
-							invalidate( mEdgeGlowTop.getBounds( false ) );
+							invalidate();
 						} else if ( rawDeltaX < 0 ) {
 							mEdgeGlowBottom.onPull( (float) overScrollDistance / getWidth() );
 							if ( !mEdgeGlowTop.isFinished() ) {
 								mEdgeGlowTop.onRelease();
 							}
-							invalidate( mEdgeGlowBottom.getBounds( true ) );
+							invalidate();
 						}
 					}
 				}
@@ -3460,8 +3461,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 				mEdgeGlowTop.setSize( height, height );
 
 				if ( mEdgeGlowTop.draw( canvas ) ) {
-					mEdgeGlowTop.setPosition( edgeX, topPadding );
-					// invalidate(mEdgeGlowTop.getBounds(false));
+					//mEdgeGlowTop.setPosition( edgeX, topPadding );
 					invalidate();
 				}
 				canvas.restoreToCount( restoreCount );
@@ -3482,7 +3482,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 				if ( mEdgeGlowBottom.draw( canvas ) ) {
 					// Account for the rotation
 					// mEdgeGlowBottom.setPosition( edgeX + width, edgeY );
-					// invalidate( mEdgeGlowBottom.getBounds( true ) );
 					invalidate();
 				}
 				canvas.restoreToCount( restoreCount );
