@@ -2196,7 +2196,7 @@ public class HListView extends AbsHListView {
 						handled = resurrectSelectionIfNeeded();
 						if ( !handled ) {
 							while ( count-- > 0 ) {
-								if ( arrowScroll( FOCUS_UP ) ) {
+								if ( arrowScroll( FOCUS_LEFT ) ) {
 									handled = true;
 								} else {
 									break;
@@ -2204,7 +2204,7 @@ public class HListView extends AbsHListView {
 							}
 						}
 					} else if ( event.hasModifiers( KeyEvent.META_ALT_ON ) ) {
-						handled = resurrectSelectionIfNeeded() || fullScroll( FOCUS_UP );
+						handled = resurrectSelectionIfNeeded() || fullScroll( FOCUS_LEFT );
 					}
 					break;
 
@@ -2213,7 +2213,7 @@ public class HListView extends AbsHListView {
 						handled = resurrectSelectionIfNeeded();
 						if ( !handled ) {
 							while ( count-- > 0 ) {
-								if ( arrowScroll( FOCUS_DOWN ) ) {
+								if ( arrowScroll( FOCUS_RIGHT ) ) {
 									handled = true;
 								} else {
 									break;
@@ -2221,7 +2221,7 @@ public class HListView extends AbsHListView {
 							}
 						}
 					} else if ( event.hasModifiers( KeyEvent.META_ALT_ON ) ) {
-						handled = resurrectSelectionIfNeeded() || fullScroll( FOCUS_DOWN );
+						handled = resurrectSelectionIfNeeded() || fullScroll( FOCUS_RIGHT );
 					}
 					break;
 
