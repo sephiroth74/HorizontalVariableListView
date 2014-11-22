@@ -21,8 +21,9 @@
 		<item name="android:scrollingCache">false</item>
 		<item name="android:overScrollMode">always</item>
 		<item name="android:fastScrollEnabled">true</item>
-		<item name="android:smoothScrollbar">false</item>
+		<item name="android:smoothScrollbar">true</item>
 		<item name="android:choiceMode">multipleChoiceModal</item>
+		<item name="android:drawSelectorOnTop">false</item>
 		<item name="hlv_stackFromRight">false</item>
 		<item name="hlv_measureWithChild">0</item>
 		<item name="hlv_dividerWidth">3dip</item>

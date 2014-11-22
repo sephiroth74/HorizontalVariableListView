@@ -1,10 +1,10 @@
 package it.sephiroth.android.sample.horizontalvariablelistviewdemo;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.util.SparseArrayCompat;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -29,7 +29,7 @@ import it.sephiroth.android.library.widget.AdapterView.OnItemClickListener;
 import it.sephiroth.android.library.widget.HListView;
 
 @TargetApi (11)
-public class SimpleHListActivity extends Activity implements OnClickListener, OnItemClickListener {
+public class SimpleHListActivity extends ActionBarActivity implements OnClickListener, OnItemClickListener {
     private static final String LOG_TAG = "SimpleHListActivity";
     HListView listView;
     Button mButton1;
@@ -102,13 +102,12 @@ public class SimpleHListActivity extends Activity implements OnClickListener, On
     }
 
     @Override
-    public void onContentChanged() {
-        super.onContentChanged();
+    public void onSupportContentChanged() {
+        super.onSupportContentChanged();
         listView = (HListView) findViewById(R.id.hListView1);
         mButton1 = (Button) findViewById(R.id.button1);
         mButton2 = (Button) findViewById(R.id.button2);
         mButton3 = (Button) findViewById(R.id.button3);
-
     }
 
     @Override

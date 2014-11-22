@@ -2882,7 +2882,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
                         // Apply overscroll
 
                         int overscroll = -incrementalDeltaX - (motionViewRealLeft - motionViewPrevLeft);
-                        if (dispatchNestedScroll(
+                        if (ApiHelper.AT_LEAST_21 && dispatchNestedScroll(
                             overscroll - incrementalDeltaX, 0, overscroll, 0,
                             mScrollOffset)) {
                             lastXCorrection -= mScrollOffset[0];
@@ -3341,6 +3341,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
                 updateSelectorState();
                 break;
             case TOUCH_MODE_SCROLL:
+                Log.v(TAG, "TOUCH_MODE_SCROLL");
                 final int childCount = getChildCount();
                 if (childCount > 0) {
                     final int firstChildLeft = getChildAt(0).getLeft();
@@ -3368,13 +3369,15 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
                                 firstChildLeft == contentLeft - mOverscrollDistance) ||
                                 (mFirstPosition + childCount == mItemCount &&
                                     lastChildRight == contentRight + mOverscrollDistance))) {
-                            if (ApiHelper.AT_LEAST_21 && !dispatchNestedPreFling(-initialVelocity, 0)) {
+                            if (!ApiHelper.AT_LEAST_21 || !dispatchNestedPreFling(-initialVelocity, 0)) {
                                 if (mFlingRunnable == null) {
                                     mFlingRunnable = new FlingRunnable();
                                 }
                                 reportScrollStateChange(OnScrollListener.SCROLL_STATE_FLING);
                                 mFlingRunnable.start(-initialVelocity);
-                                dispatchNestedFling(-initialVelocity, 0, true);
+                                if (ApiHelper.AT_LEAST_21) {
+                                    dispatchNestedFling(-initialVelocity, 0, true);
+                                }
                             } else {
                                 mTouchMode = TOUCH_MODE_REST;
                                 reportScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE);
