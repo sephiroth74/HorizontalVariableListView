@@ -3,7 +3,6 @@ package it.sephiroth.android.library.widget;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -58,6 +57,11 @@ import it.sephiroth.android.library.util.ViewHelperFactory;
 import it.sephiroth.android.library.util.ViewHelperFactory.ViewHelper;
 import it.sephiroth.android.library.util.v11.MultiChoiceModeListener;
 import it.sephiroth.android.library.util.v11.MultiChoiceModeWrapper;
+
+import static android.widget.AbsListView.CHOICE_MODE_MULTIPLE;
+import static android.widget.AbsListView.CHOICE_MODE_MULTIPLE_MODAL;
+import static android.widget.AbsListView.CHOICE_MODE_NONE;
+import static android.widget.AbsListView.CHOICE_MODE_SINGLE;
 
 @TargetApi (Build.VERSION_CODES.HONEYCOMB)
 public abstract class AbsHListView extends AdapterView<ListAdapter> implements ViewTreeObserver.OnGlobalLayoutListener,
@@ -151,7 +155,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     /**
      * Controls if/how the user may choose/check items in the list
      */
-    protected int mChoiceMode = ListView.CHOICE_MODE_NONE;
+    protected int mChoiceMode = CHOICE_MODE_NONE;
     /**
      * Controls CHOICE_MODE_MULTIPLE_MODAL. null when inactive.
      *
@@ -192,228 +196,357 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      * If mAdapter != null, whenever this is true the adapter has stable IDs.
      */
     boolean mAdapterHasStableIds;
+
     /**
      * This flag indicates the a full notify is required when the RemoteViewsAdapter connects
      */
     private boolean mDeferNotifyDataSetChanged = false;
+
     /**
      * Indicates whether the list selector should be drawn on top of the children or behind
      */
     boolean mDrawSelectorOnTop = false;
+
     /**
      * The drawable used to draw the selector
      */
     Drawable mSelector;
+
     /**
      * The current position of the selector in the list.
      */
     int mSelectorPosition = INVALID_POSITION;
+
     /**
      * Defines the selector's location and dimension at drawing time
      */
     protected Rect mSelectorRect = new Rect();
+
     /**
-     * The data set used to store unused views that should be reused during the next layout to avoid creating new ones
+     * The data set used to store unused views that should be reused during the next layout
+     * to avoid creating new ones
      */
     protected final RecycleBin mRecycler = new RecycleBin();
+
     /**
      * The selection's left padding
      */
     int mSelectionLeftPadding = 0;
+
     /**
      * The selection's top padding
      */
     int mSelectionTopPadding = 0;
+
     /**
      * The selection's right padding
      */
     int mSelectionRightPadding = 0;
+
     /**
      * The selection's bottom padding
      */
     int mSelectionBottomPadding = 0;
+
     /**
      * This view's padding
      */
     protected Rect mListPadding = new Rect();
+
     /**
      * Subclasses must retain their measure spec from onMeasure() into this member
      */
     protected int mHeightMeasureSpec = 0;
+
     /**
      * The top scroll indicator
      */
     View mScrollLeft;
+
     /**
      * The down scroll indicator
      */
     View mScrollRight;
+
     /**
-     * When the view is scrolling, this flag is set to true to indicate subclasses that the drawing cache was enabled on the
-     * children
+     * When the view is scrolling, this flag is set to true to indicate subclasses that
+     * the drawing cache was enabled on the children
      */
     protected boolean mCachingStarted;
     protected boolean mCachingActive;
+
     /**
      * The position of the view that received the down motion event
      */
     protected int mMotionPosition;
+
     /**
      * The offset to the top of the mMotionPosition view when the down motion event was received
      */
     int mMotionViewOriginalLeft;
+
     /**
      * The desired offset to the top of the mMotionPosition view after a scroll
      */
     int mMotionViewNewLeft;
+
     /**
      * The X value associated with the the down motion event
      */
     int mMotionX;
+
     /**
      * The Y value associated with the the down motion event
      */
     int mMotionY;
+
     /**
-     * One of TOUCH_MODE_REST, TOUCH_MODE_DOWN, TOUCH_MODE_TAP, TOUCH_MODE_SCROLL, or TOUCH_MODE_DONE_WAITING
+     * One of TOUCH_MODE_REST, TOUCH_MODE_DOWN, TOUCH_MODE_TAP, TOUCH_MODE_SCROLL, or
+     * TOUCH_MODE_DONE_WAITING
      */
     protected int mTouchMode = TOUCH_MODE_REST;
+
     /**
      * Y value from on the previous motion event (if any)
      */
     int mLastX;
+
     /**
      * How far the finger moved before we started scrolling
      */
     int mMotionCorrection;
+
     /**
      * Determines speed during touch scrolling
      */
     private VelocityTracker mVelocityTracker;
+
     /**
      * Handles one frame of a fling
      */
     private FlingRunnable mFlingRunnable;
+
     /**
      * Handles scrolling between positions within the list.
      */
     protected AbsPositionScroller mPositionScroller;
+
     /**
-     * The offset in pixels form the top of the AdapterView to the top of the currently selected view. Used to save and restore
-     * state.
+     * The offset in pixels form the top of the AdapterView to the top
+     * of the currently selected view. Used to save and restore state.
      */
     protected int mSelectedLeft = 0;
+
     /**
-     * Indicates whether the list is stacked from the bottom edge or the top edge.
+     * Indicates whether the list is stacked from the bottom edge or
+     * the top edge.
      */
     protected boolean mStackFromRight;
+
     /**
-     * When set to true, the list automatically discards the children's bitmap cache after scrolling.
+     * When set to true, the list automatically discards the children's
+     * bitmap cache after scrolling.
      */
     boolean mScrollingCacheEnabled;
+
     /**
      * Whether or not to enable the fast scroll feature on this list
      */
     boolean mFastScrollEnabled;
+
+    /**
+     * Whether or not to always show the fast scroll feature on this list
+     */
+    boolean mFastScrollAlwaysVisible;
+
     /**
      * Optional callback to notify client when scroll position has changed
      */
     private OnScrollListener mOnScrollListener;
+
     /**
-     * Indicates whether to use pixels-based or position-based scrollbar properties.
+     * Keeps track of our accessory window
+     */
+    //PopupWindow mPopup;
+
+    /**
+     * Used with type filter window
+     */
+    //EditText mTextFilter;
+
+    /**
+     * Indicates whether to use pixels-based or position-based scrollbar
+     * properties.
      */
     private boolean mSmoothScrollbarEnabled = true;
+
+    /**
+     * Indicates that this view supports filtering
+     */
+    private boolean mTextFilterEnabled;
+
+    /**
+     * Indicates that this view is currently displaying a filtered view of the data
+     */
+    private boolean mFiltered;
+
     /**
      * Rectangle used for hit testing children
      */
     private Rect mTouchFrame;
+
     /**
      * The position to resurrect the selected position to.
      */
     protected int mResurrectToPosition = INVALID_POSITION;
+
     private ContextMenuInfo mContextMenuInfo = null;
+
     /**
      * Maximum distance to record overscroll
      */
     protected int mOverscrollMax;
+
     /**
      * Content height divided by this is the overscroll limit.
      */
     protected static final int OVERSCROLL_LIMIT_DIVISOR = 3;
+
     /**
-     * How many positions in either direction we will search to try to find a checked item with a stable ID that moved position
-     * across a data set change. If the item isn't found it will be unselected.
+     * How many positions in either direction we will search to try to
+     * find a checked item with a stable ID that moved position across
+     * a data set change. If the item isn't found it will be unselected.
      */
     private static final int CHECK_POSITION_SEARCH_DISTANCE = 20;
+
     /**
      * Used to request a layout when we changed touch mode
      */
     private static final int TOUCH_MODE_UNKNOWN = -1;
     private static final int TOUCH_MODE_ON = 0;
     private static final int TOUCH_MODE_OFF = 1;
+
     private int mLastTouchMode = TOUCH_MODE_UNKNOWN;
+
+    private static final boolean PROFILE_SCROLLING = false;
+    private boolean mScrollProfilingStarted = false;
+
+    private static final boolean PROFILE_FLINGING = false;
+    private boolean mFlingProfilingStarted = false;
+
+    /**
+     * The StrictMode "critical time span" objects to catch animation
+     * stutters.  Non-null when a time-sensitive animation is
+     * in-flight.  Must call finish() on them when done animating.
+     * These are no-ops on user builds.
+     */
+    //private StrictMode.Span mScrollStrictSpan = null;
+    //private StrictMode.Span mFlingStrictSpan = null;
+
     /**
      * The last CheckForLongPress runnable we posted, if any
      */
     private CheckForLongPress mPendingCheckForLongPress;
+
     /**
      * The last CheckForTap runnable we posted, if any
      */
     private CheckForTap mPendingCheckForTap;
+
     /**
      * The last CheckForKeyLongPress runnable we posted, if any
      */
     private CheckForKeyLongPress mPendingCheckForKeyLongPress;
+
     /**
      * Acts upon click
      */
     private AbsHListView.PerformClick mPerformClick;
+
     /**
      * Delayed action for touch mode.
      */
     private Runnable mTouchModeReset;
+
     /**
-     * This view is in transcript mode -- it shows the bottom of the list when the data changes
+     * This view is in transcript mode -- it shows the bottom of the list when the data
+     * changes
      */
     private int mTranscriptMode;
+
     /**
-     * Indicates that this list is always drawn on top of a solid, single-color, opaque background
+     * Indicates that this list is always drawn on top of a solid, single-color, opaque
+     * background
      */
     private int mCacheColorHint;
+
     /**
      * The select child's view (from the adapter's getView) is enabled.
      */
     private boolean mIsChildViewEnabled;
+
     /**
      * The last scroll state reported to clients through {@link OnScrollListener}.
      */
     private int mLastScrollState = OnScrollListener.SCROLL_STATE_IDLE;
+
+    /**
+     * Helper object that renders and controls the fast scroll thumb.
+     */
+    //private FastScroller mFastScroll;
+
+    /**
+     * Temporary holder for fast scroller style until a FastScroller object
+     * is created.
+     */
+    private int mFastScrollStyle;
+
+    private boolean mGlobalLayoutListenerAddedFilter;
+
     private int mTouchSlop;
+    private float mDensityScale;
+
+    //private InputConnection mDefInputConnection;
+    //private InputConnectionWrapper mPublicInputConnection;
+
     private Runnable mClearScrollingCache;
     protected Runnable mPositionScrollAfterLayout;
     private int mMinimumVelocity;
     private int mMaximumVelocity;
     private float mVelocityScale = 1.0f;
-    protected final boolean[] mIsScrap = new boolean[1];
+
+    final boolean[] mIsScrap = new boolean[1];
+
     private final int[] mScrollOffset = new int[2];
     private final int[] mScrollConsumed = new int[2];
+
     // Used for offsetting MotionEvents that we feed to the VelocityTracker.
     // In the future it would be nice to be able to give this to the VelocityTracker
     // directly, or alternatively put a VT into absolute-positioning mode that only
     // reads the raw screen-coordinate x/y values.
     private int mNestedXOffset = 0;
+
+    // True when the popup should be hidden because of a call to
+    // dispatchDisplayHint()
+    private boolean mPopupHidden;
+
     /**
-     * ID of the active pointer. This is used to retain consistency during drags/flings if multiple pointers are used.
+     * ID of the active pointer. This is used to retain consistency during
+     * drags/flings if multiple pointers are used.
      */
     private int mActivePointerId = INVALID_POINTER;
+
     /**
-     * Sentinel value for no current active pointer. Used by {@link #mActivePointerId}.
+     * Sentinel value for no current active pointer.
+     * Used by {@link #mActivePointerId}.
      */
     private static final int INVALID_POINTER = -1;
+
     /**
      * Maximum distance to overscroll by during edge effects
      */
     int mOverscrollDistance;
+
     /**
      * Maximum distance to overfling during edge effects
      */
@@ -421,54 +554,71 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
     // These two EdgeGlows are always set and used together.
     // Checking one for null is as good as checking both.
+
     /**
      * Tracks the state of the top edge glow.
      */
     private EdgeEffectCompat mEdgeGlowTop;
+
     /**
      * Tracks the state of the bottom edge glow.
      */
     private EdgeEffectCompat mEdgeGlowBottom;
+
     /**
-     * An estimate of how many pixels are between the top of the list and the top of the first position in the adapter, based on the
-     * last time we saw it. Used to hint where to draw edge glows.
+     * An estimate of how many pixels are between the top of the list and
+     * the top of the first position in the adapter, based on the last time
+     * we saw it. Used to hint where to draw edge glows.
      */
     private int mFirstPositionDistanceGuess;
+
     /**
-     * An estimate of how many pixels are between the bottom of the list and the bottom of the last position in the adapter,
-     * based on
-     * the last time we saw it. Used to hint where to draw edge glows.
+     * An estimate of how many pixels are between the bottom of the list and
+     * the bottom of the last position in the adapter, based on the last time
+     * we saw it. Used to hint where to draw edge glows.
      */
     private int mLastPositionDistanceGuess;
+
     /**
      * Used for determining when to cancel out of overscroll.
      */
     private int mDirection = 0;
+
     /**
-     * Tracked on measurement in transcript mode. Makes sure that we can still pin to the bottom correctly on resizes.
+     * Tracked on measurement in transcript mode. Makes sure that we can still pin to
+     * the bottom correctly on resizes.
      */
     private boolean mForceTranscriptScroll;
+
     private int mGlowPaddingTop;
     private int mGlowPaddingBottom;
+
     /**
      * Used for interacting with list items from an accessibility service.
      */
+    //private ListItemAccessibilityDelegate mAccessibilityDelegate;
+
     private int mLastAccessibilityScrollEventFromIndex;
     private int mLastAccessibilityScrollEventToIndex;
+
     /**
      * Track the item count from the last time we handled a data change.
      */
     private int mLastHandledItemCount;
+
     /**
      * Used for smooth scrolling at a consistent rate
      */
     static final Interpolator sLinearInterpolator = new LinearInterpolator();
+
     /**
-     * The saved state that we will be restoring from when we next sync. Kept here so that if we happen to be asked to save our
-     * state
-     * before the sync happens, we can return this existing data rather than losing it.
+     * The saved state that we will be restoring from when we next sync.
+     * Kept here so that if we happen to be asked to save our state before
+     * the sync happens, we can return this existing data rather than losing
+     * it.
      */
     private SavedState mPendingSync;
+
     /**
      * Whether the view is in the process of detaching from its window.
      */
@@ -478,20 +628,25 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     private float mHorizontalScrollFactor;
 
     /**
-     * Interface definition for a callback to be invoked when the list or grid has been scrolled.
+     * Interface definition for a callback to be invoked when the list or grid
+     * has been scrolled.
      */
     public interface OnScrollListener {
+
         /**
-         * The view is not scrolling. Note navigating the list using the trackball counts as being in the idle state since these
-         * transitions are not animated.
+         * The view is not scrolling. Note navigating the list using the trackball counts as
+         * being in the idle state since these transitions are not animated.
          */
         public static int SCROLL_STATE_IDLE = 0;
+
         /**
          * The user is scrolling using touch, and their finger is still on the screen
          */
         public static int SCROLL_STATE_TOUCH_SCROLL = 1;
+
         /**
-         * The user had previously been scrolling using touch and had performed a fling. The animation is now coasting to a stop
+         * The user had previously been scrolling using touch and had performed a fling. The
+         * animation is now coasting to a stop
          */
         public static int SCROLL_STATE_FLING = 2;
 
@@ -501,37 +656,38 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
          * rendered. In particular, it will be called before any calls to
          * {@link Adapter#getView(int, View, ViewGroup)}.
          *
-         * @param view        The view whose scroll state is being reported
+         * @param view The view whose scroll state is being reported
+         *
          * @param scrollState The current scroll state. One of
-         *                    {@link #SCROLL_STATE_TOUCH_SCROLL} or {@link #SCROLL_STATE_IDLE}.
+         * {@link #SCROLL_STATE_TOUCH_SCROLL} or {@link #SCROLL_STATE_IDLE}.
          */
         public void onScrollStateChanged(AbsHListView view, int scrollState);
 
         /**
-         * Callback method to be invoked when the list or grid has been scrolled. This will be called after the scroll has completed
-         *
-         * @param view             The view whose scroll state is being reported
-         * @param firstVisibleItem the index of the first visible cell (ignore if visibleItemCount == 0)
+         * Callback method to be invoked when the list or grid has been scrolled. This will be
+         * called after the scroll has completed
+         * @param view The view whose scroll state is being reported
+         * @param firstVisibleItem the index of the first visible cell (ignore if
+         *        visibleItemCount == 0)
          * @param visibleItemCount the number of visible cells
-         * @param totalItemCount   the number of items in the list adaptor
+         * @param totalItemCount the number of items in the list adaptor
          */
-        public void onScroll(
-            AbsHListView view, int firstVisibleItem, int visibleItemCount,
+        public void onScroll(AbsHListView view, int firstVisibleItem, int visibleItemCount,
             int totalItemCount);
     }
 
     /**
-     * The top-level view of a list item can implement this interface to allow itself to modify the bounds of the selection shown
-     * for
-     * that item.
+     * The top-level view of a list item can implement this interface to allow
+     * itself to modify the bounds of the selection shown for that item.
      */
     public interface SelectionBoundsAdjuster {
         /**
-         * Called to allow the list item to adjust the bounds shown for its selection.
+         * Called to allow the list item to adjust the bounds shown for
+         * its selection.
          *
-         * @param bounds On call, this contains the bounds the list has selected for the item (that is the bounds of the entire
-         *               view). The
-         *               values can be modified as desired.
+         * @param bounds On call, this contains the bounds the list has
+         * selected for the item (that is the bounds of the entire view).  The
+         * values can be modified as desired.
          */
         public void adjustListItemSelectionBounds(Rect bounds);
     }
@@ -542,27 +698,24 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
         mOwnerThread = Thread.currentThread();
 
-        setHorizontalScrollBarEnabled(true);
+        //setHorizontalScrollBarEnabled(true);
+        //TypedArray a = context.obtainStyledAttributes(R.styleable.View);
+        //initializeScrollbarsInternal(a);
+        //a.recycle();
     }
 
     public AbsHListView(Context context, AttributeSet attrs) {
         this(context, attrs, R.attr.hlv_absHListViewStyle);
     }
 
-    public AbsHListView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-
-        if (LOG_ENABLED) {
-            Log.i(LOG_TAG, "defStyle: " + defStyle);
-        }
+    public AbsHListView(Context context, AttributeSet defStyleAttr, int defStyleRes) {
+        super(context, defStyleAttr, defStyleRes);
 
         initAbsListView();
 
         mOwnerThread = Thread.currentThread();
 
-        final Resources.Theme theme = context.getTheme();
-
-        TypedArray array = theme.obtainStyledAttributes(attrs, R.styleable.AbsHListView, defStyle, 0);
+        TypedArray array = context.getTheme().obtainStyledAttributes(defStyleAttr, R.styleable.AbsHListView, defStyleRes, 0);
 
         Drawable listSelector = null;
         boolean drawSelectorOnTop = false;
@@ -571,7 +724,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
         int transcriptMode = TRANSCRIPT_MODE_DISABLED;
         int color = 0;
         boolean smoothScrollbar = true;
-        int choiceMode = ListView.CHOICE_MODE_NONE;
+        int choiceMode = CHOICE_MODE_NONE;
 
         if (null != array) {
             listSelector = array.getDrawable(R.styleable.AbsHListView_android_listSelector);
@@ -581,7 +734,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
             transcriptMode = array.getInt(R.styleable.AbsHListView_hlv_transcriptMode, TRANSCRIPT_MODE_DISABLED);
             color = array.getColor(R.styleable.AbsHListView_android_cacheColorHint, 0);
             smoothScrollbar = array.getBoolean(R.styleable.AbsHListView_android_smoothScrollbar, true);
-            choiceMode = array.getInt(R.styleable.AbsHListView_android_choiceMode, ListView.CHOICE_MODE_NONE);
+            choiceMode = array.getInt(R.styleable.AbsHListView_android_choiceMode, CHOICE_MODE_NONE);
             array.recycle();
 
             if (LOG_ENABLED) {
@@ -609,6 +762,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     }
 
     private void initAbsListView() {
+        // Setting focusable in touch mode will set the focusable property to true
         setClickable(true);
         setFocusableInTouchMode(true);
         setWillNotDraw(false);
@@ -622,6 +776,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
         mOverscrollDistance = configuration.getScaledOverscrollDistance();
         mOverflingDistance = configuration.getScaledOverflingDistance();
         mViewHelper = ViewHelperFactory.create(this);
+        mDensityScale = getContext().getResources().getDisplayMetrics().density;
     }
 
     @Override
@@ -646,7 +801,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     public void setAdapter(ListAdapter adapter) {
         if (adapter != null) {
             mAdapterHasStableIds = mAdapter.hasStableIds();
-            if (mChoiceMode != ListView.CHOICE_MODE_NONE && mAdapterHasStableIds &&
+            if (mChoiceMode != CHOICE_MODE_NONE && mAdapterHasStableIds &&
                 mCheckedIdStates == null) {
                 mCheckedIdStates = new LongSparseArray<Integer>();
             }
@@ -662,14 +817,14 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     }
 
     /**
-     * Returns the number of items currently selected. This will only be valid if the choice mode is not {@link android.widget
-     * .AbsListView#CHOICE_MODE_NONE}
-     * (default).
-     * <p/>
-     * <p/>
-     * To determine the specific items that are currently selected, use one of the <code>getChecked*</code> methods.
+     * Returns the number of items currently selected. This will only be valid
+     * if the choice mode is not {@link #CHOICE_MODE_NONE} (default).
+     *
+     * <p>To determine the specific items that are currently selected, use one of
+     * the <code>getChecked*</code> methods.
      *
      * @return The number of items currently selected
+     *
      * @see #getCheckedItemPosition()
      * @see #getCheckedItemPositions()
      * @see #getCheckedItemIds()
@@ -679,15 +834,18 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     }
 
     /**
-     * Returns the checked state of the specified position. The result is only valid if the choice mode has been set to
-     * {@link android.widget.AbsListView#CHOICE_MODE_SINGLE} or {@link android.widget.AbsListView#CHOICE_MODE_MULTIPLE}.
+     * Returns the checked state of the specified position. The result is only
+     * valid if the choice mode has been set to {@link #CHOICE_MODE_SINGLE}
+     * or {@link #CHOICE_MODE_MULTIPLE}.
      *
      * @param position The item whose checked state to return
-     * @return The item's checked state or <code>false</code> if choice mode is invalid
+     * @return The item's checked state or <code>false</code> if choice mode
+     *         is invalid
+     *
      * @see #setChoiceMode(int)
      */
     public boolean isItemChecked(int position) {
-        if (mChoiceMode != ListView.CHOICE_MODE_NONE && mCheckStates != null) {
+        if (mChoiceMode != CHOICE_MODE_NONE && mCheckStates != null) {
             return mCheckStates.get(position, false);
         }
 
@@ -695,14 +853,16 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     }
 
     /**
-     * Returns the currently checked item. The result is only valid if the choice mode has been set to {@link android.widget
-     * .AbsListView#CHOICE_MODE_SINGLE}.
+     * Returns the currently checked item. The result is only valid if the choice
+     * mode has been set to {@link #CHOICE_MODE_SINGLE}.
      *
-     * @return The position of the currently checked item or {@link #INVALID_POSITION} if nothing is selected
+     * @return The position of the currently checked item or
+     *         {@link #INVALID_POSITION} if nothing is selected
+     *
      * @see #setChoiceMode(int)
      */
     public int getCheckedItemPosition() {
-        if (mChoiceMode == ListView.CHOICE_MODE_SINGLE && mCheckStates != null && mCheckStates.size() == 1) {
+        if (mChoiceMode == CHOICE_MODE_SINGLE && mCheckStates != null && mCheckStates.size() == 1) {
             return mCheckStates.keyAt(0);
         }
 
@@ -710,28 +870,31 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     }
 
     /**
-     * Returns the set of checked items in the list. The result is only valid if the choice mode has not been set to
-     * {@link android.widget.AbsListView#CHOICE_MODE_NONE}.
+     * Returns the set of checked items in the list. The result is only valid if
+     * the choice mode has not been set to {@link #CHOICE_MODE_NONE}.
      *
-     * @return A SparseBooleanArray which will return true for each call to get(int position) where position is a position in the
-     * list, or <code>null</code> if the choice mode is set to {@link android.widget.AbsListView#CHOICE_MODE_NONE}.
+     * @return  A SparseBooleanArray which will return true for each call to
+     *          get(int position) where position is a checked position in the
+     *          list and false otherwise, or <code>null</code> if the choice
+     *          mode is set to {@link #CHOICE_MODE_NONE}.
      */
     public SparseArrayCompat<Boolean> getCheckedItemPositions() {
-        if (mChoiceMode != ListView.CHOICE_MODE_NONE) {
+        if (mChoiceMode != CHOICE_MODE_NONE) {
             return mCheckStates;
         }
         return null;
     }
 
     /**
-     * Returns the set of checked items ids. The result is only valid if the choice mode has not been set to
-     * {@link android.widget.AbsListView#CHOICE_MODE_NONE} and the adapter has stable IDs. ({@link ListAdapter#hasStableIds()} ==
-     * {@code true})
+     * Returns the set of checked items ids. The result is only valid if the
+     * choice mode has not been set to {@link #CHOICE_MODE_NONE} and the adapter
+     * has stable IDs. ({@link ListAdapter#hasStableIds()} == {@code true})
      *
-     * @return A new array which contains the id of each checked item in the list.
+     * @return A new array which contains the id of each checked item in the
+     *         list.
      */
     public long[] getCheckedItemIds() {
-        if (mChoiceMode == ListView.CHOICE_MODE_NONE || mCheckedIdStates == null || mAdapter == null) {
+        if (mChoiceMode == CHOICE_MODE_NONE || mCheckedIdStates == null || mAdapter == null) {
             return new long[0];
         }
 
@@ -760,20 +923,21 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     }
 
     /**
-     * Sets the checked state of the specified position. The is only valid if the choice mode has been set to
-     * {@link android.widget.AbsListView#CHOICE_MODE_SINGLE} or {@link android.widget.AbsListView#CHOICE_MODE_MULTIPLE}.
+     * Sets the checked state of the specified position. The is only valid if
+     * the choice mode has been set to {@link #CHOICE_MODE_SINGLE} or
+     * {@link #CHOICE_MODE_MULTIPLE}.
      *
      * @param position The item whose checked state is to be checked
-     * @param value    The new checked state for the item
+     * @param value The new checked state for the item
      */
     public void setItemChecked(int position, boolean value) {
-        if (mChoiceMode == ListView.CHOICE_MODE_NONE) {
+        if (mChoiceMode == CHOICE_MODE_NONE) {
             return;
         }
 
         // Start selection mode if needed. We don't need to if we're unchecking something.
-        if (android.os.Build.VERSION.SDK_INT >= 11) {
-            if (value && mChoiceMode == ListView.CHOICE_MODE_MULTIPLE_MODAL && mChoiceActionMode == null) {
+        if (ApiHelper.AT_LEAST_11) {
+            if (value && mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL && mChoiceActionMode == null) {
                 if (mMultiChoiceModeCallback == null ||
                     !((MultiChoiceModeWrapper) mMultiChoiceModeCallback).hasWrappedCallback()) {
                     throw new IllegalStateException(
@@ -785,8 +949,8 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
             }
         }
 
-        if (mChoiceMode == ListView.CHOICE_MODE_MULTIPLE
-            || (android.os.Build.VERSION.SDK_INT >= 11 && mChoiceMode == ListView.CHOICE_MODE_MULTIPLE_MODAL)) {
+        if (mChoiceMode == CHOICE_MODE_MULTIPLE
+            || (ApiHelper.AT_LEAST_11 && mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL)) {
             boolean oldValue = mCheckStates.get(position, false);
             mCheckStates.put(position, value);
             if (mCheckedIdStates != null && mAdapter.hasStableIds()) {
@@ -844,12 +1008,12 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
         boolean handled = false;
         boolean dispatchItemClick = true;
 
-        if (mChoiceMode != ListView.CHOICE_MODE_NONE) {
+        if (mChoiceMode != CHOICE_MODE_NONE) {
             handled = true;
             boolean checkedStateChanged = false;
 
-            if (mChoiceMode == ListView.CHOICE_MODE_MULTIPLE
-                || (android.os.Build.VERSION.SDK_INT >= 11 && mChoiceMode == ListView.CHOICE_MODE_MULTIPLE_MODAL
+            if (mChoiceMode == CHOICE_MODE_MULTIPLE
+                || (ApiHelper.AT_LEAST_11 && mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL
                 && mChoiceActionMode != null)) {
                 boolean checked = !mCheckStates.get(position, false);
                 mCheckStates.put(position, checked);
@@ -865,15 +1029,13 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
                 } else {
                     mCheckedItemCount--;
                 }
-
                 if (mChoiceActionMode != null) {
                     ((MultiChoiceModeWrapper) mMultiChoiceModeCallback)
                         .onItemCheckedStateChanged((ActionMode) mChoiceActionMode, position, id, checked);
                     dispatchItemClick = false;
                 }
-
                 checkedStateChanged = true;
-            } else if (mChoiceMode == ListView.CHOICE_MODE_SINGLE) {
+            } else if (mChoiceMode == CHOICE_MODE_SINGLE) {
                 boolean checked = !mCheckStates.get(position, false);
                 if (checked) {
                     mCheckStates.clear();
@@ -902,13 +1064,14 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     }
 
     /**
-     * Perform a quick, in-place update of the checked or activated state on all visible item views. This should only be called when
-     * a valid choice mode is active.
+     * Perform a quick, in-place update of the checked or activated state
+     * on all visible item views. This should only be called when a valid
+     * choice mode is active.
      */
     private void updateOnScreenCheckedViews() {
         final int firstPos = mFirstPosition;
         final int count = getChildCount();
-        final boolean useActivated = android.os.Build.VERSION.SDK_INT >= 11;
+        final boolean useActivated = ApiHelper.AT_LEAST_11;
         for (int i = 0; i < count; i++) {
             final View child = getChildAt(i);
             final int position = firstPos + i;
@@ -922,48 +1085,43 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     }
 
     /**
-     * @return The current choice mode
      * @see #setChoiceMode(int)
+     *
+     * @return The current choice mode
      */
     public int getChoiceMode() {
         return mChoiceMode;
     }
 
     /**
-     * Defines the choice behavior for the List. By default, Lists do not have any choice behavior ({@link android.widget
-     * .AbsListView#CHOICE_MODE_NONE}). By
-     * setting the choiceMode to {@link android.widget.AbsListView#CHOICE_MODE_SINGLE}, the List allows up to one item to be in a
-     * chosen state. By setting the
-     * choiceMode to {@link android.widget.AbsListView#CHOICE_MODE_MULTIPLE}, the list allows any number of items to be chosen.
+     * Defines the choice behavior for the List. By default, Lists do not have any choice behavior
+     * ({@link #CHOICE_MODE_NONE}). By setting the choiceMode to {@link #CHOICE_MODE_SINGLE}, the
+     * List allows up to one item to  be in a chosen state. By setting the choiceMode to
+     * {@link #CHOICE_MODE_MULTIPLE}, the list allows any number of items to be chosen.
      *
-     * @param choiceMode One of {@link android.widget.AbsListView#CHOICE_MODE_NONE},
-     *                   {@link android.widget.AbsListView#CHOICE_MODE_SINGLE},
-     *                   or {@link android.widget.AbsListView#CHOICE_MODE_MULTIPLE}
+     * @param choiceMode One of {@link #CHOICE_MODE_NONE}, {@link #CHOICE_MODE_SINGLE}, or
+     * {@link #CHOICE_MODE_MULTIPLE}
      */
     @TargetApi (11)
     public void setChoiceMode(int choiceMode) {
         mChoiceMode = choiceMode;
 
-        if (android.os.Build.VERSION.SDK_INT >= 11) {
+        if (ApiHelper.AT_LEAST_11) {
             if (mChoiceActionMode != null) {
-
-                if (android.os.Build.VERSION.SDK_INT >= 11) {
-                    ((ActionMode) mChoiceActionMode).finish();
-                }
+                ((ActionMode) mChoiceActionMode).finish();
                 mChoiceActionMode = null;
             }
         }
-
-        if (mChoiceMode != ListView.CHOICE_MODE_NONE) {
+        if (mChoiceMode != CHOICE_MODE_NONE) {
             if (mCheckStates == null) {
-                mCheckStates = new SparseArrayCompat<Boolean>();
+                mCheckStates = new SparseArrayCompat<Boolean>(0);
             }
             if (mCheckedIdStates == null && mAdapter != null && mAdapter.hasStableIds()) {
-                mCheckedIdStates = new LongSparseArray<Integer>();
+                mCheckedIdStates = new LongSparseArray<Integer>(0);
             }
             // Modal multi-choice mode only has choices when the mode is active. Clear them.
-            if (android.os.Build.VERSION.SDK_INT >= 11) {
-                if (mChoiceMode == ListView.CHOICE_MODE_MULTIPLE_MODAL) {
+            if (ApiHelper.AT_LEAST_11) {
+                if (mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL) {
                     clearChoices();
                     setLongClickable(true);
                 }
@@ -972,15 +1130,17 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     }
 
     /**
-     * Set a {@link MultiChoiceModeListener} that will manage the lifecycle of the selection {@link ActionMode}. Only used when the
-     * choice mode is set to {@link android.widget.AbsListView#CHOICE_MODE_MULTIPLE_MODAL}.
+     * Set a {@link MultiChoiceModeListener} that will manage the lifecycle of the
+     * selection {@link ActionMode}. Only used when the choice mode is set to
+     * {@link #CHOICE_MODE_MULTIPLE_MODAL}.
      *
      * @param listener Listener that will manage the selection mode
+     *
      * @see #setChoiceMode(int)
      */
     @TargetApi (11)
     public void setMultiChoiceModeListener(MultiChoiceModeListener listener) {
-        if (android.os.Build.VERSION.SDK_INT >= 11) {
+        if (ApiHelper.AT_LEAST_11) {
             if (mMultiChoiceModeCallback == null) {
                 mMultiChoiceModeCallback = new MultiChoiceModeWrapper(this);
             }
@@ -995,35 +1155,200 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      */
     private boolean contentFits() {
         final int childCount = getChildCount();
-        if (childCount == 0) {
-            return true;
-        }
-        if (childCount != mItemCount) {
-            return false;
-        }
+        if (childCount == 0) return true;
+        if (childCount != mItemCount) return false;
 
-        return getChildAt(0).getLeft() >= mListPadding.left &&
-            getChildAt(childCount - 1).getRight() <= getWidth() - mListPadding.right;
+        return getChildAt(0).getTop() >= mListPadding.top &&
+                getChildAt(childCount - 1).getBottom() <= getHeight() - mListPadding.bottom;
     }
 
+    /**
+     * Specifies whether fast scrolling is enabled or disabled.
+     * <p>
+     * When fast scrolling is enabled, the user can quickly scroll through lists
+     * by dragging the fast scroll thumb.
+     * <p>
+     * If the adapter backing this list implements {@link SectionIndexer}, the
+     * fast scroller will display section header previews as the user scrolls.
+     * Additionally, the user will be able to quickly jump between sections by
+     * tapping along the length of the scroll bar.
+     *
+     * @see SectionIndexer
+     * @see #isFastScrollEnabled()
+     * @param enabled true to enable fast scrolling, false otherwise
+     */
+//    public void setFastScrollEnabled(final boolean enabled) {
+//        if (mFastScrollEnabled != enabled) {
+//            mFastScrollEnabled = enabled;
+//
+//            if (isOwnerThread()) {
+//                setFastScrollerEnabledUiThread(enabled);
+//            } else {
+//                post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        setFastScrollerEnabledUiThread(enabled);
+//                    }
+//                });
+//            }
+//        }
+//    }
+
+//    private void setFastScrollerEnabledUiThread(boolean enabled) {
+//        if (mFastScroll != null) {
+//            mFastScroll.setEnabled(enabled);
+//        } else if (enabled) {
+//            mFastScroll = new FastScroller(this, mFastScrollStyle);
+//            mFastScroll.setEnabled(true);
+//        }
+//
+//        resolvePadding();
+//
+//        if (mFastScroll != null) {
+//            mFastScroll.updateLayout();
+//        }
+//    }
+
+    /**
+     * Specifies the style of the fast scroller decorations.
+     *
+     * @param styleResId style resource containing fast scroller properties
+     * @see android.R.styleable#FastScroll
+     */
+//    public void setFastScrollStyle(int styleResId) {
+//        if (mFastScroll == null) {
+//            mFastScrollStyle = styleResId;
+//        } else {
+//            mFastScroll.setStyle(styleResId);
+//        }
+//    }
+
+    /**
+     * Set whether or not the fast scroller should always be shown in place of
+     * the standard scroll bars. This will enable fast scrolling if it is not
+     * already enabled.
+     * <p>
+     * Fast scrollers shown in this way will not fade out and will be a
+     * permanent fixture within the list. This is best combined with an inset
+     * scroll bar style to ensure the scroll bar does not overlap content.
+     *
+     * @param alwaysShow true if the fast scroller should always be displayed,
+     *            false otherwise
+     * @see #setScrollBarStyle(int)
+     * @see #setFastScrollEnabled(boolean)
+     */
+//    public void setFastScrollAlwaysVisible(final boolean alwaysShow) {
+//        if (mFastScrollAlwaysVisible != alwaysShow) {
+//            if (alwaysShow && !mFastScrollEnabled) {
+//                setFastScrollEnabled(true);
+//            }
+//
+//            mFastScrollAlwaysVisible = alwaysShow;
+//
+//            if (isOwnerThread()) {
+//                setFastScrollerAlwaysVisibleUiThread(alwaysShow);
+//            } else {
+//                post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        setFastScrollerAlwaysVisibleUiThread(alwaysShow);
+//                    }
+//                });
+//            }
+//        }
+//    }
+
+//    private void setFastScrollerAlwaysVisibleUiThread(boolean alwaysShow) {
+//        if (mFastScroll != null) {
+//            mFastScroll.setAlwaysShow(alwaysShow);
+//        }
+//    }
+
+    /**
+     * @return whether the current thread is the one that created the view
+     */
+    private boolean isOwnerThread() {
+        return mOwnerThread == Thread.currentThread();
+    }
+
+    /**
+     * Returns true if the fast scroller is set to always show on this view.
+     *
+     * @return true if the fast scroller will always show
+     * @see #setFastScrollAlwaysVisible(boolean)
+     */
+//    public boolean isFastScrollAlwaysVisible() {
+//        if (mFastScroll == null) {
+//            return mFastScrollEnabled && mFastScrollAlwaysVisible;
+//        } else {
+//            return mFastScroll.isEnabled() && mFastScroll.isAlwaysShowEnabled();
+//        }
+//    }
+
     @Override
-    protected int getHorizontalScrollbarHeight() {
+    public int getHorizontalScrollbarHeight() {
+//        if (mFastScroll != null && mFastScroll.isEnabled()) {
+//            return Math.max(super.getHorizontalScrollbarHeight(), mFastScroll.getHeight());
+//        }
         return super.getHorizontalScrollbarHeight();
     }
 
     /**
-     * When smooth scrollbar is enabled, the position and size of the scrollbar thumb is computed based on the number of visible
-     * pixels in the visible items. This however assumes that all list items have the same height. If you use a list in which items
-     * have different heights, the scrollbar will change appearance as the user scrolls through the list. To avoid this issue, you
-     * need to disable this property.
-     * <p/>
-     * When smooth scrollbar is disabled, the position and size of the scrollbar thumb is based solely on the number of items in the
-     * adapter and the position of the visible items inside the adapter. This provides a stable scrollbar as the user navigates
-     * through a list of items with varying heights.
+     * Returns true if the fast scroller is enabled.
+     *
+     * @see #setFastScrollEnabled(boolean)
+     * @return true if fast scroll is enabled, false otherwise
+     */
+//    @ViewDebug.ExportedProperty
+//    public boolean isFastScrollEnabled() {
+//        if (mFastScroll == null) {
+//            return mFastScrollEnabled;
+//        } else {
+//            return mFastScroll.isEnabled();
+//        }
+//    }
+
+//    @Override
+//    public void setHorizontalScrollbarPosition(int position) {
+//        super.setHorizontalScrollbarPosition(position);
+//        if (mFastScroll != null) {
+//            mFastScroll.setScrollbarPosition(position);
+//        }
+//    }
+
+//    @Override
+//    public void setScrollBarStyle(int style) {
+//        super.setScrollBarStyle(style);
+//        if (mFastScroll != null) {
+//            mFastScroll.setScrollBarStyle(style);
+//        }
+//    }
+
+    /**
+     * If fast scroll is enabled, then don't draw the vertical scrollbar.
+     * @hide
+     */
+//    protected boolean isHorizontalScrollBarHidden() {
+//        return isFastScrollEnabled();
+//    }
+
+    /**
+     * When smooth scrollbar is enabled, the position and size of the scrollbar thumb
+     * is computed based on the number of visible pixels in the visible items. This
+     * however assumes that all list items have the same height. If you use a list in
+     * which items have different heights, the scrollbar will change appearance as the
+     * user scrolls through the list. To avoid this issue, you need to disable this
+     * property.
+     *
+     * When smooth scrollbar is disabled, the position and size of the scrollbar thumb
+     * is based solely on the number of items in the adapter and the position of the
+     * visible items inside the adapter. This provides a stable scrollbar as the user
+     * navigates through a list of items with varying heights.
      *
      * @param enabled Whether or not to enable smooth scrollbar.
-     * @attr ref android.R.styleable#AbsListView_smoothScrollbar
+     *
      * @see #setSmoothScrollbarEnabled(boolean)
+     * @attr ref android.R.styleable#AbsListView_smoothScrollbar
      */
     public void setSmoothScrollbarEnabled(boolean enabled) {
         mSmoothScrollbarEnabled = enabled;
@@ -1033,6 +1358,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      * Returns the current state of the fast scroll feature.
      *
      * @return True if smooth scrollbar is enabled is enabled, false otherwise.
+     *
      * @see #setSmoothScrollbarEnabled(boolean)
      */
     @ViewDebug.ExportedProperty
@@ -1053,7 +1379,10 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     /**
      * Notify our scroll listener (if there is one) of a change in scroll state
      */
-    protected void invokeOnItemScrollListener() {
+    void invokeOnItemScrollListener() {
+        //if (mFastScroll != null) {
+        //    mFastScroll.onScroll(mFirstPosition, getChildCount(), mItemCount);
+        //}
         if (mOnScrollListener != null) {
             mOnScrollListener.onScroll(this, mFirstPosition, getChildCount(), mItemCount);
         }
@@ -1091,14 +1420,15 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     @Override
     public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
         super.onInitializeAccessibilityNodeInfo(info);
-
         info.setClassName(AbsHListView.class.getName());
         if (isEnabled()) {
             if (canScrollLeft()) {
                 info.addAction(AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD);
+                info.setScrollable(true);
             }
             if (canScrollRight()) {
                 info.addAction(AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD);
+                info.setScrollable(true);
             }
         }
     }
@@ -1106,12 +1436,12 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     int getSelectionModeForAccessibility() {
         final int choiceMode = getChoiceMode();
         switch (choiceMode) {
-            case AbsListView.CHOICE_MODE_NONE:
+            case CHOICE_MODE_NONE:
                 return AccessibilityNodeInfo.CollectionInfo.SELECTION_MODE_NONE;
-            case AbsListView.CHOICE_MODE_SINGLE:
+            case CHOICE_MODE_SINGLE:
                 return AccessibilityNodeInfo.CollectionInfo.SELECTION_MODE_SINGLE;
-            case AbsListView.CHOICE_MODE_MULTIPLE:
-            case AbsListView.CHOICE_MODE_MULTIPLE_MODAL:
+            case CHOICE_MODE_MULTIPLE:
+            case CHOICE_MODE_MULTIPLE_MODAL:
                 return AccessibilityNodeInfo.CollectionInfo.SELECTION_MODE_MULTIPLE;
             default:
                 return AccessibilityNodeInfo.CollectionInfo.SELECTION_MODE_NONE;
@@ -1131,26 +1461,40 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
                     smoothScrollBy(viewportWidth, PositionScroller.SCROLL_DURATION);
                     return true;
                 }
-            }
-            return false;
+            } return false;
             case AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD: {
                 if (isEnabled() && mFirstPosition > 0) {
                     final int viewportWidth = getWidth() - mListPadding.left - mListPadding.right;
                     smoothScrollBy(-viewportWidth, PositionScroller.SCROLL_DURATION);
                     return true;
                 }
-            }
-            return false;
+            } return false;
         }
         return false;
     }
 
+//    /** @hide */
+//    @Override
+//    public View findViewByAccessibilityIdTraversal(int accessibilityId) {
+//        if (accessibilityId == getAccessibilityViewId()) {
+//            return this;
+//        }
+//        // If the data changed the children are invalid since the data model changed.
+//        // Hence, we pretend they do not exist. After a layout the children will sync
+//        // with the model at which point we notify that the accessibility state changed,
+//        // so a service will be able to re-fetch the views.
+//        if (mDataChanged) {
+//            return null;
+//        }
+//        return super.findViewByAccessibilityIdTraversal(accessibilityId);
+//    }
+
     /**
-     * Indicates whether the children's drawing cache is used during a scroll. By default, the drawing cache is enabled but this
-     * will
-     * consume more memory.
+     * Indicates whether the children's drawing cache is used during a scroll.
+     * By default, the drawing cache is enabled but this will consume more memory.
      *
      * @return true if the scrolling cache is enabled, false otherwise
+     *
      * @see #setScrollingCacheEnabled(boolean)
      * @see View#setDrawingCacheEnabled(boolean)
      */
@@ -1160,13 +1504,15 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     }
 
     /**
-     * Enables or disables the children's drawing cache during a scroll. By default, the drawing cache is enabled but this will use
-     * more memory.
-     * <p/>
-     * When the scrolling cache is enabled, the caches are kept after the first scrolling. You can manually clear the cache by
-     * calling {@link android.view.ViewGroup#setChildrenDrawingCacheEnabled(boolean)}.
+     * Enables or disables the children's drawing cache during a scroll.
+     * By default, the drawing cache is enabled but this will use more memory.
+     *
+     * When the scrolling cache is enabled, the caches are kept after the
+     * first scrolling. You can manually clear the cache by calling
+     * {@link android.view.ViewGroup#setChildrenDrawingCacheEnabled(boolean)}.
      *
      * @param enabled true to enable the scroll cache, false otherwise
+     *
      * @see #isScrollingCacheEnabled()
      * @see View#setDrawingCacheEnabled(boolean)
      */
@@ -1175,6 +1521,33 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
             clearScrollingCache();
         }
         mScrollingCacheEnabled = enabled;
+    }
+
+    /**
+     * Enables or disables the type filter window. If enabled, typing when
+     * this view has focus will filter the children to match the users input.
+     * Note that the {@link Adapter} used by this view must implement the
+     * {@link Filterable} interface.
+     *
+     * @param textFilterEnabled true to enable type filtering, false otherwise
+     *
+     * @see Filterable
+     */
+    public void setTextFilterEnabled(boolean textFilterEnabled) {
+        mTextFilterEnabled = textFilterEnabled;
+    }
+
+    /**
+     * Indicates whether type filtering is enabled for this view
+     *
+     * @return true if type filtering is enabled, false otherwise
+     *
+     * @see #setTextFilterEnabled(boolean)
+     * @see Filterable
+     */
+    @ViewDebug.ExportedProperty
+    public boolean isTextFilterEnabled() {
+        return mTextFilterEnabled;
     }
 
     @Override
@@ -1201,7 +1574,8 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     }
 
     /**
-     * Indicates whether the content of this view is pinned to, or stacked from, the bottom edge.
+     * Indicates whether the content of this view is pinned to, or stacked from,
+     * the bottom edge.
      *
      * @return true if the content is stacked from the bottom edge, false otherwise
      */
@@ -1210,9 +1584,11 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     }
 
     /**
-     * When stack from bottom is set to true, the list fills its content starting from the bottom of the view.
+     * When stack from bottom is set to true, the list fills its content starting from
+     * the bottom of the view.
      *
-     * @param stackFromRight true to pin the view's content to the bottom edge, false to pin the view's content to the top edge
+     * @param stackFromRight true to pin the view's content to the bottom edge,
+     *        false to pin the view's content to the top edge
      */
     public void setStackFromRight(boolean stackFromRight) {
         if (mStackFromRight != stackFromRight) {
@@ -1347,9 +1723,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
         @Override
         public void writeToParcel(Parcel out, int flags) {
-            if (LOG_ENABLED) {
-                Log.i(TAG, "writeToParcel");
-            }
             super.writeToParcel(out, flags);
             out.writeLong(selectedId);
             out.writeLong(firstId);
@@ -1397,15 +1770,14 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
     @Override
     public Parcelable onSaveInstanceState() {
-        if (LOG_ENABLED) {
-            Log.i(TAG, "onSaveInstanceState");
-            Log.d(TAG, "mPendingSync: " + mPendingSync);
-        }
         /*
-         * This doesn't really make sense as the place to dismiss the popups, but there don't seem to be any other useful hooks
-		 * that
-		 * happen early enough to keep from getting complaints about having leaked the window.
+         * This doesn't really make sense as the place to dismiss the
+         * popups, but there don't seem to be any other useful hooks
+         * that happen early enough to keep from getting complaints
+         * about having leaked the window.
 		 */
+        //dismissPopup();
+
         Parcelable superState = super.onSaveInstanceState();
 
         SavedState ss = new SavedState(superState);
@@ -1462,7 +1834,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
         }
 
         ss.filter = null;
-        ss.inActionMode = android.os.Build.VERSION.SDK_INT >= 11 && mChoiceMode == ListView.CHOICE_MODE_MULTIPLE_MODAL
+        ss.inActionMode = android.os.Build.VERSION.SDK_INT >= 11 && mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL
             && mChoiceActionMode != null;
 
         if (mCheckStates != null) {
@@ -1534,7 +1906,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
         mCheckedItemCount = ss.checkedItemCount;
 
         if (android.os.Build.VERSION.SDK_INT >= 11) {
-            if (ss.inActionMode && mChoiceMode == ListView.CHOICE_MODE_MULTIPLE_MODAL && mMultiChoiceModeCallback != null) {
+            if (ss.inActionMode && mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL && mMultiChoiceModeCallback != null) {
                 mChoiceActionMode = startActionMode((MultiChoiceModeWrapper) mMultiChoiceModeCallback);
             }
         }
@@ -2482,7 +2854,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
         // CHOICE_MODE_MULTIPLE_MODAL takes over long press.
         if (android.os.Build.VERSION.SDK_INT >= 11) {
-            if (mChoiceMode == ListView.CHOICE_MODE_MULTIPLE_MODAL) {
+            if (mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL) {
                 if (mChoiceActionMode == null &&
                     (mChoiceActionMode = startActionMode((MultiChoiceModeWrapper) mMultiChoiceModeCallback)) != null) {
                     setItemChecked(longPressPosition, true);
@@ -4653,7 +5025,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
         int lastHandledItemCount = mLastHandledItemCount;
         mLastHandledItemCount = mItemCount;
 
-        if (mChoiceMode != ListView.CHOICE_MODE_NONE && mAdapter != null && mAdapter.hasStableIds()) {
+        if (mChoiceMode != CHOICE_MODE_NONE && mAdapter != null && mAdapter.hasStableIds()) {
             confirmCheckedPositionsById();
         }
 
