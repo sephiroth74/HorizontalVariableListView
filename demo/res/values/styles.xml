@@ -1,35 +1,35 @@
-<resources xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto">
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="AppBaseTheme" parent="android:Theme.Light"></style>
+	<style name="AppBaseTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar"></style>
 
-    <!-- Application theme. -->
-    <style name="AppTheme" parent="AppBaseTheme">
-        <item name="hlv_listViewStyle">@style/HListView</item>
-        <item name="hlv_absHListViewStyle">@style/AbsHListView</item>
-        <item name="hlv_listPreferredItemWidth">64dip</item>
-    </style>
+	<!-- Application theme. -->
+	<style name="AppTheme" parent="AppBaseTheme">
+		<item name="hlv_listViewStyle">@style/HListView</item>
+		<item name="hlv_absHListViewStyle">@style/AbsHListView</item>
+		<item name="hlv_listPreferredItemWidth">64dip</item>
+	</style>
 
-    <style name="AbsHListView">
-        <item name="android:scrollbars">horizontal</item>
-        <item name="android:fadingEdge">horizontal</item>
-    </style>
+	<style name="AbsHListView">
+		<item name="android:scrollbars">horizontal</item>
+		<item name="android:fadingEdge">horizontal</item>
+	</style>
 
-    <style name="HListView" parent="AbsHListView">
-        <item name="android:listSelector">@android:drawable/list_selector_background</item>
-        <item name="android:cacheColorHint">?android:attr/colorBackgroundCacheHint</item>
-        <item name="android:divider">@android:drawable/divider_horizontal_bright</item>
-        <item name="android:scrollingCache">false</item>
-        <item name="android:overScrollMode">always</item>
-        <item name="android:fastScrollEnabled">true</item>
-	    <item name="android:smoothScrollbar">false</item>
-        <item name="android:choiceMode">multipleChoiceModal</item>
-        <item name="hlv_stackFromRight">false</item>
-        <item name="hlv_measureWithChild">0</item>
-        <item name="hlv_dividerWidth">3dip</item>
-	    <item name="hlv_headerDividersEnabled">true</item>
-	    <item name="hlv_footerDividersEnabled">true</item>
-	    <item name="hlv_transcriptMode">disabled</item>
-    </style>
+	<style name="HListView" parent="AbsHListView">
+		<item name="android:listSelector">@android:drawable/list_selector_background</item>
+		<item name="android:cacheColorHint">?android:attr/colorBackgroundCacheHint</item>
+		<item name="android:divider">@android:drawable/divider_horizontal_bright</item>
+		<item name="android:scrollingCache">false</item>
+		<item name="android:overScrollMode">always</item>
+		<item name="android:fastScrollEnabled">true</item>
+		<item name="android:smoothScrollbar">true</item>
+		<item name="android:choiceMode">multipleChoiceModal</item>
+		<item name="android:drawSelectorOnTop">false</item>
+		<item name="hlv_stackFromRight">false</item>
+		<item name="hlv_measureWithChild">0</item>
+		<item name="hlv_dividerWidth">3dip</item>
+		<item name="hlv_headerDividersEnabled">true</item>
+		<item name="hlv_footerDividersEnabled">true</item>
+		<item name="hlv_transcriptMode">disabled</item>
+	</style>
 
 </resources>

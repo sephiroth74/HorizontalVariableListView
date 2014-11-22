@@ -1,0 +1,21 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <style name="HListView" parent="AbsHListView">
+        <item name="android:listSelector">@drawable/item_background_material</item>
+        <item name="android:cacheColorHint">?android:attr/colorBackgroundCacheHint</item>
+        <item name="android:divider">@android:drawable/divider_horizontal_bright</item>
+        <item name="android:scrollingCache">false</item>
+        <item name="android:overScrollMode">always</item>
+        <item name="android:fastScrollEnabled">true</item>
+	    <item name="android:smoothScrollbar">true</item>
+        <item name="android:choiceMode">multipleChoiceModal</item>
+        <item name="hlv_stackFromRight">false</item>
+        <item name="hlv_measureWithChild">0</item>
+        <item name="hlv_dividerWidth">1sp</item>
+	    <item name="hlv_headerDividersEnabled">true</item>
+	    <item name="hlv_footerDividersEnabled">true</item>
+	    <item name="hlv_transcriptMode">disabled</item>
+    </style>
+
+</resources>
