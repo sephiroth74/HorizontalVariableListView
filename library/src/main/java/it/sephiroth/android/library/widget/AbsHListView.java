@@ -38,7 +38,6 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
@@ -476,7 +475,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     private boolean mIsDetaching;
     protected boolean mAttachedToWindow;
 
-    protected AccessibilityManager mAccessibilityManager;
+    private float mHorizontalScrollFactor;
 
     /**
      * Interface definition for a callback to be invoked when the list or grid has been scrolled.
@@ -623,8 +622,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
         mOverscrollDistance = configuration.getScaledOverscrollDistance();
         mOverflingDistance = configuration.getScaledOverflingDistance();
         mViewHelper = ViewHelperFactory.create(this);
-
-        mAccessibilityManager = (AccessibilityManager) getContext().getSystemService(Context.ACCESSIBILITY_SERVICE);
     }
 
     @Override
@@ -3485,8 +3482,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
         return dispatchNestedFling(velocityX, velocityY, consumed);
     }
 
-    private float mHorizontalScrollFactor;
-
     /**
      * Gets a scale factor that determines the distance the view should scroll vertically in response to
      * {@link MotionEvent#ACTION_SCROLL}.
@@ -3560,6 +3555,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
         }
     }
 
+    @SuppressWarnings("unused")
     public void setOverScrollEffectPadding(int topPadding, int bottomPadding) {
         mGlowPaddingTop = topPadding;
         mGlowPaddingBottom = bottomPadding;
@@ -3984,6 +3980,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      *
      * @return A scalar dimensionless value representing the coefficient of friction.
      */
+    @SuppressWarnings("unused")
     public void setFriction(float friction) {
         if (mFlingRunnable == null) {
             mFlingRunnable = new FlingRunnable();
@@ -3996,6 +3993,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      *
      * @param scale The scale factor to multiply the velocity by.
      */
+    @SuppressWarnings("unused")
     public void setVelocityScale(float scale) {
         mVelocityScale = scale;
     }
@@ -4029,6 +4027,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      * @param offset   Desired distance in pixels of <code>position</code> from the top of the view when scrolling is finished
      * @param duration Number of milliseconds to use for the scroll
      */
+    @SuppressWarnings("unused")
     public void smoothScrollToPositionFromLeft(int position, int offset, int duration) {
         if (mPositionScroller == null) {
             mPositionScroller = createPositionScroller();
@@ -4044,6 +4043,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      * @param position Position to scroll to
      * @param offset   Desired distance in pixels of <code>position</code> from the top of the view when scrolling is finished
      */
+    @SuppressWarnings("unused")
     public void smoothScrollToPositionFromLeft(int position, int offset) {
         if (mPositionScroller == null) {
             mPositionScroller = createPositionScroller();
@@ -4174,6 +4174,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      * @param x the amount of pixels to scroll by vertically
      * @see #canScrollList(int)
      */
+    @SuppressWarnings("unused")
     public void scrollListBy(int x) {
         trackMotionScroll(-x, -x);
     }
@@ -4460,6 +4461,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     /**
      * Causes all the views to be rebuilt and redrawn.
      */
+    @SuppressWarnings("unused")
     public void invalidateViews() {
         mDataChanged = true;
         rememberSyncState();
@@ -5200,6 +5202,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     /**
      * Clear the text filter.
      */
+    @SuppressWarnings("unused")
     public void clearTextFilter() {
         //        if (mFiltered) {
         //            getTextFilterInput().setText("");
@@ -5213,6 +5216,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     /**
      * Returns if the ListView currently has a text filter.
      */
+    @SuppressWarnings("unused")
     public boolean hasTextFilter() {
         return false;
     }
@@ -5330,6 +5334,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      *
      * @return {@link #TRANSCRIPT_MODE_DISABLED}, {@link #TRANSCRIPT_MODE_NORMAL} or {@link #TRANSCRIPT_MODE_ALWAYS_SCROLL}
      */
+    @SuppressWarnings("unused")
     public int getTranscriptMode() {
         return mTranscriptMode;
     }
@@ -5377,6 +5382,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      * @param views A list into which to put the reclaimed views
      */
     @SuppressLint ("NewApi")
+    @SuppressWarnings("unused")
     public void reclaimViews(List<View> views) {
         int childCount = getChildCount();
         RecyclerListener listener = mRecycler.mRecyclerListener;
@@ -5453,6 +5459,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      * This defers a notifyDataSetChanged on the pending RemoteViewsAdapter if it has not
      * connected yet.
      */
+    @SuppressWarnings("unused")
     public void deferNotifyDataSetChanged() {
         mDeferNotifyDataSetChanged = true;
     }
@@ -5560,6 +5567,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
             super(c, attrs);
         }
 
+        @SuppressWarnings("unused")
         public LayoutParams(int w, int h) {
             super(w, h);
         }
@@ -5578,10 +5586,8 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      * A RecyclerListener is used to receive a notification whenever a View is placed inside the RecycleBin's scrap heap. This
      * listener is used to free resources associated to Views placed in the RecycleBin.
      *
-     * @see it.sephiroth.android.library.widget.AbsHListView.RecycleBin
-     * @see it.sephiroth.android.library.widget.AbsHListView#setRecyclerListener(it.sephiroth.android.library.widget.AbsHListView
-     * .RecyclerListener)
-     * .RecyclerListener)
+     * @see AbsHListView.RecycleBin
+     * @see AbsHListView#setRecyclerListener(it.sephiroth.android.library.widget.AbsHListView.RecyclerListener)
      */
     public static interface RecyclerListener {
         /**
