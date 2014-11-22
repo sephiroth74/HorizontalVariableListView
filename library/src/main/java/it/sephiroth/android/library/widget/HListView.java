@@ -2103,7 +2103,7 @@ public class HListView extends AbsHListView {
                         handled = resurrectSelectionIfNeeded();
                         if (!handled) {
                             while (count-- > 0) {
-                                if (arrowScroll(FOCUS_UP)) {
+                                if (arrowScroll(FOCUS_LEFT)) {
                                     handled = true;
                                 } else {
                                     break;
@@ -2111,7 +2111,7 @@ public class HListView extends AbsHListView {
                             }
                         }
                     } else if (event.hasModifiers(KeyEvent.META_ALT_ON)) {
-                        handled = resurrectSelectionIfNeeded() || fullScroll(FOCUS_UP);
+                        handled = resurrectSelectionIfNeeded() || fullScroll(FOCUS_LEFT);
                     }
                     break;
 
@@ -2120,7 +2120,7 @@ public class HListView extends AbsHListView {
                         handled = resurrectSelectionIfNeeded();
                         if (!handled) {
                             while (count-- > 0) {
-                                if (arrowScroll(FOCUS_DOWN)) {
+                                if (arrowScroll(FOCUS_RIGHT)) {
                                     handled = true;
                                 } else {
                                     break;
@@ -2128,19 +2128,19 @@ public class HListView extends AbsHListView {
                             }
                         }
                     } else if (event.hasModifiers(KeyEvent.META_ALT_ON)) {
-                        handled = resurrectSelectionIfNeeded() || fullScroll(FOCUS_DOWN);
+                        handled = resurrectSelectionIfNeeded() || fullScroll(FOCUS_RIGHT);
                     }
                     break;
 
                 case KeyEvent.KEYCODE_DPAD_UP:
                     if (event.hasNoModifiers()) {
-                        handled = handleHorizontalFocusWithinListItem(View.FOCUS_UP);
+                        handled = handleHorizontalFocusWithinListItem(View.FOCUS_LEFT);
                     }
                     break;
 
                 case KeyEvent.KEYCODE_DPAD_DOWN:
                     if (event.hasNoModifiers()) {
-                        handled = handleHorizontalFocusWithinListItem(View.FOCUS_DOWN);
+                        handled = handleHorizontalFocusWithinListItem(View.FOCUS_RIGHT);
                     }
                     break;
 
@@ -2159,38 +2159,38 @@ public class HListView extends AbsHListView {
                 case KeyEvent.KEYCODE_SPACE:
 
                     if (event.hasNoModifiers()) {
-                        handled = resurrectSelectionIfNeeded() || pageScroll(FOCUS_DOWN);
+                        handled = resurrectSelectionIfNeeded() || pageScroll(FOCUS_RIGHT);
                     } else if (event.hasModifiers(KeyEvent.META_SHIFT_ON)) {
-                        handled = resurrectSelectionIfNeeded() || pageScroll(FOCUS_UP);
+                        handled = resurrectSelectionIfNeeded() || pageScroll(FOCUS_RIGHT);
                     }
                     handled = true;
                     break;
 
                 case KeyEvent.KEYCODE_PAGE_UP:
                     if (event.hasNoModifiers()) {
-                        handled = resurrectSelectionIfNeeded() || pageScroll(FOCUS_UP);
+                        handled = resurrectSelectionIfNeeded() || pageScroll(FOCUS_LEFT);
                     } else if (event.hasModifiers(KeyEvent.META_ALT_ON)) {
-                        handled = resurrectSelectionIfNeeded() || fullScroll(FOCUS_UP);
+                        handled = resurrectSelectionIfNeeded() || fullScroll(FOCUS_LEFT);
                     }
                     break;
 
                 case KeyEvent.KEYCODE_PAGE_DOWN:
                     if (event.hasNoModifiers()) {
-                        handled = resurrectSelectionIfNeeded() || pageScroll(FOCUS_DOWN);
+                        handled = resurrectSelectionIfNeeded() || pageScroll(FOCUS_RIGHT);
                     } else if (event.hasModifiers(KeyEvent.META_ALT_ON)) {
-                        handled = resurrectSelectionIfNeeded() || fullScroll(FOCUS_DOWN);
+                        handled = resurrectSelectionIfNeeded() || fullScroll(FOCUS_RIGHT);
                     }
                     break;
 
                 case KeyEvent.KEYCODE_MOVE_HOME:
                     if (event.hasNoModifiers()) {
-                        handled = resurrectSelectionIfNeeded() || fullScroll(FOCUS_UP);
+                        handled = resurrectSelectionIfNeeded() || fullScroll(FOCUS_LEFT);
                     }
                     break;
 
                 case KeyEvent.KEYCODE_MOVE_END:
                     if (event.hasNoModifiers()) {
-                        handled = resurrectSelectionIfNeeded() || fullScroll(FOCUS_DOWN);
+                        handled = resurrectSelectionIfNeeded() || fullScroll(FOCUS_RIGHT);
                     }
                     break;
 
@@ -2221,16 +2221,16 @@ public class HListView extends AbsHListView {
     /**
      * Scrolls left or right by the number of items currently present on screen.
      *
-     * @param direction either {@link View#FOCUS_UP} or {@link View#FOCUS_DOWN}
+     * @param direction either {@link View#FOCUS_LEFT} or {@link View#FOCUS_RIGHT}
      * @return whether selection was moved
      */
     boolean pageScroll(int direction) {
         int nextPage = -1;
         boolean down = false;
 
-        if (direction == FOCUS_UP) {
+        if (direction == FOCUS_LEFT) {
             nextPage = Math.max(0, mSelectedPosition - getChildCount() - 1);
-        } else if (direction == FOCUS_DOWN) {
+        } else if (direction == FOCUS_RIGHT) {
             nextPage = Math.min(mItemCount - 1, mSelectedPosition + getChildCount() - 1);
             down = true;
         }
@@ -2266,12 +2266,12 @@ public class HListView extends AbsHListView {
      * Go to the last or first item if possible (not worrying about panning across or navigating within the internal focus of the
      * currently selected item.)
      *
-     * @param direction either {@link View#FOCUS_UP} or {@link View#FOCUS_DOWN}
+     * @param direction either {@link View#FOCUS_LEFT} or {@link View#FOCUS_RIGHT}
      * @return whether selection was moved
      */
     boolean fullScroll(int direction) {
         boolean moved = false;
-        if (direction == FOCUS_UP) {
+        if (direction == FOCUS_LEFT) {
             if (mSelectedPosition != 0) {
                 int position = lookForSelectablePosition(0, true);
                 if (position >= 0) {
@@ -2281,7 +2281,7 @@ public class HListView extends AbsHListView {
                 }
                 moved = true;
             }
-        } else if (direction == FOCUS_DOWN) {
+        } else if (direction == FOCUS_RIGHT) {
             if (mSelectedPosition < mItemCount - 1) {
                 int position = lookForSelectablePosition(mItemCount - 1, true);
                 if (position >= 0) {
@@ -2310,10 +2310,10 @@ public class HListView extends AbsHListView {
      */
     private boolean handleHorizontalFocusWithinListItem(int direction) {
         // TODO: implement this
-        if (direction != View.FOCUS_UP && direction != View.FOCUS_DOWN) {
+        if (direction != View.FOCUS_LEFT && direction != View.FOCUS_RIGHT) {
             throw new IllegalArgumentException(
                 "direction must be one of"
-                    + " {View.FOCUS_UP, View.FOCUS_DOWN}");
+                    + " {View.FOCUS_LEFT, View.FOCUS_RIGHT}");
         }
 
         final int numChildren = getChildCount();
@@ -2351,7 +2351,7 @@ public class HListView extends AbsHListView {
     /**
      * Scrolls to the next or previous item if possible.
      *
-     * @param direction either {@link View#FOCUS_UP} or {@link View#FOCUS_DOWN}
+     * @param direction either {@link View#FOCUS_LEFT} or {@link View#FOCUS_RIGHT}
      * @return whether selection was moved
      */
     boolean arrowScroll(int direction) {
@@ -2371,7 +2371,7 @@ public class HListView extends AbsHListView {
      * Handle an arrow scroll going up or down. Take into account whether items are selectable, whether there are focusable items
      * etc.
      *
-     * @param direction Either {@link android.view.View#FOCUS_UP} or {@link android.view.View#FOCUS_DOWN}.
+     * @param direction Either {@link android.view.View#FOCUS_LEFT} or {@link android.view.View#FOCUS_RIGHT}.
      * @return Whether any scrolling, selection or focus change occured.
      */
     private boolean arrowScrollImpl(int direction) {
@@ -2412,7 +2412,7 @@ public class HListView extends AbsHListView {
         }
 
         if (amountToScroll > 0) {
-            scrollListItemsBy((direction == View.FOCUS_UP) ? amountToScroll : -amountToScroll);
+            scrollListItemsBy((direction == View.FOCUS_LEFT) ? amountToScroll : -amountToScroll);
             needToRedraw = true;
         }
 
@@ -2457,7 +2457,7 @@ public class HListView extends AbsHListView {
      * @param selectedView        The currently selected view (before changing selection). should be <code>null</code> if there
      *                            was no previous
      *                            selection.
-     * @param direction           Either {@link android.view.View#FOCUS_UP} or {@link android.view.View#FOCUS_DOWN}.
+     * @param direction           Either {@link android.view.View#FOCUS_LEFT} or {@link android.view.View#FOCUS_RIGHT}.
      * @param newSelectedPosition The position of the next selection.
      * @param newFocusAssigned    whether new focus was assigned. This matters because when something has focus,
      *                            we don't want to show selection
@@ -2481,7 +2481,7 @@ public class HListView extends AbsHListView {
         final int selectedIndex = mSelectedPosition - mFirstPosition;
         final int nextSelectedIndex = newSelectedPosition - mFirstPosition;
 
-        if (direction == View.FOCUS_UP) {
+        if (direction == View.FOCUS_LEFT) {
             leftViewIndex = nextSelectedIndex;
             rightViewIndex = selectedIndex;
             leftView = getChildAt(leftViewIndex);
@@ -2586,7 +2586,7 @@ public class HListView extends AbsHListView {
      * Determine how much we need to scroll in order to get the next selected view visible, with a fading edge showing below as
      * applicable. The amount is capped at {@link #getMaxScrollAmount()} .
      *
-     * @param direction            either {@link android.view.View#FOCUS_UP} or {@link android.view.View#FOCUS_DOWN}.
+     * @param direction            either {@link android.view.View#FOCUS_LEFT} or {@link android.view.View#FOCUS_RIGHT}.
      * @param nextSelectedPosition The position of the next selection, or {@link #INVALID_POSITION} if there is no next
      *                             selectable position
      * @return The amount to scroll. Note: this is always positive! Direction needs to be taken into account when actually
@@ -2598,7 +2598,7 @@ public class HListView extends AbsHListView {
 
         final int numChildren = getChildCount();
 
-        if (direction == View.FOCUS_DOWN) {
+        if (direction == View.FOCUS_RIGHT) {
             int indexToMakeVisible = numChildren - 1;
             if (nextSelectedPosition != INVALID_POSITION) {
                 indexToMakeVisible = nextSelectedPosition - mFirstPosition;
@@ -2689,14 +2689,14 @@ public class HListView extends AbsHListView {
     }
 
     /**
-     * @param direction either {@link android.view.View#FOCUS_UP} or {@link android.view.View#FOCUS_DOWN}.
+     * @param direction either {@link android.view.View#FOCUS_LEFT} or {@link android.view.View#FOCUS_RIGHT}.
      * @return The position of the next selectable position of the views that are currently visible, taking into account the fact
      * that there might be no selection. Returns {@link #INVALID_POSITION} if there is no selectable view on screen in the
      * given direction.
      */
     private int lookForSelectablePositionOnScreen(int direction) {
         final int firstPosition = mFirstPosition;
-        if (direction == View.FOCUS_DOWN) {
+        if (direction == View.FOCUS_RIGHT) {
             int startPos = (mSelectedPosition != INVALID_POSITION) ?
                 mSelectedPosition + 1 :
                 firstPosition;
@@ -2743,7 +2743,7 @@ public class HListView extends AbsHListView {
      * via
      * an {@link ArrowScrollFocusResult}, otherwise, return null.
      *
-     * @param direction either {@link android.view.View#FOCUS_UP} or {@link android.view.View#FOCUS_DOWN}.
+     * @param direction either {@link android.view.View#FOCUS_LEFT} or {@link android.view.View#FOCUS_RIGHT}.
      * @return The result if focus has changed, or <code>null</code>.
      */
     private ArrowScrollFocusResult arrowScrollFocused(final int direction) {
@@ -2753,7 +2753,7 @@ public class HListView extends AbsHListView {
             View oldFocus = selectedView.findFocus();
             newFocus = FocusFinder.getInstance().findNextFocus(this, oldFocus, direction);
         } else {
-            if (direction == View.FOCUS_DOWN) {
+            if (direction == View.FOCUS_RIGHT) {
                 final boolean leftFadingEdgeShowing = (mFirstPosition > 0);
                 final int listLeft = mListPadding.left +
                     (leftFadingEdgeShowing ? getArrowScrollPreviewLength() : 0);
@@ -2784,8 +2784,8 @@ public class HListView extends AbsHListView {
             if (mSelectedPosition != INVALID_POSITION && positionOfNewFocus != mSelectedPosition) {
                 final int selectablePosition = lookForSelectablePositionOnScreen(direction);
                 if (selectablePosition != INVALID_POSITION &&
-                    ((direction == View.FOCUS_DOWN && selectablePosition < positionOfNewFocus) ||
-                        (direction == View.FOCUS_UP && selectablePosition > positionOfNewFocus))) {
+                    ((direction == View.FOCUS_RIGHT && selectablePosition < positionOfNewFocus) ||
+                        (direction == View.FOCUS_LEFT && selectablePosition > positionOfNewFocus))) {
                     return null;
                 }
             }
@@ -2843,7 +2843,7 @@ public class HListView extends AbsHListView {
     /**
      * Determine how much we need to scroll in order to get newFocus in view.
      *
-     * @param direction          either {@link android.view.View#FOCUS_UP} or {@link android.view.View#FOCUS_DOWN}.
+     * @param direction          either {@link android.view.View#FOCUS_LEFT} or {@link android.view.View#FOCUS_RIGHT}.
      * @param newFocus           The view that would take focus.
      * @param positionOfNewFocus The position of the list item containing newFocus
      * @return The amount to scroll. Note: this is always positive! Direction needs to be taken into account when actually
@@ -2853,7 +2853,7 @@ public class HListView extends AbsHListView {
         int amountToScroll = 0;
         newFocus.getDrawingRect(mTempRect);
         offsetDescendantRectToMyCoords(newFocus, mTempRect);
-        if (direction == View.FOCUS_UP) {
+        if (direction == View.FOCUS_LEFT) {
             if (mTempRect.left < mListPadding.left) {
                 amountToScroll = mListPadding.left - mTempRect.left;
                 if (positionOfNewFocus > 0) {
