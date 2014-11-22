@@ -17,7 +17,6 @@ import android.os.Parcelable;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.util.LongSparseArray;
 import android.support.v4.util.SparseArrayCompat;
-import android.support.v4.view.AccessibilityDelegateCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.accessibility.AccessibilityEventCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
@@ -39,6 +38,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
@@ -454,7 +454,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     /**
      * Used for interacting with list items from an accessibility service.
      */
-    private ListItemAccessibilityDelegate mAccessibilityDelegate;
     private int mLastAccessibilityScrollEventFromIndex;
     private int mLastAccessibilityScrollEventToIndex;
     /**
@@ -476,6 +475,8 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      */
     private boolean mIsDetaching;
     protected boolean mAttachedToWindow;
+
+    protected AccessibilityManager mAccessibilityManager;
 
     /**
      * Interface definition for a callback to be invoked when the list or grid has been scrolled.
@@ -622,6 +623,8 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
         mOverscrollDistance = configuration.getScaledOverscrollDistance();
         mOverflingDistance = configuration.getScaledOverflingDistance();
         mViewHelper = ViewHelperFactory.create(this);
+
+        mAccessibilityManager = (AccessibilityManager) getContext().getSystemService(Context.ACCESSIBILITY_SERVICE);
     }
 
     @Override
@@ -1907,6 +1910,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
             child.setDrawingCacheBackgroundColor(mCacheColorHint);
         }
 
+
         if (android.os.Build.VERSION.SDK_INT >= 16) {
             if (child.getImportantForAccessibility() == IMPORTANT_FOR_ACCESSIBILITY_AUTO) {
                 child.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
@@ -1935,99 +1939,10 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
         child.setLayoutParams(lp);
     }
 
-    @TargetApi (14)
-    class ListItemAccessibilityDelegate extends AccessibilityDelegateCompat {
-        @Override
-        public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
-            super.onInitializeAccessibilityNodeInfo(host, info);
-
-            final int position = getPositionForView(host);
-            final ListAdapter adapter = getAdapter();
-
-            if ((position == INVALID_POSITION) || (adapter == null)) {
-                return;
-            }
-
-            if (!isEnabled() || !adapter.isEnabled(position)) {
-                return;
-            }
-
-            if (position == getSelectedItemPosition()) {
-                info.setSelected(true);
-                info.addAction(AccessibilityNodeInfoCompat.ACTION_CLEAR_SELECTION);
-            } else {
-                info.addAction(AccessibilityNodeInfoCompat.ACTION_SELECT);
-            }
-
-            if (isClickable()) {
-                info.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
-                info.setClickable(true);
-            }
-
-            if (isLongClickable()) {
-                info.addAction(AccessibilityNodeInfoCompat.ACTION_LONG_CLICK);
-                info.setLongClickable(true);
-            }
-
-        }
-
-        @Override
-        public boolean performAccessibilityAction(View host, int action, Bundle arguments) {
-            if (super.performAccessibilityAction(host, action, arguments)) {
-                return true;
-            }
-
-            final int position = getPositionForView(host);
-            final ListAdapter adapter = getAdapter();
-
-            if ((position == INVALID_POSITION) || (adapter == null)) {
-                // Cannot perform actions on invalid items.
-                return false;
-            }
-
-            if (!isEnabled() || !adapter.isEnabled(position)) {
-                // Cannot perform actions on disabled items.
-                return false;
-            }
-
-            final long id = getItemIdAtPosition(position);
-
-            switch (action) {
-                case AccessibilityNodeInfoCompat.ACTION_CLEAR_SELECTION: {
-                    if (getSelectedItemPosition() == position) {
-                        setSelection(INVALID_POSITION);
-                        return true;
-                    }
-                }
-                return false;
-                case AccessibilityNodeInfoCompat.ACTION_SELECT: {
-                    if (getSelectedItemPosition() != position) {
-                        setSelection(position);
-                        return true;
-                    }
-                }
-                return false;
-                case AccessibilityNodeInfoCompat.ACTION_CLICK: {
-                    if (isClickable()) {
-                        return performItemClick(host, position, id);
-                    }
-                }
-                return false;
-                case AccessibilityNodeInfoCompat.ACTION_LONG_CLICK: {
-                    if (isLongClickable()) {
-                        return performLongPress(host, position, id);
-                    }
-                }
-                return false;
-            }
-
-            return false;
-        }
-    }
-
     /**
      * Positions the selector in a way that mimics touch.
      */
+    @SuppressWarnings("unused")
     void positionSelectorLikeTouch(int position, View sel, float x, float y) {
         positionSelectorLikeFocus(position, sel);
 
@@ -2200,9 +2115,9 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      * @param resID A Drawable resource to use as the selection highlight.
      * @attr ref android.R.styleable#AbsListView_listSelector
      */
-    @TargetApi(21)
+    @TargetApi (21)
     public void setSelector(int resID) {
-        if(ApiHelper.AT_LEAST_21) {
+        if (ApiHelper.AT_LEAST_21) {
             setSelector(getContext().getDrawable(resID));
         } else {
             setSelector(getResources().getDrawable(resID));
@@ -2811,7 +2726,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
         return false;
     }
 
-    @TargetApi(21)
+    @TargetApi (21)
     private void scrollIfNeeded(int x, int y, MotionEvent vtev) {
         int rawDeltaX = x - mMotionX;
 
@@ -3056,7 +2971,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     }
 
     @SuppressLint ("Override")
-    @TargetApi(21)
+    @TargetApi (21)
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         if (!isEnabled()) {
@@ -3077,7 +2992,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
             return false;
         }
 
-        if(ApiHelper.AT_LEAST_21) {
+        if (ApiHelper.AT_LEAST_21) {
             startNestedScroll(SCROLL_AXIS_HORIZONTAL);
         }
         initVelocityTrackerIfNotExists();
@@ -3264,7 +3179,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
         }
     }
 
-    @TargetApi(21)
+    @TargetApi (21)
     private void onTouchUp(MotionEvent ev) {
         switch (mTouchMode) {
             case TOUCH_MODE_DOWN:
@@ -3341,7 +3256,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
                 updateSelectorState();
                 break;
             case TOUCH_MODE_SCROLL:
-                Log.v(TAG, "TOUCH_MODE_SCROLL");
                 final int childCount = getChildCount();
                 if (childCount > 0) {
                     final int firstChildLeft = getChildAt(0).getLeft();
@@ -3522,15 +3436,15 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     }
 
     @Override
-    @TargetApi(21)
+    @TargetApi (21)
     public void onNestedScrollAccepted(View child, View target, int axes) {
-        if(ApiHelper.AT_LEAST_21) {
+        if (ApiHelper.AT_LEAST_21) {
             super.onNestedScrollAccepted(child, target, axes);
             startNestedScroll(SCROLL_AXIS_HORIZONTAL);
         }
     }
 
-    @TargetApi(21)
+    @TargetApi (21)
     @Override
     public void onNestedScroll(
         View target, int dxConsumed, int dyConsumed,
@@ -3547,13 +3461,13 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
             }
 
             // TODO: verify this
-            if(ApiHelper.AT_LEAST_21) {
+            if (ApiHelper.AT_LEAST_21) {
                 dispatchNestedScroll(mxConsumed, 0, mxUnconsumed, 0, null);
             }
         }
     }
 
-    @TargetApi(21)
+    @TargetApi (21)
     @Override
     public boolean onNestedFling(View target, float velocityX, float velocityY, boolean consumed) {
         final int childCount = getChildCount();
@@ -3680,7 +3594,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
         super.requestDisallowInterceptTouchEvent(disallowIntercept);
     }
 
-    @TargetApi(21)
+    @TargetApi (21)
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         final int actionMasked = ev.getActionMasked();
@@ -5665,7 +5579,8 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      * listener is used to free resources associated to Views placed in the RecycleBin.
      *
      * @see it.sephiroth.android.library.widget.AbsHListView.RecycleBin
-     * @see it.sephiroth.android.library.widget.AbsHListView#setRecyclerListener(it.sephiroth.android.library.widget.AbsHListView.RecyclerListener)
+     * @see it.sephiroth.android.library.widget.AbsHListView#setRecyclerListener(it.sephiroth.android.library.widget.AbsHListView
+     * .RecyclerListener)
      * .RecyclerListener)
      */
     public static interface RecyclerListener {
@@ -6112,9 +6027,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
             }
             // Just in case this is called during a layout pass
             final View[] activeViews = mActiveViews;
-            final int count = activeViews.length;
-            for (int i = 0; i < count; ++i) {
-                final View victim = activeViews[i];
+            for (final View victim : activeViews) {
                 if (victim != null) {
                     victim.setDrawingCacheBackgroundColor(color);
                 }
@@ -6156,19 +6069,16 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
             }
         }
 
-        @TargetApi(14)
+        @TargetApi (14)
         private void clearAccessibilityFromScrap(View view) {
-//            if (view.isAccessibilityFocused()) {
-//                view.clearAccessibilityFocus();
-//            }
-            if(ApiHelper.AT_LEAST_14) {
+            if (ApiHelper.AT_LEAST_14) {
                 view.setAccessibilityDelegate(null);
             }
         }
 
-        @TargetApi(14)
+        @TargetApi (14)
         private void removeDetachedView(View child, boolean animate) {
-            if(ApiHelper.AT_LEAST_14) {
+            if (ApiHelper.AT_LEAST_14) {
                 child.setAccessibilityDelegate(null);
             }
             AbsHListView.this.removeDetachedView(child, animate);
@@ -6200,7 +6110,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
     }
 
     /**
-     * Sets the selected item and positions the selection y pixels from the top edge
+     * Sets the selected item and positions the selection x pixels from the top edge
      * of the ListView. (If in touch mode, the item will not be selected but it will
      * still be positioned appropriately.)
      *
@@ -6208,6 +6118,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
      * @param x        The distance from the left edge of the HListView (plus padding) that the
      *                 item will be positioned.
      */
+    @SuppressWarnings ("unused")
     public void setSelectionFromLeft(int position, int x) {
         if (mAdapter == null) {
             return;
@@ -6246,6 +6157,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
         public abstract void start(int position, int boundPosition);
 
+        @SuppressWarnings ("unused")
         public abstract void startWithOffset(int position, int offset);
 
         public abstract void startWithOffset(int position, int offset, int duration);
