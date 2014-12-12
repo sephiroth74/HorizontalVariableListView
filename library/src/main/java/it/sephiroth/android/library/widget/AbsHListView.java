@@ -3231,7 +3231,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
                                         mTouchMode = TOUCH_MODE_REST;
                                         child.setPressed(false);
                                         setPressed(false);
-                                        if (!mDataChanged && !mIsDetaching && mAttachedToWindow {
+                                        if (!mDataChanged && !mIsDetaching && mAttachedToWindow) {
                                             performClick.run();
                                         }
                                     }
