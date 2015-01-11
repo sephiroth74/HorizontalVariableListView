@@ -790,8 +790,22 @@ public class OverScroller {
             }
 
             mSplineDistance = (int) (totalDistance * Math.signum(velocity));
+			int totalDistanceToScroll = mSplineDistance
+					+ AbsHListView.TOUCH_SCROLL_X;
+			int position = totalDistanceToScroll / AbsHListView.CHILD_WIDTH;
+			if (position == 0) {
+				mDuration = mSplineDuration = mSplineDuration + 100;
+				if (AbsHListView.TOUCH_SCROLL_X < 0)
+					position = -1;
+				else
+					position = 1;
+			}
+			// Touch Scroll + Fling Scroll
+			int totalDistanceToCover = position * AbsHListView.CHILD_WIDTH;
+			mSplineDistance = totalDistanceToCover - AbsHListView.TOUCH_SCROLL_X ;
+            
             mFinal = start + mSplineDistance;
-
+            
             // Clamp to a valid final position
             if (mFinal < min) {
                 adjustDuration(mStart, mFinal, min);

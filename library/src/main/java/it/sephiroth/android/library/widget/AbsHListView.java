@@ -60,6 +60,11 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 		ViewTreeObserver.OnTouchModeChangeListener {
 
 	private static final String TAG = "AbsListView";
+	public static int CHILD_WIDTH;
+	public static int SIDE_CHILD_WIDTH;
+	public static int TOUCH_SCROLL_X;
+	public static int CURRENT_POSITION;
+	public static boolean IS_IDLE_ENABLED = false;
 
 	/**
 	 * Disables the transcript mode.
@@ -3664,7 +3669,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			}
 		}
 	}
-
+	
 	/**
 	 * Responsible for fling behavior. Use {@link #start(int)} to initiate a fling. Each frame of the fling is handled in
 	 * {@link #run()}. A FlingRunnable will keep re-posting itself until the fling is done.
