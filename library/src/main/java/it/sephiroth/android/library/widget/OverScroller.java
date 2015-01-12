@@ -790,8 +790,8 @@ public class OverScroller {
             }
 
             mSplineDistance = (int) (totalDistance * Math.signum(velocity));
-			int totalDistanceToScroll = mSplineDistance
-					+ AbsHListView.TOUCH_SCROLL_X;
+			int totalDistanceToScroll = (int)(mSplineDistance * 1.5
+					+ AbsHListView.TOUCH_SCROLL_X);
 			int position = totalDistanceToScroll / AbsHListView.CHILD_WIDTH;
 			if (position == 0) {
 				mDuration = mSplineDuration = mSplineDuration + 100;
