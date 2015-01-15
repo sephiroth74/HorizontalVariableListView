@@ -1,5 +1,14 @@
 package it.sephiroth.android.library.widget;
 
+import it.sephiroth.android.library.R;
+import it.sephiroth.android.library.util.ViewHelperFactory;
+import it.sephiroth.android.library.util.ViewHelperFactory.ViewHelper;
+import it.sephiroth.android.library.util.v11.MultiChoiceModeListener;
+import it.sephiroth.android.library.util.v11.MultiChoiceModeWrapper;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -46,25 +55,12 @@ import android.widget.Checkable;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import it.sephiroth.android.library.R;
-import it.sephiroth.android.library.util.ViewHelperFactory;
-import it.sephiroth.android.library.util.ViewHelperFactory.ViewHelper;
-import it.sephiroth.android.library.util.v11.MultiChoiceModeListener;
-import it.sephiroth.android.library.util.v11.MultiChoiceModeWrapper;
-
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public abstract class AbsHListView extends AdapterView<ListAdapter> implements ViewTreeObserver.OnGlobalLayoutListener,
 		ViewTreeObserver.OnTouchModeChangeListener {
 
 	private static final String TAG = "AbsListView";
 	public static int CHILD_WIDTH;
-	public static int SIDE_CHILD_WIDTH;
-	public static int TOUCH_SCROLL_X;
-	public static int CURRENT_POSITION;
-	public static boolean IS_IDLE_ENABLED = false;
 
 	/**
 	 * Disables the transcript mode.
@@ -3722,12 +3718,31 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 			int initialX = initialVelocity < 0 ? Integer.MAX_VALUE : 0;
 			mLastFlingX = initialX;
 			mScroller.setInterpolator( null );
-			mScroller.fling( initialX, 0, initialVelocity, 0, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE );
+			
+			mScroller.fling( initialX, 0, initialVelocity, 0, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE,getScrollX() );
 			mTouchMode = TOUCH_MODE_FLING;
-			mViewHelper.postOnAnimation( this );
+			mViewHelper.postOnAnimation(this);
 		}
 
-		void startSpringback() {
+		int getScrollX() {
+			View firstChild = getChildAt(0);
+			int scrollX = 0;
+			if (getFirstVisiblePosition() == 0) {
+				scrollX = (-firstChild.getLeft());
+				CHILD_WIDTH = (int) (firstChild.getMeasuredWidth() - (32 * getResources()
+						.getDisplayMetrics().density));
+			} else if (getFirstVisiblePosition() > 0) {
+				scrollX = (int) (-firstChild.getLeft()
+						+ (firstChild.getMeasuredWidth() + (32 * getResources()
+								.getDisplayMetrics().density)) + (getFirstVisiblePosition() - 1)
+						* (firstChild.getMeasuredWidth()));
+
+				CHILD_WIDTH = firstChild.getMeasuredWidth();
+			}
+			return scrollX;
+		}
+
+	void startSpringback() {
 			if ( mScroller.springBack( getScrollX(), 0, 0, 0, 0, 0 ) ) {
 				mTouchMode = TOUCH_MODE_OVERFLING;
 				invalidate();
@@ -3740,7 +3755,7 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 
 		void startOverfling( int initialVelocity ) {
 			mScroller.setInterpolator( null );
-			mScroller.fling( getScrollX(), 0, initialVelocity, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, 0, getWidth(), 0 );
+			mScroller.fling( getScrollX(), 0, initialVelocity, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, 0, getWidth(), 0,getScrollX() );
 			mTouchMode = TOUCH_MODE_OVERFLING;
 			invalidate();
 			mViewHelper.postOnAnimation( this );
