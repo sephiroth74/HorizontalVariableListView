@@ -1,3 +1,7 @@
+Deprecated
+==========================
+This widget is now *deprecated* and it won't be updated anymore. Use [RecyclerView][5] instead
+
 Horizontal Variable ListView
 ==========================
 
@@ -77,3 +81,5 @@ http://www.apache.org/licenses/LICENSE-2.0
 [3]: http://developer.android.com/reference/android/widget/ListView.html
 
 [4]: http://developer.android.com/reference/android/widget/ExpandableListView.html
+
+[5]: https://developer.android.com/reference/android/support/v7/widget/RecyclerView.html
