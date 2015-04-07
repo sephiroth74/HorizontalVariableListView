@@ -5151,9 +5151,6 @@ public abstract class AbsHListView extends AdapterView<ListAdapter> implements V
 	 * @return the distance between the rectangles
 	 */
 	public static int getDistance( Rect source, Rect dest, int direction ) {
-
-		// TODO: implement this
-
 		int sX, sY; // source x, y
 		int dX, dY; // dest x, y
 		switch ( direction ) {
