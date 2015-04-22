@@ -424,8 +424,8 @@ public class OverScroller {
     }
 
     public void fling(int startX, int startY, int velocityX, int velocityY,
-            int minX, int maxX, int minY, int maxY) {
-        fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY, 0, 0);
+            int minX, int maxX, int minY, int maxY,int scrollX) {
+        fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY, 0, 0,scrollX);
     }
 
     /**
@@ -456,7 +456,7 @@ public class OverScroller {
      *            direction will be possible.
      */
     public void fling(int startX, int startY, int velocityX, int velocityY,
-            int minX, int maxX, int minY, int maxY, int overX, int overY) {
+            int minX, int maxX, int minY, int maxY, int overX, int overY,int scrollX) {
         // Continue a scroll or fling in progress
         if (mFlywheel && !isFinished()) {
             float oldVelocityX = mScrollerX.mCurrVelocity;
@@ -469,8 +469,8 @@ public class OverScroller {
         }
 
         mMode = FLING_MODE;
-        mScrollerX.fling(startX, velocityX, minX, maxX, overX);
-        mScrollerY.fling(startY, velocityY, minY, maxY, overY);
+        mScrollerX.fling(startX, velocityX, minX, maxX, overX,scrollX);
+        mScrollerY.fling(startY, velocityY, minY, maxY, overY,scrollX);
     }
 
     /**
@@ -768,7 +768,7 @@ public class OverScroller {
             mDuration = (int) (1000.0 * Math.sqrt(-2.0 * delta / mDeceleration));
         }
 
-        void fling(int start, int velocity, int min, int max, int over) {
+        void fling(int start, int velocity, int min, int max, int over,int scrollX) {
             mOver = over;
             mFinished = false;
             mCurrVelocity = mVelocity = velocity;
@@ -789,9 +789,21 @@ public class OverScroller {
                 totalDistance = getSplineFlingDistance(velocity);
             }
 
-            mSplineDistance = (int) (totalDistance * Math.signum(velocity));
-            mFinal = start + mSplineDistance;
+			mSplineDistance = (int) (totalDistance * 1.5 * Math
+					.signum(velocity));
+			int totalDistanceToScroll = mSplineDistance + scrollX;
+			int initPosition = scrollX / AbsHListView.CHILD_WIDTH;
+			int position = totalDistanceToScroll / AbsHListView.CHILD_WIDTH;
+			if (position == initPosition) {
+				mDuration = mSplineDuration = mSplineDuration + 100;
+				if (mSplineDistance > 0)
+					position = position + 1;
+				
+			}
+			mSplineDistance = position * AbsHListView.CHILD_WIDTH - scrollX;
 
+            mFinal = start + mSplineDistance;
+            
             // Clamp to a valid final position
             if (mFinal < min) {
                 adjustDuration(mStart, mFinal, min);
@@ -855,7 +867,7 @@ public class OverScroller {
             } else {
                 final double totalDistance = getSplineFlingDistance(velocity);
                 if (totalDistance > Math.abs(overDistance)) {
-                    fling(start, velocity, positive ? min : start, positive ? start : max, mOver);
+                    fling(start, velocity, positive ? min : start, positive ? start : max, mOver,0);
                 } else {
                     startSpringback(start, edge, velocity);
                 }
