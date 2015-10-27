@@ -18,7 +18,7 @@ package it.sephiroth.android.library.widget;
 
 import android.content.Context;
 import android.hardware.SensorManager;
-import android.util.FloatMath;
+import java.lang.Math;
 import android.util.Log;
 import android.view.ViewConfiguration;
 import android.view.animation.AnimationUtils;
@@ -200,7 +200,7 @@ public class OverScroller {
     public float getCurrVelocity() {
         float squaredNorm = mScrollerX.mCurrVelocity * mScrollerX.mCurrVelocity;
         squaredNorm += mScrollerY.mCurrVelocity * mScrollerY.mCurrVelocity;
-        return FloatMath.sqrt(squaredNorm);
+        return (float) Math.sqrt(squaredNorm);
     }
 
     /**
